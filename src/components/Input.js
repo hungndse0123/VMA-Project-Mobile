@@ -1,72 +1,48 @@
-import React from 'react';
-import {StyleSheet, TextInput, View, Dimensions} from 'react-native';
+import React, { Component } from 'react'
+import { StyleSheet, View, TextInput, Dimensions } from 'react-native'
 import Text from './Text';
 import * as theme from '../constants/theme';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
-const Input = ({
-  label,
-  rightLabel,
-  style,
-  email,
-  phone,
-  number,
-  full,
-  password,
-  marginBottom,
-  ...props
-}) => {
-  const inputStyles = [
-    styles.input,
-    marginBottom && {marginBottom: marginBottom},
-    full && styles.full,
-    style,
-  ];
+export default class Input extends Component {
+  render() {
+    const { label, rightLabel, full, email, phone, number, password, style, ...props } = this.props;
+    const inputStyles = [
+      styles.input,
+      full && styles.full,
+      style,
+    ];
 
-  const inputType = email
-    ? 'email-address'
-    : number
-    ? 'numeric'
-    : phone
-    ? 'phone-pad'
-    : 'default';
+    const inputType = email
+      ? 'email-address' : number
+      ? 'numeric' : phone
+      ? 'phone-pad' : 'default';
 
-  return (
-    <View>
-      <View style={styles.labelContainer}>
-        <Text
-          // height={14}
-          // weight={'bold'}
-
-          // size={12}
-          // spacing={1.12}
-          // color="#B0BAC9"
-          style={styles.label}
-          caption
-          medium>
-          {label}
-        </Text>
-        {rightLabel}
+    return (
+      <View>
+        <View style={styles.labelContainer}>
+          <Text caption medium style={styles.label}>
+            {label}
+          </Text>
+          {rightLabel}
+        </View>
+        <TextInput
+          style={inputStyles}
+          secureTextEntry={password}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType={inputType}
+          {...props}
+        />
       </View>
-      <TextInput
-        style={inputStyles}
-        secureTextEntry={password}
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType={inputType}
-        {...props}
-      />
-    </View>
-  );
-};
-
-export default Input;
+    )
+  }
+}
 
 const styles = StyleSheet.create({
   input: {
     backgroundColor: theme.colors.input,
-    // opacity: 0.2,
     borderWidth: 0.5,
     borderColor: theme.colors.border,
     borderRadius: 5,
@@ -79,13 +55,12 @@ const styles = StyleSheet.create({
   label: {
     textTransform: 'uppercase',
   },
-
-  full: {
-    width: width - 50,
-  },
   labelContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
   },
+  full: {
+    width: width - 50,
+  }
 });

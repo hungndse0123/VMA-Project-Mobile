@@ -1,2 +1,1 @@
-# VMA-Project-Mobile
- VMA-Mobile
+# velocity-app-react-native

@@ -1,34 +1,40 @@
-import React from 'react';
-import {StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
+import React, { Component } from 'react'
+import { StyleSheet, Dimensions, TouchableOpacity } from 'react-native'
 import * as theme from '../constants/theme';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const Button = ({children, opacity, full, style, ...props}) => {
-  const buttonStyles = [styles.button, full && styles.full, style];
-  return (
-    <TouchableOpacity
-      style={buttonStyles}
-      activeOpacity={opacity || 0.8}
-      {...props}>
-      {children}
-    </TouchableOpacity>
-  );
-};
+export default class Button extends Component {
+  render() {
+    const { style, full, opacity, children, ...props } = this.props;
+    const buttonStyles = [
+      styles.button,
+      full && styles.full,
+      style,
+    ];
 
-export default Button;
+    return (
+      <TouchableOpacity
+        style={buttonStyles}
+        activeOpacity={opacity || 0.8}
+        {...props}
+      >
+        {children}
+      </TouchableOpacity>
+    )
+  }
+}
 
 const styles = StyleSheet.create({
   button: {
     backgroundColor: theme.colors.blue,
-    borderRadius: 5,
+    borderRadius: 4,
     height: 55,
-    // paddingVertical: 10,
+    paddingVertical: 11,
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   full: {
     width: width - 50,
-  },
+  }
 });
