@@ -8,52 +8,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:25758894581:android:eed7e8c909c1dd591fb8bc",
-        "android_client_info": {
-          "package_name": "com.example.firebasetest"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "25758894581-ukbt7hf5est5d01qd5dlkvq09g4k50bf.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.firebasetest",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
-          }
-        },
-        {
-          "client_id": "25758894581-v7npl5mrc0mgmd38e750dtm475pfe5jj.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.firebasetest",
-            "certificate_hash": "030cbe73ee02b056d5b0c75160a818190dea6f97"
-          }
-        },
-        {
-          "client_id": "25758894581-n3bp69p6s7fr7m33oas8juvs4bnv2bbk.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyD-Zpk-VTrjdFFljLikPiCak3OJrh0JnLo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "25758894581-n3bp69p6s7fr7m33oas8juvs4bnv2bbk.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:25758894581:android:0ea9dd89697e8cfd1fb8bc",
+        "mobilesdk_app_id": "1:25758894581:android:2e745b9049ab29d11fb8bc",
         "android_client_info": {
           "package_name": "com.velocityapp"
         }

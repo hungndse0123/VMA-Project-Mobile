@@ -1,33 +1,47 @@
-import axios from 'axios';
+import axios from 'axios'
 
-const ax = axios.create({
-    baseURL: '/api/v1',
-    headers:{
-        origin: 'VmaApplication',
-        "Content-Type": "text/plain",
-        withCredentials: true,
-    }
+const instance = axios.create({
+    baseURL: 'http://192.168.1.3:9000/api/v1/drivers/941287851231',
+    headers: {
+        'content-type':'application/octet-stream',
+        'x-rapidapi-host':'example.com',
+        'x-rapidapi-key': process.env.RAPIDAPI_KEY
+    },
 });
 
+export default {
+    getData: () =>
+    instance({
+        'method':'GET',
+        'url':'/query',
+        'params': {
+            'search':'parameter',
+        },
+        transformResponse: [function (data) {
+            // Do whatever you want to transform the data
+            console.log('Transforming data...')
 
-/**
- * @return {number}
- */
- 
-export async function GetData(url) {
-    try {
-        const response = await ax.get(url);
-        return response;
-    }catch (e) {
-        console.log(e);
-    }
-}
+            const json = JSON.parse(data)
 
-export async function PostData(url,body) {
-    try {
-        const response = await ax.post(url,body);
-        return response;
-    }catch (e) {
-        console.log(e)
-    }
+            // list of nested object keys
+            const dates = Object.keys(json['nested object'])
+
+            data = {
+                dates
+            }
+
+            return data;
+        }],
+    }),
+    postData: () =>
+    instance({
+        'method': 'POST',
+        'url':'/api',
+        'data': {
+            'item1':'data1',
+            'item2':'item2'
+        },
+        'headers': { 'content-type':'application/json' // override instance defaults
+        },
+    })
 }

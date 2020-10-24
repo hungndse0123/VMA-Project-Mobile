@@ -207,7 +207,7 @@
 // export default Overview;
 import React, { useState, useEffect } from "react";
 
-import { TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet } from "react-native";
+import { TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
 import Block from '../components/Block';
 import Text from '../components/Text';
@@ -244,8 +244,7 @@ const ProfileScreen = ({ navigation }) => {
   const signOut = () => {
     signOutUser()
       .then(() => {
-        alert("User Signed out");
-        navigation.navigate("Login");
+        BackHandler.exitApp();
       })
       .catch((error) => {
         alert(error);

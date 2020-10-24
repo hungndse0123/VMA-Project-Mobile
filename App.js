@@ -18,6 +18,8 @@ import Login from './src/screens/Login';
 import Register from './src/screens/Register';
 import Forgot from './src/screens/Forgot';
 import Overview from './src/screens/Overview';
+import Profile from './src/screens/Profile';
+import Service from './src/screens/Service';
 
 
 
@@ -52,13 +54,15 @@ const App = () => {
       <NavigationContainer>
         <Stack.Navigator
           headerMode="none"
-          initialRouteName={user ? "Overview" : "Login"}
+          initialRouteName={user ? "Service" : "Login"}
         >
+          <Stack.Screen name="Profile" component={Profile} />
           <Stack.Screen name="PhoneOTP" component={PhoneOTP} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="Overview" component={Overview} />
           <Stack.Screen name="Forgot" component={Forgot} />
+          <Stack.Screen name="Service" component={Service} />
         </Stack.Navigator>
       </NavigationContainer>
     );
