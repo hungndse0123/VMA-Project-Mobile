@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     fontSize: theme.sizes.font,
     color: theme.colors.black,
-    height: 45,
+    height: 35,
     paddingVertical: 11,
     paddingHorizontal: 16,
   },

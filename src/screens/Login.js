@@ -125,6 +125,7 @@ import Loader from '../components/Loader';
 const {height} = Dimensions.get('window');
 
 const Login = ({ navigation }) => {
+  
     const [phoneNumber, setPhoneNumber] = useState("");
     const [clearInput, setClearInput] = useState(false);
 
@@ -173,6 +174,7 @@ const Login = ({ navigation }) => {
             console.log("Erorrrrrr    -------------- ", error);
         }
     };
+    
 
     return (
         // <Container>
@@ -201,6 +203,7 @@ const Login = ({ navigation }) => {
         //     </Content>
         //     <Loader isAnimate={isLoading} />
         // </Container>
+        
         <KeyboardAwareScrollView
                 enabled
                 behavior="padding"

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import UserRepository from '../repositories/UserRepository';
 
-import { Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, TouchableOpacity } from "react-native";
+import { Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, TouchableOpacity, AsyncStorage } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
 import Block from '../components/Block';
 import Text from '../components/Text';
@@ -10,6 +11,7 @@ import Card from '../components/Card';
 import Icon from '../components/Icon';
 import * as theme from '../constants/theme';
 import Header from "../components/Header";
+
 
 
 const ProfileScreen = ({ navigation }) => {
@@ -70,33 +72,6 @@ const ProfileScreen = ({ navigation }) => {
         }
     });
     const [user, setUser] = useState(null);
-
-    const signOut = () => {
-        signOutUser()
-            .then(() => {
-                updateStatus(user.uid);
-                BackHandler.exitApp();
-            })
-            .catch((error) => {
-                alert(error);
-            });
-    };
-    const updateStatus = (userid) => {
-        axios({
-            method: 'PATCH',
-            url: "http://192.168.43.125:9000/api/v1/users/" + userid + "?userStatusId=2",
-            //   url: "http://192.168.1.3:9000/api/v1/users/941287851231?userStatusId=2",
-            params: {
-
-            }
-        }).then((response) => {
-        })
-            .catch((error) => {
-                console.log(error)
-            });
-
-    }
-
     useEffect(() => {
         getCurrentUser()
             .then((user) => {
@@ -137,7 +112,7 @@ const ProfileScreen = ({ navigation }) => {
                 <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 30, }} title="Service">
                     <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
-                            onPress={() => navigation.navigate("Profile")}
+                            onPress={() => navigation.navigate("Assigned Driver")}
                             style={styles.activeBorder}
                         >
                             <Block
@@ -151,8 +126,8 @@ const ProfileScreen = ({ navigation }) => {
                                         {profileIcon}
                                     </Block>
                                     <Block style={{ marginLeft: 17, marginTop: 10 }}>
-                                        <Text h4 style={{ marginBottom: 5, marginLeft: 10 }} >View Profile</Text>
-                                        <Text style={{ marginLeft: 10 }} color="black3">View personal info</Text>
+                                        <Text h4 style={{ marginBottom: 5, marginLeft: 10 }} >Drivers</Text>
+                                        <Text style={{ marginLeft: 10 }} color="black3">View Drivers</Text>
                                     </Block>
                                 </Block>
                             </Block>
@@ -160,7 +135,7 @@ const ProfileScreen = ({ navigation }) => {
                     </Block>
                     <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
-                            onPress={() => navigation.navigate("Requests")}
+                            onPress={() => navigation.navigate("Contributor Vehicle")}
                             style={styles.activeBorder}
                         >
                             <Block
@@ -174,14 +149,14 @@ const ProfileScreen = ({ navigation }) => {
                                         {requestIcon}
                                     </Block>
                                     <Block style={{ marginLeft: 17, marginTop: 10 }}>
-                                        <Text h4 style={{ marginBottom: 5, marginLeft: 10 }} >View Request</Text>
-                                        <Text style={{ marginLeft: 10 }} color="black3">View list request</Text>
+                                        <Text h4 style={{ marginBottom: 5, marginLeft: 10 }} >Contributed Vehices</Text>
+                                        <Text style={{ marginLeft: 10 }} color="black3">View Contributed Vehices</Text>
                                     </Block>
                                 </Block>
                             </Block>
                         </TouchableWithoutFeedback>
                     </Block>
-                    <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
+                    {/* <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
                             onPress={() => navigation.navigate("Profile")}
                             style={styles.activeBorder}
@@ -203,7 +178,7 @@ const ProfileScreen = ({ navigation }) => {
                                 </Block>
                             </Block>
                         </TouchableWithoutFeedback>
-                    </Block>
+                    </Block> */}
                 </Card>
             </ScrollView>
 

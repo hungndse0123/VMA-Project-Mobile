@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import ContributorRepository from '../repositories/ContributorRepository';
+import UserRepository from '../repositories/UserRepository';
 
 import { TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, AsyncStorage } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
@@ -106,18 +108,7 @@ const ProfileScreen = ({ navigation, route }) => {
             });
     };
     const updateStatus = (userid) => {
-        axios({
-            method: 'PATCH',
-            url: "http://192.168.43.125:9000/api/v1/users/" + userid + "?userStatusId=2",
-            //   url: "http://192.168.1.3:9000/api/v1/users/941287851231?userStatusId=2",
-            params: {
-
-            }
-        }).then((response) => {
-        })
-            .catch((error) => {
-                console.log(error)
-            });
+        UserRepository.updateUserStatusByUserId(userid, 'INACTIVE')
 
     }
 
@@ -142,24 +133,23 @@ const ProfileScreen = ({ navigation, route }) => {
     );
     //   const [user, setUser] = useState(null);
 
-    const [driverdetailname, setDriverdetailname] = useState('');
-    const [driverdetailphone, setDriverdetailphone] = useState('');
-    const [driverdetailbirthdate, setDriverdetailbirthdate] = useState('');
-    const [driverdetailaddress, setDriverdetailaddress] = useState('');
-    const [driverdetailimage, setDriverdetailimage] = useState('');
-    let Image_Http_URL = { uri: driverdetailimage };
+    // const [driverdetailname, setDriverdetailname] = useState('');
+    //const [driverdetailphone, setDriverdetailphone] = useState('');
+    // const [driverdetailbirthdate, setDriverdetailbirthdate] = useState('');
+    // const [driverdetailaddress, setDriverdetailaddress] = useState('');
+    // const [driverdetailimage, setDriverdetailimage] = useState('');
+    const [contributor, setContributor] = useState(null);
+    //let Image_Http_URL = { uri: contributor.imageLink };
     const init = userid => {
-        axios({
-            "method": "GET",
-            "url": "http://192.168.43.125:9000/api/v1/drivers/" + userid,
-            //"url": "http://192.168.1.3:9000/api/v1/drivers/941287851231",
-        })
+        ContributorRepository.getDetailContributor(userid)
             .then((response) => {
-                setDriverdetailname(response.data.driverDetail.fullName);
-                setDriverdetailphone(response.data.driverDetail.phoneNumber);
-                setDriverdetailbirthdate(response.data.driverDetail.dateOfBirth);
-                setDriverdetailaddress(response.data.driverDetail.address);
-                setDriverdetailimage(response.data.driverDetail.imageLink);
+                const result = Object.entries(response);
+
+                setContributor({
+                    ...contributor,
+                    result
+                })
+                console.log(contributor);
             })
             .catch((error) => {
                 console.log(error)
@@ -173,12 +163,12 @@ const ProfileScreen = ({ navigation, route }) => {
 
                 <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Personal profile">
                     <Block column center style={{ marginTop: 10 }}>
-                        <Image source={Image_Http_URL} style={{ height: 100, width: 100, marginBottom: 25 }} center />
+                        {/* <Image source={Image_Http_URL} style={{ height: 100, width: 100, marginBottom: 25 }} center /> */}
                         <Input
                             full
                             email
                             label="Phone number"
-                            value={driverdetailphone}
+                            // value={}
                             style={{ marginBottom: 25 }}
                             editable={false}
                         />
@@ -186,7 +176,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             full
                             email
                             label="Full name"
-                            value={driverdetailname}
+                            // value={contributor.fullName}
                             style={{ marginBottom: 25 }}
                             editable={false}
                         />
@@ -194,7 +184,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             full
                             email
                             label="Birthdate"
-                            value={driverdetailbirthdate}
+                            // value={contributor.dateOfBirth}
                             style={{ marginBottom: 25 }}
                             editable={false}
                         />
@@ -202,7 +192,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             full
                             email
                             label="Address"
-                            value={driverdetailaddress}
+                            // value={contributor.address}
                             style={{ marginBottom: 25 }}
                             editable={false}
                         />
