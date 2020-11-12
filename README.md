@@ -1,1 +1,1 @@
-# velocity-app-react-native
+# vma-app-react-native
