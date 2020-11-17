@@ -76,12 +76,16 @@ const ProfileScreen = ({ navigation }) => {
         getCurrentUser()
             .then((user) => {
                 setUser(user);
+                updateStatus(user.uid)
             })
             .catch((error) => {
                 setUser(null);
                 console.log(error);
             });
     }, []);
+    const updateStatus = (userid) => {
+        UserRepository.updateUserStatusByUserId(userid, 'ACTIVE')
+    }
 
     const profileIcon = (
         <Image
@@ -151,6 +155,29 @@ const ProfileScreen = ({ navigation }) => {
                                     <Block style={{ marginLeft: 17, marginTop: 10 }}>
                                         <Text h4 style={{ marginBottom: 5, marginLeft: 10 }} >Contributed Vehices</Text>
                                         <Text style={{ marginLeft: 10 }} color="black3">View Contributed Vehices</Text>
+                                    </Block>
+                                </Block>
+                            </Block>
+                        </TouchableWithoutFeedback>
+                    </Block>
+                    <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
+                        <TouchableWithoutFeedback
+                            onPress={() => navigation.navigate("Request Menu")}
+                            style={styles.activeBorder}
+                        >
+                            <Block
+                                style={[
+                                    styles.card,
+                                    styles.active
+                                ]}
+                            >
+                                <Block row>
+                                    <Block style={styles.icon}>
+                                        {maintenanceIcon}
+                                    </Block>
+                                    <Block style={{ marginLeft: 17, marginTop: 10 }}>
+                                        <Text h4 style={{ marginBottom: 5, marginLeft: 10 }} >Request</Text>
+                                        <Text style={{ marginLeft: 10 }} color="black3">View and create Request</Text>
                                     </Block>
                                 </Block>
                             </Block>

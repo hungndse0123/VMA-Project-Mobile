@@ -7,7 +7,8 @@ import {
   Text,
   StatusBar,
   ActivityIndicator,
-  AsyncStorage
+  AsyncStorage,
+  LogBox
 } from "react-native";
 import { checkAuthState } from "./src/services/FireAuthHelper";
 import { NavigationContainer } from "@react-navigation/native";
@@ -55,11 +56,22 @@ const App = () => {
   //   }
   // }
   // LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
+  LogBox.ignoreAllLogs();
   checkAuthState()
     .then((user) => {
       console.log("checkOnAuthStateChanged =>", user);
       setUser(user);
-      setRole("CONTRIBUTOR");
+      UserRepository.getUserrole()
+        .then((response) => {
+          setRole(response.data["roleList"][0]["roleName"]);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+          setUser(null);
+          setIsLoading(false);
+        })
+      setIsLoading(false);
       //clearAllData();
       //setRole(_retrieveData());
       // AsyncStorage.getItem("@ROLE").then((response) => {
@@ -67,14 +79,23 @@ const App = () => {
       // });
       // getData();
       //console.log(test);
-      //setRole(test);
-      setIsLoading(false);
+      //setRole(test);      
     })
     .catch((error) => {
       console.log(error);
       setUser(null);
       setIsLoading(false);
     });
+  // user ? UserRepository.getUserrole()
+  //   .then((response) => {
+  //     setRole(response.data["roleList"][1]["roleName"]);
+  //     setIsLoading(false);
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //     setUser(null);
+  //     setIsLoading(false);
+  //   }) : null
   // UserRepository.getUserrole().then((response) => {
   //   //console.log(response);
   //   const result = Object.values(response.data.roleList);
@@ -114,39 +135,9 @@ const App = () => {
 
   const Navigate = () => {
     return (
-
       <NavigationContainer>
-        {/* <Drawer.Navigator
-          initialRouteName={user ? "Service" : "Login"}
-          drawerContent={(props) => <CustomDrawerContent {...props} />}
-          screenOptions={{ headerTitleAlign: "center" }}
-        >
-          <Drawer.Screen name="PhoneOTP" options={{ headerShown: false, }} component={PhoneOTP} />
-          <Drawer.Screen name="Login" options={{ headerShown: false }} component={Login} />
-          <Drawer.Screen name="Role" options={{ headerShown: false }} component={Role} />
-          {
-            role === "CONTRIBUTOR" ? (
-              <>
-                <Drawer.Screen name="Service" options={{ headerShown: false, drawerIcon: () => <Icon name="home" size={30} /> }} component={ContributorService} />
-                <Drawer.Screen name="Profile" options={{ headerShown: false, drawerIcon: () => <Icon name="user" size={30} /> }} component={ContributorProfile} />
-
-                <Drawer.Screen name="Assigned Driver" options={{ headerShown: false, drawerIcon: () => <Icon name="user" size={30} /> }} component={ContributorDriver} />
-
-                <Drawer.Screen name="Contributor Vehicle" options={{ headerShown: false, drawerIcon: () => <Icon name="suitcase" size={30} /> }} component={ContributorVehicle} />
-              </>
-            )
-              : role === "DRIVER" ?
-                (
-                  <>
-                    <Drawer.Screen name="Service" options={{ headerShown: false, drawerIcon: () => <Icon name="home" size={30} /> }} component={Service} />
-                    <Drawer.Screen name="Profile" options={{ headerShown: false, drawerIcon: () => <Icon name="user" size={30} /> }} component={Profile} />
-                    <Drawer.Screen name="Requests" options={{ headerShown: false, drawerIcon: () => <Icon name="upload" size={30} /> }} component={Requests} />
-                  </>
-                ) : (<></>)
-          }
-        </Drawer.Navigator> */}
         <Drawer.Navigator
-          initialRouteName={user ? role === "CONTRIBUTOR" ? "Contributor" : role === "DRIVER" ? "Driver" : (Contributor) : "Auth"}>
+          initialRouteName={user ? role === "CONTRIBUTOR" ? "Contributor" : role === "DRIVER" ? "Driver" : null : "Auth"}>
           <Drawer.Screen name="Auth" options={{ headerShown: false, }} component={AuthNavigator} />
           <Drawer.Screen name="Driver" options={{ headerShown: false, }} component={DriverNavigator} />
           <Drawer.Screen name="Contributor" options={{ headerShown: false, }} component={ContributorNavigator} />

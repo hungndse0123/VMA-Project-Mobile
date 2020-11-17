@@ -8,13 +8,8 @@ import Text from '../components/Text';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Card from '../components/Card';
-import Icon from '../components/Icon';
-import Label from '../components/Label';
-import menu from '../assets/images/icons/menu.png';
 import * as theme from '../constants/theme';
-import Auth from "@react-native-firebase/auth";
 import DropDownPicker from 'react-native-dropdown-picker';
-import { Left } from "native-base";
 import Header from "../components/Header";
 
 const ProfileScreen = ({ navigation, route }) => {
@@ -118,18 +113,21 @@ const ProfileScreen = ({ navigation, route }) => {
     });
 
     const [user, setUser] = useState(null);
+    const [Image_Http_URL, setImage_Http_URL] = useState({});
+    const [username, setUsername] = useState("");
 
     useEffect(() => {
         getCurrentUser()
             .then((user) => {
                 setUser(user);
+                setImage_Http_URL({ uri: user["photoURL"] });
+                setUsername(user.displayName);
                 init(user.uid)
             })
             .catch((error) => {
                 setUser(null);
                 console.log(error);
             });
-
 
         console.log(vehicleList);
     }, []);
@@ -179,7 +177,6 @@ const ProfileScreen = ({ navigation, route }) => {
     const [filterfrom, setFilterfrom] = useState("");
     const [filterto, setFilterto] = useState("");
     const [filterstring, setFilterstring] = useState("");
-    let Image_Http_URL = { uri: "https://scontent.fsgn2-5.fna.fbcdn.net/v/t1.0-9/80742826_2481110258768067_7881332290297528320_o.jpg?_nc_cat=104&ccb=2&_nc_sid=09cbfe&_nc_ohc=xABpuTzKeNkAX9UlkVS&_nc_ht=scontent.fsgn2-5.fna&oh=ba9257d410d63d4dd10fc28bf9d9bfb6&oe=5FBF8173" };
     return (
         <SafeAreaView style={styles.overview}>
             <Header navigation={navigation} title="Vehicles" />
@@ -192,20 +189,6 @@ const ProfileScreen = ({ navigation, route }) => {
                         Alert.alert("Modal has been closed.");
                     }}
                 >
-                    {/* <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Hello World!</Text>
-
-            <TouchableHighlight
-              style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
-              onPress={() => {
-                setModalVisible(!modalVisible);
-              }}
-            >
-              <Text style={styles.textStyle}>Hide Modal</Text>
-            </TouchableHighlight>
-          </View>
-        </View> */}
                     <View style={styles.centeredView}>
                         <Card style={styles.margin, { marginHorizontal: 10, marginTop: 70, marginBottom: 10 }} title="Filter options">
                             <Text caption medium style={styles.label}>
@@ -273,8 +256,8 @@ const ProfileScreen = ({ navigation, route }) => {
                     <Block flex={1.2} row style={{ marginRight: 20 }}>
                         <Image source={Image_Http_URL} style={{ height: 50, width: 50, borderRadius: 400 / 2 }} />
                         <Block>
-                            <Text style={{ paddingHorizontal: 16, marginTop: 3 }}>Nguyen Duc Hung</Text>
-                            <Text ligth caption style={{ paddingHorizontal: 16, marginTop: 3 }}>Driver</Text>
+                            <Text style={{ paddingHorizontal: 16, marginTop: 3 }}>{username}</Text>
+                            <Text ligth caption style={{ paddingHorizontal: 16, marginTop: 3 }}>Contributor</Text>
                         </Block>
 
                     </Block>
@@ -316,7 +299,10 @@ const ProfileScreen = ({ navigation, route }) => {
                         <FlatList
                             data={vehicleList.result}
                             renderItem={({ item }) =>
-                                <TouchableOpacity onPress={() => navigation.navigate("Service")}>
+                                <TouchableOpacity onPress={() =>
+                                    navigation.navigate("VehicleDetail", {
+                                        itemId: item["vehicleId"],
+                                    })}>
                                     <Card center row style={[styles.marginCard]} style={{
                                         borderColor: theme.colors.lightBlue,
                                         borderWidth: 1,
@@ -345,7 +331,6 @@ const ProfileScreen = ({ navigation, route }) => {
                         />
                     )
                 }
-
             </ScrollView>
 
         </SafeAreaView>

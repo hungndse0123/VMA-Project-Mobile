@@ -1,25 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { useIsFocused } from '@react-navigation/native'
 import axios from 'axios';
+import ContributorRepository from '../repositories/ContributorRepository';
+import VehicleRepository from '../repositories/VehicleRepository';
 import DriverRepository from '../repositories/DriverRepository';
-import UserRepository from '../repositories/UserRepository';
+import FeedbackRepository from '../repositories/FeedbackRepository';
 
-import { TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, FlatList, Modal, BackHandler, TouchableWithoutFeedback, AsyncStorage } from "react-native";
+import { Alert, Dimensions, Modal, TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, FlatList, AsyncStorage } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
 import Block from '../components/Block';
 import Text from '../components/Text';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Card from '../components/Card';
-import Icon from "react-native-vector-icons/Entypo";
 import Label from '../components/Label';
 import menu from '../assets/images/icons/menu.png';
 import * as theme from '../constants/theme';
 import Auth from "@react-native-firebase/auth";
 import Header from "../components/Header";
+import Icon from "react-native-vector-icons/Entypo";
+import Loader from '../components/Loader';
 import ImageViewer from 'react-native-image-zoom-viewer';
+import StarRating from 'react-native-star-rating';
 
-const ProfileScreen = ({ navigation, route }) => {
+const { width } = Dimensions.get("window");
+
+const DriverDetail = ({ navigation, route }) => {
     const styles = StyleSheet.create({
         overview: {
             flex: 1,
@@ -78,49 +84,14 @@ const ProfileScreen = ({ navigation, route }) => {
     });
 
     const [user, setUser] = useState(null);
-
-    useEffect(() => {
-        getCurrentUser()
-            .then((user) => {
-                setUser(user);
-                // init(user.uid);
-                init(user.uid);
-            })
-            .catch((error) => {
-                setUser(null);
-                console.log(error);
-            });
-    }, [isFocused]);
-
-    // const _storeData = () => {
-    //     AsyncStorage.getAllKeys()
-    //         .then(keys => AsyncStorage.multiRemove(keys))
-    //         .then(() => alert('success'));
-    // };
-
-    const signOut = () => {
-        signOutUser()
-            .then(() => {
-                updateStatus(user.uid);
-                //_storeData();
-                BackHandler.exitApp();
-            })
-            .catch((error) => {
-                alert(error);
-            });
-    };
-    const updateStatus = (userid) => {
-        UserRepository.updateUserStatusByUserId(userid, 'INACTIVE')
-
-    }
-    //   const [user, setUser] = useState(null);
-
     const [documentVisible, setDocumentVisible] = useState(false);
+    const { itemId } = route.params;
     const isFocused = useIsFocused();
-    const [driver, setDriver] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
     const [showModal, setshowModal] = useState(-1);
     const [imageIndex, setimageIndex] = useState(0);
-    //let Image_Http_URL = { uri: driverdetailimage };
+    const [ratingModalVisible, setRatingModalVisible] = useState(false);
+
     const renderImages = (item, parindex) => (
         // <TouchableOpacity onPress={() => {
         //     setimageIndex(index)
@@ -148,8 +119,34 @@ const ProfileScreen = ({ navigation, route }) => {
                 </TouchableOpacity>
             } />
     )
-    const init = userid => {
-        DriverRepository.getDetailDriver(userid)
+
+    useEffect(() => {
+        setIsLoading(true);
+        getCurrentUser()
+            .then((user) => {
+                setUser(user);
+                // init(user.uid);
+                init();
+                //console.log(Profile_Image);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                setUser(null);
+                console.log(error);
+                setIsLoading(false);
+            });
+    }, [isFocused]);
+
+    const _storeData = () => {
+        AsyncStorage.getAllKeys()
+            .then(keys => AsyncStorage.multiRemove(keys))
+            .then(() => alert('success'));
+    };
+    const [driver, setDriver] = useState({})
+    const [comment, setComment] = useState('');
+    const [rate, setRate] = useState(0);
+    const init = () => {
+        DriverRepository.getDetailDriver(itemId)
             .then((response) => {
                 //console.log(response);
                 const result = Object.entries(response);
@@ -160,33 +157,136 @@ const ProfileScreen = ({ navigation, route }) => {
             })
     }
 
+    const sendFeedback = (driverId) => {
+        VehicleRepository.getCurrentlyAssignedVehicleByDriverId(driverId)
+            .then((response) => {
+                // console.log(response)
+                // setIssuedvehicleid(response["issuedVehicleId"])
+                let data = {
+                    comment: comment,
+                    issuedVehicleId: response["issuedVehicleId"],
+                    rate: rate
+                }
+                console.log(data)
+                FeedbackRepository.createFeedback(data)
+                    .then((response) => {
+                        console.log(response.status)
+                        Alert.alert(
+                            'Rated',
+                            'Feedback sent!!!',
+                            [
+                                // {
+                                //     text: 'Back to menu',
+                                //     onPress: () => navigation.navigate("Service")
+                                // },
+                                {
+                                    text: 'Close',
+                                    onPress: () => console.log('Cancel Pressed'),
+                                    style: 'cancel'
+                                },
+                            ],
+                            { cancelable: false }
+                        );
+                    })
+                    .catch((error) => {
+                        Alert.alert(
+                            'Error',
+                            JSON.stringify(error),
+                            [
+                                {
+                                    text: 'Cancel',
+                                    onPress: () => console.log('Cancel Pressed'),
+                                    style: 'cancel'
+                                },
+                                { text: 'OK', onPress: () => console.log('OK Pressed') }
+                            ],
+                            { cancelable: false }
+                        );
+                    })
+            })
+            .catch((error) => {
+                console.log(JSON.stringify(error))
+            })
+        setComment('')
+        setRate(0)
+    }
+
     return (
         <SafeAreaView style={styles.overview}>
+            <Loader isAnimate={isLoading} />
             <Header navigation={navigation} title="Profile" />
             <ScrollView contentContainerStyle={{ paddingVertical: 25 }}>
 
-                <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 20, }} title="Personal profile">
+                <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Driver profile">
                     <Block column center style={{ marginTop: 10 }}>
+                        <Image source={{ uri: driver["imageLink"] }} style={{ height: 100, width: 100, marginBottom: 25 }} center />
                         <Block style={{ marginBottom: 25 }}>
-                            <Image source={{ uri: driver["imageLink"] }} style={{ height: 100, width: 100, marginBottom: 25 }} center />
-                            <TouchableOpacity
-                                onPress={() => {
-                                    signOut()
+                            <Modal
+                                animationType="fade"
+                                transparent={true}
+                                visible={ratingModalVisible}
+                                onRequestClose={() => {
+                                    setRatingModalVisible(!ratingModalVisible)
                                 }}
                             >
-                                <Block row >
-                                    <Icon name="log-out" style={{ marginRight: 5 }} />
-                                    <Text medium caption>
-                                        LOG OUT
+                                <ScrollView style={styles.centeredView, { marginTop: 90 }}>
+                                    <Card style={styles.margin} title="Rate driver">
+                                        <Block column style={{ marginBottom: 25 }}>
+                                            <Text caption medium style={styles.label, { marginBottom: 10 }}>
+                                                Rate
                             </Text>
+                                            <StarRating
+                                                disabled={false}
+                                                // emptyStar={'ios-star-outline'}
+                                                // fullStar={'ios-star'}
+                                                // halfStar={'ios-star-half'}
+                                                // iconSet={'Ionicons'}
+                                                maxStars={5}
+                                                rating={rate}
+                                                selectedStar={(rating) => setRate(rating)}
+                                                fullStarColor={'blue'}
+                                            />
+
+                                        </Block>
+                                        <Input
+                                            multiline={true}
+                                            onChangeText={text => setComment(text)}
+                                            label="Comment"
+                                            value={comment}
+                                            style={{ marginBottom: 25, height: width - 200, width: width - 100, textAlignVertical: "top" }}
+
+                                        />
+                                        <Button center style={styles.margin, { marginBottom: 15 }}
+                                            onPress={() => {
+                                                sendFeedback(itemId)
+                                                setRatingModalVisible(!ratingModalVisible)
+                                            }}
+                                        >
+                                            <Text color="white">
+                                                Rate
+            </Text>
+                                        </Button>
+                                    </Card>
+                                </ScrollView>
+                            </Modal>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setRatingModalVisible(!ratingModalVisible)
+                                }}
+                            >
+                                <Block row center style={{ marginTop: 5 }}>
+                                    <Icon name="star-outlined" style={{ marginRight: 5 }} />
+                                    <Text medium caption>
+                                        RATE THIS DRIVER
+                                    </Text>
 
                                 </Block>
 
                             </TouchableOpacity>
                         </Block>
+
                         <Input
                             full
-                            email
                             label="Phone number"
                             value={driver["phoneNumber"]}
                             style={{ marginBottom: 25 }}
@@ -194,23 +294,28 @@ const ProfileScreen = ({ navigation, route }) => {
                         />
                         <Input
                             full
-                            email
                             label="Full name"
+                            value={driver["fullName"]}
+                            style={{ marginBottom: 25 }}
+                            editable={false}
+                        />
+                        <Input
+                            full
+                            label="Gender"
                             value={driver["gender"] === true ? "Male" : "Female"}
                             style={{ marginBottom: 25 }}
                             editable={false}
                         />
                         <Input
                             full
-                            email
                             label="Birthdate"
                             value={driver["dateOfBirth"]}
                             style={{ marginBottom: 25 }}
                             editable={false}
                         />
                         <Input
+                            multiline={true}
                             full
-                            email
                             label="Address"
                             value={driver["address"]}
                             style={{ marginBottom: 25, height: 80, textAlignVertical: "top" }}
@@ -306,19 +411,16 @@ const ProfileScreen = ({ navigation, route }) => {
                                     } />
                             </Block>) : (<></>)
                         }
-                        {/* <Button full style={styles.margin} onPress={signOut}>
-                            <Text color="white">
-                                Sign out
-            </Text>
-                        </Button> */}
+
                     </Block>
 
 
                 </Card>
+
             </ScrollView>
 
         </SafeAreaView>
     );
 };
 
-export default ProfileScreen;
+export default DriverDetail;

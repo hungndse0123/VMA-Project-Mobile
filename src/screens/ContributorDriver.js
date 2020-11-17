@@ -16,8 +16,8 @@ import menu from '../assets/images/icons/menu.png';
 import * as theme from '../constants/theme';
 import Auth from "@react-native-firebase/auth";
 import DropDownPicker from 'react-native-dropdown-picker';
-import { Left } from "native-base";
 import Header from "../components/Header";
+import Loader from '../components/Loader';
 
 const ProfileScreen = ({ navigation, route }) => {
     const styles = StyleSheet.create({
@@ -120,35 +120,40 @@ const ProfileScreen = ({ navigation, route }) => {
     });
 
     const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
+
         getCurrentUser()
             .then((user) => {
                 setUser(user);
+                //Image_Http_URL = { uri: user["photoURL"] };
+                init(user.uid);
+                setImage_Http_URL({ uri: user["photoURL"] });
+                setUsername(user.displayName);
             })
             .catch((error) => {
                 setUser(null);
                 console.log(error);
             });
-        // setDriverList({
-        //     ...driverList, driverRes: [{
-        //         userId: "h3WwvRl0",
-        //         fullName: "Alice",
-        //         phoneNumber: "0938196698",
-        //         vehicleId: "h3WwvRl0",
-        //         userStatus: "INACTIVE"
-        //     }, {
-        //         userId: "h3WwvRl0",
-        //         fullName: "Alice",
-        //         phoneNumber: "0938196698",
-        //         vehicleId: "h3WwvRl0",
-        //         userStatus: "INACTIVE"
-        //     },]
-        // })
-        init()
-        console.log(driverList);
+
+        //console.log(driverList);
+        setIsLoading(false);
     }, []);
-    const init = () => {
+    const init = (uid) => {
+        // DriverRepository.getIssuedDrivers(uid)
+        //     .then((response) => {
+        //         //console.log(response);
+        //         const result = Object.values(response.drivers);
+        //         //console.log(result);
+        //         setDriverList({
+        //             ...driverList,
+        //             result
+        //         })
+        //     })
+        //     .catch((error) => {
+        //         console.log(error)
+        //     })
         DriverRepository.getDriver("")
             .then((response) => {
                 //console.log(response);
@@ -164,12 +169,25 @@ const ProfileScreen = ({ navigation, route }) => {
             })
     }
     const filter = filterstring => {
-        DriverRepository.getDriver(filterstring)
+        // DriverRepository.getIssuedDrivers(`${user.uid}${filterstring}`)
+        //     .then((response) => {
+        //         //console.log(response);
+        //         const result = Object.values(response.drivers);
+        //         //console.log(result);
+        //         (result === null ? setIsNull(true) : setIsNull(false))
+        //         setDriverList({
+        //             ...driverList,
+        //             result
+        //         })
+        //     })
+        //     .catch((error) => {
+        //         console.log(error)
+        //     })
+        DriverRepository.getDriver(`${filterstring}`)
             .then((response) => {
                 //console.log(response);
                 const result = Object.values(response.driverRes);
                 //console.log(result);
-                (result === null ? setIsNull(true) : setIsNull(false))
                 setDriverList({
                     ...driverList,
                     result
@@ -182,6 +200,7 @@ const ProfileScreen = ({ navigation, route }) => {
         setFiltername("");
         setFilterphone("");
     }
+
     const [driverList, setDriverList] = useState([{
     }
     ])
@@ -191,7 +210,9 @@ const ProfileScreen = ({ navigation, route }) => {
     const [selectedStatus, setSelectedStatus] = useState("");
     const [filtername, setFiltername] = useState("");
     const [filterphone, setFilterphone] = useState("");
-    let Image_Http_URL = { uri: "https://scontent.fsgn2-5.fna.fbcdn.net/v/t1.0-9/80742826_2481110258768067_7881332290297528320_o.jpg?_nc_cat=104&ccb=2&_nc_sid=09cbfe&_nc_ohc=xABpuTzKeNkAX9UlkVS&_nc_ht=scontent.fsgn2-5.fna&oh=ba9257d410d63d4dd10fc28bf9d9bfb6&oe=5FBF8173" };
+    const [Image_Http_URL, setImage_Http_URL] = useState({});
+    const [username, setUsername] = useState("");
+
     return (
         <SafeAreaView style={styles.overview}>
             <Header navigation={navigation} title="Drivers" />
@@ -204,34 +225,8 @@ const ProfileScreen = ({ navigation, route }) => {
                         Alert.alert("Modal has been closed.");
                     }}
                 >
-                    {/* <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Hello World!</Text>
-
-            <TouchableHighlight
-              style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
-              onPress={() => {
-                setModalVisible(!modalVisible);
-              }}
-            >
-              <Text style={styles.textStyle}>Hide Modal</Text>
-            </TouchableHighlight>
-          </View>
-        </View> */}
-                    <View style={styles.centeredView}>
+                    <ScrollView style={styles.centeredView, { marginTop: 90 }}>
                         <Card style={styles.margin, { marginHorizontal: 10, marginTop: 70, marginBottom: 10 }} title="Filter options">
-
-                            {/* <DropDownPicker
-                                items={[
-                                    { label: 'Vehicle change', value: 'Vehicle change' },
-                                    { label: 'Document update', value: 'Document update' },
-                                ]}
-                                defaultValue={selectedType}
-                                itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
-                                placeholder="Select type"
-                                containerStyle={{ height: 40, width: 250, marginBottom: 25 }}
-                                onChangeItem={item => setSelectedType(item.value)}
-                            /> */}
                             <Input
                                 full
                                 label="Name"
@@ -245,7 +240,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 style={{ marginBottom: 25, width: 250 }}
                                 onChangeText={text => setFilterphone(text)}
                             />
-                            <Text caption medium style={styles.label}>
+                            {/* <Text caption medium style={styles.label}>
                                 Request status
           </Text>
                             <DropDownPicker
@@ -258,9 +253,9 @@ const ProfileScreen = ({ navigation, route }) => {
                                 placeholder="Select type"
                                 containerStyle={{ height: 40, width: 250, marginBottom: 25 }}
                                 onChangeItem={item => setSelectedStatus(item.value)}
-                            />
+                            /> */}
                             <Button center style={styles.margin} onPress={() => {
-                                filter(`?name=${filtername}&phoneNumber=${filterphone}&userStatus=${selectedStatus}`);
+                                filter(`?name=${filtername}&phoneNumber=${filterphone}`);
                                 setModalVisible(!modalVisible);
                             }}>
                                 <Text color="white">
@@ -268,14 +263,14 @@ const ProfileScreen = ({ navigation, route }) => {
             </Text>
                             </Button>
                         </Card>
-                    </View>
+                    </ScrollView>
                 </Modal>
                 <Card column middle>
                     <Block flex={1.2} row style={{ marginRight: 20 }}>
                         <Image source={Image_Http_URL} style={{ height: 50, width: 50, borderRadius: 400 / 2 }} />
                         <Block>
-                            <Text style={{ paddingHorizontal: 16, marginTop: 3 }}>Nguyen Duc Hung</Text>
-                            <Text ligth caption style={{ paddingHorizontal: 16, marginTop: 3 }}>Driver</Text>
+                            <Text style={{ paddingHorizontal: 16, marginTop: 3 }}>{username}</Text>
+                            <Text ligth caption style={{ paddingHorizontal: 16, marginTop: 3 }}>Contributor</Text>
                         </Block>
 
                     </Block>
@@ -302,6 +297,11 @@ const ProfileScreen = ({ navigation, route }) => {
           </Text>
         </Block> */}
                 <Card row style={[styles.marginCard], { backgroundColor: theme.colors.gray2, height: 12 }} border="false" shadow="false">
+                    <Block style={{ flex: 0.5 }}>
+                        <Text medium caption style={[styles.label]}>
+                            No.
+        </Text>
+                    </Block>
                     <Block>
                         <Text medium caption style={[styles.label]}>
                             Phone
@@ -312,11 +312,11 @@ const ProfileScreen = ({ navigation, route }) => {
                             Name
         </Text>
                     </Block>
-                    <Block >
+                    {/* <Block >
                         <Text medium caption style={[styles.label, { marginLeft: 25 }]}>
                             Status
-        </Text>
-                    </Block>
+                        </Text>
+                    </Block> */}
                 </Card>
                 {isNull === true ? (
                     <Block >
@@ -327,12 +327,23 @@ const ProfileScreen = ({ navigation, route }) => {
                 ) : (
                         <FlatList
                             data={driverList.result}
-                            renderItem={({ item }) =>
-                                <TouchableOpacity onPress={() => navigation.navigate("Service")}>
+                            renderItem={({ item, index }) =>
+                                <TouchableOpacity onPress={() => {
+                                    setIsLoading(true);
+                                    setIsLoading(false);
+                                    navigation.navigate("DriverDetail", {
+                                        itemId: item["userId"],
+                                    })
+                                }}>
                                     <Card center row style={[styles.marginCard]} style={{
                                         borderColor: theme.colors.lightBlue,
                                         borderWidth: 1,
                                     }}>
+                                        <Block style={{ flex: 0.5 }}>
+                                            <Text medium>
+                                                {index}
+                                            </Text>
+                                        </Block>
                                         <Block>
                                             <Text medium>
                                                 {item["phoneNumber"]}
@@ -343,22 +354,20 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 {item["fullName"]}
                                             </Text>
                                         </Block>
-                                        <Block >{item["userStatus"] === "ACTIVE" ? (<Text color="green" medium style={[{ marginLeft: 25 }]}>
+                                        {/* <Block >{item["userStatus"] === "ACTIVE" ? (<Text color="green" medium style={[{ marginLeft: 25 }]}>
                                             {item["userStatus"]}
                                         </Text>) : (<Text medium style={[{ marginLeft: 25 }]} color="red">
                                             {item["userStatus"]}
                                         </Text>)}
 
-                                        </Block>
-
+                                        </Block> */}
                                     </Card>
                                 </TouchableOpacity>}
                         />
                     )
                 }
-
             </ScrollView>
-
+            <Loader isAnimate={isLoading} />
         </SafeAreaView>
     );
 };

@@ -26,7 +26,6 @@ const SignUpScreen = ({ navigation, route }) => {
     'Non-serializable values were found in the navigation state',
   ]);
 
-
   // checkAuthState()
   // .then((user) => {
   //   console.log("checkOnAuthStateChanged =>", user);
@@ -40,10 +39,8 @@ const SignUpScreen = ({ navigation, route }) => {
   //   setOTP("");
   //   alert(error.message);
   // });
-
   const updateStatus = (userid) => {
     UserRepository.updateUserStatusByUserId(userid, 'ACTIVE')
-
   }
 
   const handleVerifyCode = code => {

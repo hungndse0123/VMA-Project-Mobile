@@ -89,18 +89,6 @@
 
 // export default Login;
 import React, { useState, useEffect } from "react";
-// import {
-//     Container,
-//     Header,
-//     Left,
-//     Body,
-//     Right,
-//     Title,
-//     Content,
-//     Button,
-//     Text,
-//     Icon
-// } from "native-base";
 import {
   Image,
   KeyboardAvoidingView,
@@ -122,149 +110,149 @@ import { signInWithPhoneNumber } from "../services/FireAuthHelper";
 import PhoneNoInput from '../components/PhoneNoInput';
 import Loader from '../components/Loader';
 
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 const Login = ({ navigation }) => {
-  
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [clearInput, setClearInput] = useState(false);
 
-    const [isLoading, setIsLoading] = useState(false); //For Loader Hide/Show
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [clearInput, setClearInput] = useState(false);
 
-    useEffect(() => {
-        setClearInput(false);
-    }, []);
+  const [isLoading, setIsLoading] = useState(false); //For Loader Hide/Show
 
-    /**
-    * @description Function to Validate Phone Number.
-    * @param null.
-    */
-    const validatePhoneNumber = () => {
-        var regexp = /^\+[0-9]?()[0-9](\s|\S)(\d[0-9]{8,16})$/;
-        console.log("test mob ------------------- ", phoneNumber);
-        return regexp.test(phoneNumber);
-    };
+  useEffect(() => {
+    setClearInput(false);
+  }, []);
 
-    /**
-    * @description Function to Login with Phone Number.
-    * @param null.
-    */
-    const handleSendCode = async () => {
-        try {
-            // Request to send OTP
-            if (validatePhoneNumber) {
-                setIsLoading(true);
-                signInWithPhoneNumber(phoneNumber)
-                    .then((result) => {
-                        setClearInput(true);
-                        setIsLoading(false);
-                        navigation.navigate("PhoneOTP", {
-                            confirmResult: result,
-                            phoneNumber: phoneNumber,
-                        });
-                    })
-                    .catch((error) => {
-                        setIsLoading(false);
-                        alert(error.message);
-                    });
-            } else {
-                alert("Invalid Phone Number");
-            }
-        } catch (error) {
-            console.log("Erorrrrrr    -------------- ", error);
-        }
-    };
-    
+  /**
+  * @description Function to Validate Phone Number.
+  * @param null.
+  */
+  const validatePhoneNumber = () => {
+    var regexp = /^\+[0-9]?()[0-9](\s|\S)(\d[0-9]{8,16})$/;
+    console.log("test mob ------------------- ", phoneNumber);
+    return regexp.test(phoneNumber);
+  };
 
-    return (
-        // <Container>
-        //     <Header>
-        //         <Left>
-        //             <Button transparent onPress={() => navigation.goBack()}>
-        //                 <Icon name="arrow-back" />
-        //             </Button>
-        //         </Left>
-        //         <Body>
-        //             <Title>Login</Title>
-        //         </Body>
-        //         <Right />
-        //     </Header>
-        //     <Content>
-        //         <View style={{ marginTop: '10%', width: '80%', alignSelf: 'center' }}>
-        //             <PhoneNoInput
-        //                 getInputvalue={(value) => setPhoneNumber(value)}
-        //                 inputValueClean={clearInput}
-        //             />
-        //         </View>
+  /**
+  * @description Function to Login with Phone Number.
+  * @param null.
+  */
+  const handleSendCode = async () => {
+    try {
+      // Request to send OTP
+      if (validatePhoneNumber) {
+        setIsLoading(true);
+        signInWithPhoneNumber(phoneNumber)
+          .then((result) => {
+            setClearInput(true);
+            setIsLoading(false);
+            navigation.navigate("PhoneOTP", {
+              confirmResult: result,
+              phoneNumber: phoneNumber,
+            });
+          })
+          .catch((error) => {
+            setIsLoading(false);
+            alert(error.message);
+          });
+      } else {
+        alert("Invalid Phone Number");
+      }
+    } catch (error) {
+      console.log("Erorrrrrr    -------------- ", error);
+    }
+  };
 
-        //         <Button rounded style={styles.button} onPress={handleSendCode}>
-        //             <Text> Send OTP </Text>
-        //         </Button>
-        //     </Content>
-        //     <Loader isAnimate={isLoading} />
-        // </Container>
-        
-        <KeyboardAwareScrollView
-                enabled
-                behavior="padding"
-                keyboardVerticalOffset={height * 0.2}
-                style={{ marginVertical: 40 }} showsVerticalScrollIndicator={false}
-              >
-                <Block center middle>
-                  <Block middle>
-                    <Image
-                      source={require('../assets/images/Base/Logo.png')}
-                      style={{ height: 70, width: 102 }}
-                    />
-                  </Block>
-                  <Block flex={2.5} center>
-                    <Text h3 style={{ marginTop: 44, marginBottom: 6 }}>
-                      Sign in to VMA
+
+  return (
+    // <Container>
+    //     <Header>
+    //         <Left>
+    //             <Button transparent onPress={() => navigation.goBack()}>
+    //                 <Icon name="arrow-back" />
+    //             </Button>
+    //         </Left>
+    //         <Body>
+    //             <Title>Login</Title>
+    //         </Body>
+    //         <Right />
+    //     </Header>
+    //     <Content>
+    //         <View style={{ marginTop: '10%', width: '80%', alignSelf: 'center' }}>
+    //             <PhoneNoInput
+    //                 getInputvalue={(value) => setPhoneNumber(value)}
+    //                 inputValueClean={clearInput}
+    //             />
+    //         </View>
+
+    //         <Button rounded style={styles.button} onPress={handleSendCode}>
+    //             <Text> Send OTP </Text>
+    //         </Button>
+    //     </Content>
+    //     <Loader isAnimate={isLoading} />
+    // </Container>
+
+    <KeyboardAwareScrollView
+      enabled
+      behavior="padding"
+      keyboardVerticalOffset={height * 0.2}
+      style={{ marginVertical: 40 }} showsVerticalScrollIndicator={false}
+    >
+      <Block center middle>
+        <Block middle>
+          <Image
+            source={require('../assets/images/Base/Logo.png')}
+            style={{ height: 70, width: 102 }}
+          />
+        </Block>
+        <Block flex={2.5} center>
+          <Text h3 style={{ marginTop: 44, marginBottom: 6 }}>
+            Sign in to VMA
                     </Text>
-                    <Text paragraph color="black3">
-                      Please enter your credentials to proceed.
+          <Text paragraph color="black3">
+            Please enter your credentials to proceed.
                     </Text>
-                    
 
 
-                    <Block center style={{ marginTop: 70 }}>
-                    <Block center style={{ marginBottom: 70 , alignSelf: 'center', width: '85%'}}>
-                    <PhoneNoInput
-                        getInputvalue={(value) => setPhoneNumber(value)}
-                        inputValueClean={clearInput}
-                    />
-                    </Block>
-                      <Button
-                        full
-                        style={{ marginBottom: 12 }}
-                        onPress={handleSendCode}
-                      >
-                        <Text button>Sign in</Text>
-                      </Button>
-                      <Text paragraph color="gray">
+
+          <Block center style={{ marginTop: 70 }}>
+            <Block center style={{ marginBottom: 70, alignSelf: 'center', width: '85%' }}>
+              <PhoneNoInput
+                getInputvalue={(value) => setPhoneNumber(value)}
+                inputValueClean={clearInput}
+              />
+            </Block>
+            <Button
+              full
+              style={{ marginBottom: 12 }}
+              onPress={handleSendCode}
+            >
+              <Text button>Sign in</Text>
+            </Button>
+            {/* <Text paragraph color="gray">
                         Don't have an account? <Text
                           height={18}
                           color="blue"
                           onPress={() => navigation.navigate('Register')}>
                            Sign up
                         </Text>
-                      </Text>
-                    </Block>
-                  </Block>
-                </Block>
-                <Loader isAnimate={isLoading} />
-              </KeyboardAwareScrollView>
-    );
+                      </Text> */}
+          </Block>
+        </Block>
+      </Block>
+      <Loader isAnimate={isLoading} />
+    </KeyboardAwareScrollView>
+  );
 };
 
 export default Login;
 
 const styles = StyleSheet.create({
-    button: {
-        justifyContent: "center",
-        width: 200,
-        alignSelf: "center",
-        marginBottom: 20,
-        marginTop: '10%'
-    },
+  button: {
+    justifyContent: "center",
+    width: 200,
+    alignSelf: "center",
+    marginBottom: 20,
+    marginTop: '10%'
+  },
 });
