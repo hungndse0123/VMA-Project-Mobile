@@ -3,7 +3,7 @@ import axios from 'axios';
 import Repository from "../repositories/Repository";
 import DriverRepository from "../repositories/DriverRepository";
 
-import { TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, Modal, View, TouchableHighlight, Picker, FlatList } from "react-native";
+import { Dimensions, TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, Modal, View, TouchableHighlight, Picker, FlatList } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
 import Block from '../components/Block';
 import Text from '../components/Text';
@@ -19,7 +19,9 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import Header from "../components/Header";
 import Loader from '../components/Loader';
 
-const ProfileScreen = ({ navigation, route }) => {
+const { width } = Dimensions.get("window");
+
+const ContributorDriver = ({ navigation, route }) => {
     const styles = StyleSheet.create({
         overview: {
             flex: 1,
@@ -123,75 +125,49 @@ const ProfileScreen = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-
         getCurrentUser()
             .then((user) => {
                 setUser(user);
                 //Image_Http_URL = { uri: user["photoURL"] };
-                init(user.uid);
                 setImage_Http_URL({ uri: user["photoURL"] });
                 setUsername(user.displayName);
+                init(user.uid);
             })
             .catch((error) => {
                 setUser(null);
                 console.log(error);
             });
-
-        //console.log(driverList);
         setIsLoading(false);
     }, []);
-    const init = (uid) => {
-        // DriverRepository.getIssuedDrivers(uid)
-        //     .then((response) => {
-        //         //console.log(response);
-        //         const result = Object.values(response.drivers);
-        //         //console.log(result);
-        //         setDriverList({
-        //             ...driverList,
-        //             result
-        //         })
-        //     })
-        //     .catch((error) => {
-        //         console.log(error)
-        //     })
-        DriverRepository.getDriver("")
+
+    const init = async (uid) => {
+        setIsLoading(true);
+        await DriverRepository.getIssuedDrivers(uid, '')
             .then((response) => {
-                //console.log(response);
-                const result = Object.values(response.driverRes);
-                //console.log(result);
+                const result = Object.values(response.drivers);
                 setDriverList({
                     ...driverList,
                     result
                 })
+                console.log(JSON.stringify(driverList))
             })
             .catch((error) => {
-                console.log(error)
+                console.log(JSON.stringify(error))
             })
+        setIsLoading(false);
     }
-    const filter = filterstring => {
-        // DriverRepository.getIssuedDrivers(`${user.uid}${filterstring}`)
-        //     .then((response) => {
-        //         //console.log(response);
-        //         const result = Object.values(response.drivers);
-        //         //console.log(result);
-        //         (result === null ? setIsNull(true) : setIsNull(false))
-        //         setDriverList({
-        //             ...driverList,
-        //             result
-        //         })
-        //     })
-        //     .catch((error) => {
-        //         console.log(error)
-        //     })
-        DriverRepository.getDriver(`${filterstring}`)
+    const filter = async (uid, filterstring) => {
+        setIsLoading(true);
+        await DriverRepository.getIssuedDrivers(uid, `${filterstring}`)
             .then((response) => {
                 //console.log(response);
-                const result = Object.values(response.driverRes);
+                const result = Object.values(response.drivers);
                 //console.log(result);
                 setDriverList({
                     ...driverList,
                     result
                 })
+
             })
             .catch((error) => {
                 console.log(error)
@@ -199,6 +175,7 @@ const ProfileScreen = ({ navigation, route }) => {
         setSelectedStatus("");
         setFiltername("");
         setFilterphone("");
+        setIsLoading(false);
     }
 
     const [driverList, setDriverList] = useState([{
@@ -222,7 +199,7 @@ const ProfileScreen = ({ navigation, route }) => {
                     transparent={true}
                     visible={modalVisible}
                     onRequestClose={() => {
-                        Alert.alert("Modal has been closed.");
+                        setModalVisible(false)
                     }}
                 >
                     <ScrollView style={styles.centeredView, { marginTop: 90 }}>
@@ -255,12 +232,12 @@ const ProfileScreen = ({ navigation, route }) => {
                                 onChangeItem={item => setSelectedStatus(item.value)}
                             /> */}
                             <Button center style={styles.margin} onPress={() => {
-                                filter(`?name=${filtername}&phoneNumber=${filterphone}`);
+                                filter(user.uid, `?name=${filtername}&phoneNumber=${filterphone}`);
                                 setModalVisible(!modalVisible);
                             }}>
                                 <Text color="white">
                                     Filter
-            </Text>
+                                </Text>
                             </Button>
                         </Card>
                     </ScrollView>
@@ -318,10 +295,15 @@ const ProfileScreen = ({ navigation, route }) => {
                         </Text>
                     </Block> */}
                 </Card>
-                {isNull === true ? (
-                    <Block >
-                        <Text medium caption style={[styles.label, { marginLeft: 14 }]}>
-                            Status
+                {driverList.length === 1 ? (
+                    <Block style={{ marginTop: 15 }} center>
+                        <Image
+                            style={{ width: width - 100, height: width - 100 }}
+                            source={ // if clicked a new img
+                                require('../assets/images/emptylist.png')} //else show random
+                        />
+                        <Text large center caption >
+                            LIST IS EMPTY
                     </Text>
                     </Block>
                 ) : (
@@ -330,10 +312,11 @@ const ProfileScreen = ({ navigation, route }) => {
                             renderItem={({ item, index }) =>
                                 <TouchableOpacity onPress={() => {
                                     setIsLoading(true);
-                                    setIsLoading(false);
+
                                     navigation.navigate("DriverDetail", {
                                         itemId: item["userId"],
                                     })
+                                    setIsLoading(false);
                                 }}>
                                     <Card center row style={[styles.marginCard]} style={{
                                         borderColor: theme.colors.lightBlue,
@@ -354,13 +337,6 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 {item["fullName"]}
                                             </Text>
                                         </Block>
-                                        {/* <Block >{item["userStatus"] === "ACTIVE" ? (<Text color="green" medium style={[{ marginLeft: 25 }]}>
-                                            {item["userStatus"]}
-                                        </Text>) : (<Text medium style={[{ marginLeft: 25 }]} color="red">
-                                            {item["userStatus"]}
-                                        </Text>)}
-
-                                        </Block> */}
                                     </Card>
                                 </TouchableOpacity>}
                         />
@@ -372,4 +348,4 @@ const ProfileScreen = ({ navigation, route }) => {
     );
 };
 
-export default ProfileScreen;
+export default ContributorDriver;

@@ -33,7 +33,7 @@ const DrawerNavigation = () => {
         >
             <Drawer.Screen name="PhoneOTP" options={{ headerShown: false, }} component={PhoneOTP} />
             <Drawer.Screen name="Login" options={{ headerShown: false }} component={Login} />
-            <Drawer.Screen name="Role" options={{ headerShown: false }} component={Role} />
+            {/* <Drawer.Screen name="Role" options={{ headerShown: false }} component={Role} /> */}
         </Drawer.Navigator>
     );
 };

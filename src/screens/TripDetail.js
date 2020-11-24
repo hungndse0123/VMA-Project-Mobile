@@ -22,6 +22,7 @@ import Icon from "react-native-vector-icons/Entypo";
 import Loader from '../components/Loader';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import DropDownPicker from 'react-native-dropdown-picker';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const { width } = Dimensions.get("window");
 
@@ -84,41 +85,15 @@ const ProfileScreen = ({ navigation, route }) => {
     });
 
     const [user, setUser] = useState(null);
+    const [username, setUsername] = useState('');
     const [passengerVisible, setPassengerVisible] = useState(false);
-    const { itemId, contractVehicleId, vehicleStatus, lastRefresh } = route.params;
+    const { vehicleId, contractId, contractVehicleId, vehicleStatus, lastRefresh, contractTrips } = route.params;
     const isFocused = useIsFocused();
     const [isLoading, setIsLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [imageIndex, setimageIndex] = useState(0);
     const [selectedVehicleStatus, setSelectedVehicleStatus] = useState('');
     const [statusModalVisible, setStatusModalVisible] = useState(false);
-    const renderImages = (item, parindex) => (
-        // <TouchableOpacity onPress={() => {
-        //     setimageIndex(index)
-        //     setshowModal(1)
-        // }}>
-        //     <Image
-        //         source={{ uri: item }}
-        //         style={{ height: 100, width: 100, marginBottom: 25, marginRight: 15 }}
-        //         center />
-        // </TouchableOpacity>
-        <FlatList
-            data={item["userDocumentImages"]}
-            horizontal={true}
-            renderItem={({ item, index }) =>
-                // <Image source={{ uri: item["imageLink"] }} style={{ height: 100, width: 100, marginBottom: 25, marginRight: 15 }} center />
-                //renderImages(item["imageLink"], index)
-                <TouchableOpacity onPress={() => {
-                    setimageIndex(index)
-                    setshowModal(parindex)
-                }}>
-                    <Image
-                        source={{ uri: item["imageLink"] }}
-                        style={{ height: 100, width: 100, marginBottom: 25, marginRight: 15 }}
-                        center />
-                </TouchableOpacity>
-            } />
-    )
 
     useEffect(() => {
         setIsLoading(true);
@@ -126,6 +101,8 @@ const ProfileScreen = ({ navigation, route }) => {
             .then((user) => {
                 setUser(user);
                 // init(user.uid);
+                setSelectedVehicleStatus(vehicleStatus)
+                setUsername(user.displayName)
                 init();
                 getStatus(user.uid);
                 //console.log(Profile_Image);
@@ -137,66 +114,56 @@ const ProfileScreen = ({ navigation, route }) => {
             });
     }, [isFocused]);
 
-    const _storeData = () => {
-        AsyncStorage.getAllKeys()
-            .then(keys => AsyncStorage.multiRemove(keys))
-            .then(() => alert('success'));
-    };
     const [contract, setContract] = useState({})
     const [passengerList, setPassengerList] = useState([])
     const [passengerAddList, setPassengerAddList] = useState([])
+    const [vehicleStatusList, setVehicleStatusList] = useState([])
+    const [schedule, setSchedule] = useState([])
     const [contractOwner, setContractOwner] = useState(null)
     const [addName, setAddName] = useState('')
     const [addPhone, setAddPhone] = useState('')
     const [addBirth, setAddBirth] = useState('')
     const [addAddress, setAddAddress] = useState('')
+    const [isBirthDateVisible, setIsBirthDateVisible] = useState(false)
+
+
     const init = () => {
-        ContractRepository.getDetailContract(itemId)
-            .then((response) => {
-                //console.log(response);
-                //const result = Object.entries(response);
-                //console.log(response["userId"]);
-                //console.log(result["userId"]);
-                // setDriver({
-                //     ...driver,
-                //     result
-                // })
-                setContract(response);
-                setContractOwner(response["contractOwner"]["userName"])
-                //console.log(driver["userDocumentList"][0]["userDocumentImages"][0]["imageLink"]);
-                //console.log(driver[10][0].userDocumentImages);
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        ContractRepository.getPassengerList(`?contractVehicleId=${contractVehicleId}`)
-            .then((response) => {
-                //console.log(response);
-                //const result = Object.entries(response);
-                //console.log(response["userId"]);
-                //console.log(result["userId"]);
-                // setDriver({
-                //     ...driver,
-                //     result
-                // })
-                setPassengerList(response);
-                //console.log(driver["userDocumentList"][0]["userDocumentImages"][0]["imageLink"]);
-                //console.log(driver[10][0].userDocumentImages);
-            })
-            .catch((error) => {
-                console.log(error)
-            })
+        setVehicleStatusList([])
+        initVehicleStatusList()
+        initPassengerList()
         console.log(contractVehicleId)
     }
-    const initPassengerList = () => {
-        ContractRepository.getPassengerList(`?contractVehicleId=${contractVehicleId}`)
+    const initPassengerList = async () => {
+        setIsLoading(true)
+        await ContractRepository.getPassengerList(`?contractVehicleId=${contractVehicleId}`)
             .then((response) => {
                 setPassengerList(response);
             })
             .catch((error) => {
                 console.log(error)
             })
-        console.log(contractVehicleId)
+        setIsLoading(false)
+        //console.log(contractVehicleId)
+    }
+    const initVehicleStatusList = async () => {
+        setIsLoading(true)
+        await ContractRepository.getContractVehicleStatus()
+            .then((response) => {
+                //console.log(response);
+                const result = Object.values(response);
+                //console.log(result);
+                for (let i = 0; i < result.length; i++)
+                    setVehicleStatusList(prevArray => [
+                        ...prevArray, {
+                            label: result[i],
+                            value: result[i]
+                        }
+                    ])
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        setIsLoading(false)
     }
     const getStatus = (uid) => {
         VehicleRepository.getVehicleTrip(`/${uid}`)
@@ -230,8 +197,11 @@ const ProfileScreen = ({ navigation, route }) => {
                             text: 'Back to trip detail',
                             onPress: () => navigation.navigate("TripDetail", {
                                 lastRefresh: Date(Date.now()).toString(),
-                                itemId: itemId,
-                                contractVehicleId: contractVehicleId
+                                contractId: contractId,
+                                contractVehicleId: contractVehicleId,
+                                vehicleId: vehicleId,
+                                contractTrips: contractTrips,
+                                vehicleStatus: selectedVehicleStatus
                             })
                         },
                     ],
@@ -255,25 +225,30 @@ const ProfileScreen = ({ navigation, route }) => {
             })
         setPassengerAddList([])
     }
-    const updatestatus = () => {
+    const startstatus = async () => {
+        setIsLoading(true)
         let data = {
-            contractVehicleId: contractVehicleId,
-            vehicleStatus: selectedVehicleStatus
+            contractId: contractId,
+            vehicleId: vehicleId,
         }
-        ContractRepository.updateContractVehicleStatus(data)
+        console.log(JSON.stringify(data))
+        console.log(JSON.stringify(vehicleId))
+        await ContractRepository.startContractVehicle(data)
             .then((response) => {
                 console.log(response.status)
                 Alert.alert(
-                    'Updated',
-                    'Status updated!!',
+                    'Started',
+                    'Your trip is started!!',
                     [
                         {
                             text: 'Back to trip detail',
                             onPress: () => navigation.navigate("TripDetail", {
                                 lastRefresh: Date(Date.now()).toString(),
-                                itemId: itemId,
-                                vehicleStatus: selectedVehicleStatus,
-                                contractVehicleId: contractVehicleId
+                                contractId: contractId,
+                                contractVehicleId: contractVehicleId,
+                                vehicleId: vehicleId,
+                                contractTrips: contractTrips,
+                                vehicleStatus: selectedVehicleStatus
                             })
                         },
                     ],
@@ -295,6 +270,56 @@ const ProfileScreen = ({ navigation, route }) => {
                     { cancelable: false }
                 );
             })
+        setIsLoading(false)
+        //setPassengerAddList([])
+    }
+
+    const endstatus = async () => {
+        setIsLoading(true)
+        let data = {
+            contractId: contractId,
+            vehicleId: vehicleId,
+        }
+        console.log(JSON.stringify(data))
+        console.log(JSON.stringify(vehicleId))
+        await ContractRepository.endContractVehicle(data)
+            .then((response) => {
+                console.log(response.status)
+                Alert.alert(
+                    'End',
+                    'Your trip is end!!',
+                    [
+                        {
+                            text: 'Back to trip detail',
+                            onPress: () => navigation.navigate("TripDetail", {
+                                lastRefresh: Date(Date.now()).toString(),
+                                contractId: contractId,
+                                contractVehicleId: contractVehicleId,
+                                vehicleId: vehicleId,
+                                contractTrips: contractTrips,
+                                vehicleStatus: selectedVehicleStatus
+                            })
+                        },
+                    ],
+                    { cancelable: false }
+                );
+            })
+            .catch((error) => {
+                Alert.alert(
+                    'Error',
+                    JSON.stringify(error),
+                    [
+                        {
+                            text: 'Cancel',
+                            onPress: () => console.log('Cancel Pressed'),
+                            style: 'cancel'
+                        },
+                        { text: 'OK', onPress: () => console.log('OK Pressed') }
+                    ],
+                    { cancelable: false }
+                );
+            })
+        setIsLoading(false)
         //setPassengerAddList([])
     }
 
@@ -306,17 +331,17 @@ const ProfileScreen = ({ navigation, route }) => {
                 <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Trip Detail">
                     <Block column center style={{ marginTop: 10 }}>
                         <Block style={{ marginBottom: 25 }}>
-                            {vehicleStatus === "FINISHED" ? (<Text color="green" medium>
+                            {vehicleStatus === "COMPLETED" ? (<Text color="green" medium>
                                 STATUS: {vehicleStatus}
                             </Text>) : (<Text medium color="yellow">
                                 STATUS: {vehicleStatus}
                             </Text>)}
-                            <Modal
+                            {/* <Modal
                                 animationType="fade"
                                 transparent={true}
                                 visible={statusModalVisible}
                                 onRequestClose={() => {
-                                    Alert.alert("Modal has been closed.");
+                                    setStatusModalVisible(!statusModalVisible)
                                 }}
                             >
                                 <ScrollView style={styles.centeredView, { marginTop: 90 }}>
@@ -326,14 +351,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 Select status to update
                             </Text>
                                             <DropDownPicker
-                                                items={[
-                                                    { label: 'NOT_STARTED', value: 'NOT_STARTED' },
-                                                    { label: 'IN_PROGRESS', value: 'IN_PROGRESS' },
-                                                    { label: 'ON_SCHEDULE', value: 'ON_SCHEDULE' },
-                                                    { label: 'DELAYED', value: 'DELAYED' },
-                                                    { label: 'COMPLETED', value: 'COMPLETED' },
-                                                    { label: 'DROPPED', value: 'DROPPED' },
-                                                ]}
+                                                items={vehicleStatusList}
                                                 defaultValue={selectedVehicleStatus}
                                                 //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
                                                 placeholder="Select status"
@@ -351,159 +369,139 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 Update
             </Text>
                                         </Button>
-                                        <FlatList
-                                            data={passengerAddList}
-                                            renderItem={({ item, index }) =>
-                                                <TouchableWithoutFeedback
+                                        <Block row style={{ marginTop: 10, marginBottom: 15 }}>
+                                            <FlatList
+                                                data={passengerAddList}
+                                                renderItem={({ item, index }) =>
+                                                    <TouchableWithoutFeedback
 
-                                                    style={{ marginBottom: 15 }}
-                                                >
-                                                    <Block
-                                                        style={[
-                                                            styles.card,
-                                                            styles.active,
-                                                            { marginBottom: 15 }
-                                                        ]}
+                                                        style={{ marginBottom: 15 }}
                                                     >
+                                                        <Block
+                                                            style={[
+                                                                styles.card,
+                                                                styles.active,
+                                                                { marginBottom: 15 }
+                                                            ]}
+                                                        >
 
-                                                        <Block row>
-                                                            <Block column>
+                                                            <Block row>
+                                                                <Block column>
 
-                                                                <Text style={{ marginLeft: 10 }} color="black3">Full name: {item["fullName"]}</Text>
-                                                                <Text style={{ marginLeft: 10 }} color="black3">Phone number: {item["phoneNumber"]}</Text>
-                                                                <Text style={{ marginLeft: 10 }} color="black3">Date of birth: {item["dateOfBirth"]}</Text>
-                                                                <Text style={{ marginLeft: 10 }} color="black3">Address: {item["address"]}</Text>
+                                                                    <Text style={{ marginLeft: 10 }} color="black3">Full name: {item["fullName"]}</Text>
+                                                                    <Text style={{ marginLeft: 10 }} color="black3">Phone number: {item["phoneNumber"]}</Text>
+                                                                    <Text style={{ marginLeft: 10 }} color="black3">Date of birth: {item["dateOfBirth"]}</Text>
+                                                                    <Text style={{ marginLeft: 10 }} color="black3">Address: {item["address"]}</Text>
+                                                                </Block>
                                                             </Block>
                                                         </Block>
-                                                    </Block>
-                                                </TouchableWithoutFeedback>
-                                            } />
+                                                    </TouchableWithoutFeedback>
+                                                } />
+                                        </Block>
                                     </Card>
                                 </ScrollView>
-                            </Modal>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    // setIsLoading(true);
-                                    // setIsLoading(false);
-                                    // navigation.navigate("TripDetail", {
-                                    //     itemId: item["contractId"],
-                                    //     contractVehicleId: item["contractVehicleId"]
-                                    // })
-                                    setStatusModalVisible(!statusModalVisible)
-                                }}
-                            >
-                                <Block row style={{ marginTop: 5 }}>
-                                    <Icon name="cw" style={{ marginRight: 5 }} />
-                                    <Text medium caption>
-                                        UPDATE STATUS
+                            </Modal> */}
+                            {vehicleStatus === "NOT_STARTED" ?
+                                (<TouchableOpacity
+                                    onPress={() => {
+                                        // setIsLoading(true);
+                                        // setIsLoading(false);
+                                        // navigation.navigate("TripDetail", {
+                                        //     itemId: item["contractId"],
+                                        //     contractVehicleId: item["contractVehicleId"]
+                                        // })
+                                        setSelectedVehicleStatus("IN_PROGRESS")
+                                        startstatus()
+                                    }}
+                                >
+                                    <Block center row style={{ marginTop: 5 }}>
+                                        <Icon name="aircraft-take-off" style={{ marginLeft: 20, marginRight: 5 }} />
+                                        <Text medium caption>
+                                            START TRIP
                             </Text>
 
-                                </Block>
+                                    </Block>
 
-                            </TouchableOpacity>
+                                </TouchableOpacity>) : (vehicleStatus === "IN_PROGRESS" ? (<TouchableOpacity
+                                    onPress={() => {
+                                        // setIsLoading(true);
+                                        // setIsLoading(false);
+                                        // navigation.navigate("TripDetail", {
+                                        //     itemId: item["contractId"],
+                                        //     contractVehicleId: item["contractVehicleId"]
+                                        // })
+                                        setSelectedVehicleStatus("COMPLETED")
+                                        endstatus()
+                                    }}
+                                >
+                                    <Block row style={{ marginTop: 5 }}>
+                                        <Icon name="aircraft-landing" style={{ marginLeft: 20, marginRight: 5 }} />
+                                        <Text medium caption>
+                                            END TRIP
+                            </Text>
+
+                                    </Block>
+
+                                </TouchableOpacity>) : (<></>))}
+
                         </Block>
                         <Input
                             full
                             label="Contract Id"
-                            value={JSON.stringify(contract["contractId"])}
+                            value={JSON.stringify(contractId)}
                             style={{ marginBottom: 25 }}
                             editable={false}
                         />
-                        <Input
-                            full
-                            label="Owner"
-                            value={contractOwner}
-                            style={{ marginBottom: 25 }}
-                            editable={false}
-                        />
-                        <Input
-                            full
-                            label="Signed Date"
-                            value={contract["signedDate"]}
-                            style={{ marginBottom: 25 }}
-                            editable={false}
-                        />
-                        <Input
-                            multiline={true}
-                            full
-                            label="Signed Location"
-                            value={contract["signedLocation"]}
-                            style={{ marginBottom: 25, height: 80, textAlignVertical: "top" }}
-                            editable={false}
-                        />
-
-                        <Block row style={{ marginBottom: 25 }}>
-                            <Input
-                                full
-                                label="Duration From"
-                                value={contract["durationFrom"]}
-                                style={{ marginRight: 15, width: width - 190 }}
-                                editable={false}
-                            />
-                            <Input
-                                full
-                                label="Duration to"
-                                value={contract["durationTo"]}
-                                style={{ width: width - 190 }}
-                                editable={false}
-                            />
-                        </Block>
-                        <Input
-                            full
-                            multiline={true}
-                            label="Departure Location"
-                            value={contract["departureLocation"]}
-                            style={{ marginBottom: 25, height: 80, textAlignVertical: "top" }}
-                            editable={false}
-                        />
-                        <Input
-                            full
-                            multiline={true}
-                            label="Destination Location"
-                            value={contract["destinationLocation"]}
-                            style={{ marginBottom: 25, height: 80, textAlignVertical: "top" }}
-                            editable={false}
-                        />
-                        <Input
-                            full
-                            label="Departure Time"
-                            value={contract["departureTime"]}
-                            style={{ marginBottom: 25 }}
-                            editable={false}
-                        />
-                        <Input
-                            full
-                            label="Destination Time"
-                            value={contract["destinationTime"]}
-                            style={{ marginBottom: 25 }}
-                            editable={false}
-                        />
-                        <Input
-                            full
-                            label="Total Price"
-                            value={JSON.stringify(contract["totalPrice"])}
-                            style={{ marginBottom: 25 }}
-                            editable={false}
-                        />
-                        <Input
-                            full
-                            label="Other Information"
-                            value={contract["otherInformation"]}
-                            style={{ marginBottom: 25 }}
-                            editable={false}
-                        />
-
-                        <Button full center style={styles.margin, { marginBottom: 10 }} onPress={() => {
-                            setPassengerVisible(!passengerVisible)
-                            //initPassengerList()
-                        }}>
-                            <Block row center>
-                                <Text color="white">
-                                    View Passenger
+                    </Block>
+                    <Text caption medium style={styles.label}>
+                        CONTRACT TRIPS
                             </Text>
-                                {passengerVisible ? <Icon name="chevron-small-up" size={15} color="white" style={{ alignItems: 'flex-end' }} /> : <Icon name="chevron-small-down" size={15} color="white" style={{ alignItems: 'flex-end' }} />}
-                            </Block>
-                        </Button>
+                    <Block column style={{ marginTop: 10 }}>
+                        <FlatList
+                            data={contractTrips}
+                            renderItem={({ item, index }) =>
+                                <TouchableWithoutFeedback
+
+                                    style={{ marginBottom: 15 }}
+                                >
+                                    <Block
+                                        style={[
+                                            styles.card,
+                                            styles.active,
+                                            { marginBottom: 15 }
+                                        ]}
+                                    >
+                                        <Block row >
+                                            <Text h4 style={{ marginBottom: 15 }} color="brown">Trip No: {index + 1}</Text>
+                                        </Block>
+                                        <Block row>
+                                            <Block column>
+
+                                                <Text style={{ marginLeft: 10 }} color="black3">Contract Trip Id: {item["contractTripId"]}</Text>
+                                                <Text style={{ marginLeft: 10 }} color="black3">Departure Location: {item["departureLocation"]}</Text>
+                                                <Text style={{ marginLeft: 10 }} color="black3">Destination Location: {item["destinationLocation"]}</Text>
+                                                <Text style={{ marginLeft: 10 }} color="black3">Departure Time: {item["departureTime"]}</Text>
+                                                <Text style={{ marginLeft: 10 }} color="black3">Destination Time: {item["destinationTime"]}</Text>
+                                                <Text style={{ marginLeft: 10 }} color="black3">Schedule: </Text>
+                                                <FlatList data={item["schedule"]} renderItem={({ item, index }) => <Text column style={{ marginLeft: 10 }} color="black3">+ Location {index + 1}: {item["location"]}</Text>} />
+                                            </Block>
+                                        </Block>
+                                    </Block>
+                                </TouchableWithoutFeedback>
+                            } />
+                        <Block center style={{ marginTop: 10 }}>
+                            <Button full center style={styles.margin, { marginBottom: 10 }} onPress={() => {
+                                setPassengerVisible(!passengerVisible)
+                                //initPassengerList()
+                            }}>
+                                <Block row center>
+                                    <Text color="white">
+                                        View Passenger
+                            </Text>
+                                    {passengerVisible ? <Icon name="chevron-small-up" size={15} color="white" style={{ alignItems: 'flex-end' }} /> : <Icon name="chevron-small-down" size={15} color="white" style={{ alignItems: 'flex-end' }} />}
+                                </Block>
+                            </Button>
+                        </Block>
                         {passengerVisible ? (passengerList.length !== 0 ?
                             (<Block row style={{ marginTop: 10, marginBottom: 15 }}>
                                 <FlatList
@@ -520,7 +518,6 @@ const ProfileScreen = ({ navigation, route }) => {
                                                     { marginBottom: 15 }
                                                 ]}
                                             >
-
                                                 <Block row>
                                                     <Block column>
 
@@ -533,12 +530,19 @@ const ProfileScreen = ({ navigation, route }) => {
                                             </Block>
                                         </TouchableWithoutFeedback>
                                     } />
-                            </Block>) : (<Block row style={{ marginTop: 10, marginBottom: 15 }}>
+                            </Block>) : (<Block row style={{ marginBottom: 15 }}>
                                 <Block column>
-                                    <Block column style={styles.margin, { marginBottom: 10 }}>
-                                        <Text style={{ marginLeft: 10 }} color="black3">Passenger list not applied yet :((</Text>
+                                    <Block style={{ marginTop: 15 }} center>
+                                        <Image
+                                            style={{ width: width - 250, height: width - 250 }}
+                                            source={ // if clicked a new img
+                                                require('../assets/images/emptylist.png')} //else show random
+                                        />
+                                        <Text large center caption >
+                                            LIST IS EMPTY
+                    </Text>
                                     </Block>
-                                    <Button center style={styles.margin, { marginBottom: 10 }}
+                                    <Button center style={styles.margin, { marginTop: 15 }}
                                         onPress={() => {
                                             setModalVisible(!modalVisible);
                                         }}
@@ -556,13 +560,14 @@ const ProfileScreen = ({ navigation, route }) => {
                                     transparent={true}
                                     visible={modalVisible}
                                     onRequestClose={() => {
-                                        Alert.alert("Modal has been closed.");
+                                        setModalVisible(!modalVisible)
                                     }}
                                 >
                                     <ScrollView style={styles.centeredView, { marginTop: 90 }}>
                                         <Card style={styles.margin} title="List passenger">
                                             <Block column style={{ marginBottom: 25 }}>
                                                 <Input
+                                                    maxLength={50}
                                                     label="Full name"
                                                     style={{ marginRight: 15, width: width - 100, marginBottom: 15 }}
                                                     value={addName}
@@ -571,6 +576,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 //onPress={setIsDepartureVisible(true)}
                                                 />
                                                 <Input
+                                                    maxLength={10}
                                                     label="Phone number"
                                                     style={{ marginRight: 15, width: width - 100, marginBottom: 15 }}
                                                     value={addPhone}
@@ -579,6 +585,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 //onPress={setIsDepartureVisible(true)}
                                                 />
                                                 <Input
+                                                    onFocus={() => setIsBirthDateVisible(!isBirthDateVisible)}
                                                     label="Date of birth"
                                                     style={{ marginRight: 15, width: width - 100, marginBottom: 15 }}
                                                     value={addBirth}
@@ -586,7 +593,19 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 //onFocus={() => setIsDepartureVisible(true)}
                                                 //onPress={setIsDepartureVisible(true)}
                                                 />
+                                                <DateTimePickerModal
+                                                    isVisible={isBirthDateVisible}
+                                                    mode="date"
+                                                    onConfirm={datetime => {
+                                                        //console.log(datetime)
+                                                        setAddBirth(`${datetime.getFullYear()}-${datetime.getMonth()}-${datetime.getDate()}`)
+                                                        //console.log(departureTime)
+                                                        setIsBirthDateVisible(!isBirthDateVisible)
+                                                    }}
+                                                    onCancel={text => setIsBirthDateVisible(!isBirthDateVisible)}
+                                                />
                                                 <Input
+                                                    maxLength={250}
                                                     label="Address"
                                                     style={{ marginRight: 15, width: width - 100, marginBottom: 15 }}
                                                     value={addAddress}
@@ -616,33 +635,45 @@ const ProfileScreen = ({ navigation, route }) => {
                                                     Add to list
             </Text>
                                             </Button>
-                                            <FlatList
-                                                data={passengerAddList}
-                                                renderItem={({ item, index }) =>
-                                                    <TouchableWithoutFeedback
+                                            {passengerAddList.length === 0 ? (
+                                                <Block style={{ marginTop: 15, marginBottom: 15 }} center>
+                                                    <Image
+                                                        style={{ width: width - 250, height: width - 250 }}
+                                                        source={ // if clicked a new img
+                                                            require('../assets/images/emptylist.png')} //else show random
+                                                    />
+                                                    <Text large center caption >
+                                                        LIST IS EMPTY
+                    </Text>
+                                                </Block>
+                                            ) : (
+                                                    <FlatList
+                                                        data={passengerAddList}
+                                                        renderItem={({ item, index }) =>
+                                                            <TouchableWithoutFeedback
 
-                                                        style={{ marginBottom: 15 }}
-                                                    >
-                                                        <Block
-                                                            style={[
-                                                                styles.card,
-                                                                styles.active,
-                                                                { marginBottom: 15 }
-                                                            ]}
-                                                        >
+                                                                style={{ marginBottom: 15 }}
+                                                            >
+                                                                <Block
+                                                                    style={[
+                                                                        styles.card,
+                                                                        styles.active,
+                                                                        { marginBottom: 15 }
+                                                                    ]}
+                                                                >
 
-                                                            <Block row>
-                                                                <Block column>
+                                                                    <Block row>
+                                                                        <Block column>
 
-                                                                    <Text style={{ marginLeft: 10 }} color="black3">Full name: {item["fullName"]}</Text>
-                                                                    <Text style={{ marginLeft: 10 }} color="black3">Phone number: {item["phoneNumber"]}</Text>
-                                                                    <Text style={{ marginLeft: 10 }} color="black3">Date of birth: {item["dateOfBirth"]}</Text>
-                                                                    <Text style={{ marginLeft: 10 }} color="black3">Address: {item["address"]}</Text>
+                                                                            <Text style={{ marginLeft: 10 }} color="black3">Full name: {item["fullName"]}</Text>
+                                                                            <Text style={{ marginLeft: 10 }} color="black3">Phone number: {item["phoneNumber"]}</Text>
+                                                                            <Text style={{ marginLeft: 10 }} color="black3">Date of birth: {item["dateOfBirth"]}</Text>
+                                                                            <Text style={{ marginLeft: 10 }} color="black3">Address: {item["address"]}</Text>
+                                                                        </Block>
+                                                                    </Block>
                                                                 </Block>
-                                                            </Block>
-                                                        </Block>
-                                                    </TouchableWithoutFeedback>
-                                                } />
+                                                            </TouchableWithoutFeedback>
+                                                        } />)}
                                             <Button center style={styles.margin, { marginBottom: 15 }}
                                                 onPress={() => {
                                                     createPassengerList();

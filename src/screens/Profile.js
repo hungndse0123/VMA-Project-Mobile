@@ -18,6 +18,7 @@ import * as theme from '../constants/theme';
 import Auth from "@react-native-firebase/auth";
 import Header from "../components/Header";
 import ImageViewer from 'react-native-image-zoom-viewer';
+import Loader from '../components/Loader';
 
 const ProfileScreen = ({ navigation, route }) => {
     const styles = StyleSheet.create({
@@ -120,6 +121,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [driver, setDriver] = useState({});
     const [showModal, setshowModal] = useState(-1);
     const [imageIndex, setimageIndex] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
     //let Image_Http_URL = { uri: driverdetailimage };
     const renderImages = (item, parindex) => (
         // <TouchableOpacity onPress={() => {
@@ -148,8 +150,9 @@ const ProfileScreen = ({ navigation, route }) => {
                 </TouchableOpacity>
             } />
     )
-    const init = userid => {
-        DriverRepository.getDetailDriver(userid)
+    const init = async (userid) => {
+        setIsLoading(true);
+        await DriverRepository.getDetailDriver(userid)
             .then((response) => {
                 //console.log(response);
                 const result = Object.entries(response);
@@ -158,6 +161,7 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 console.log(error)
             })
+        setIsLoading(false);
     }
 
     return (
@@ -210,7 +214,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         />
                         <Input
                             full
-                            email
+                            multiline={true}
                             label="Address"
                             value={driver["address"]}
                             style={{ marginBottom: 25, height: 80, textAlignVertical: "top" }}
@@ -316,7 +320,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
                 </Card>
             </ScrollView>
-
+            <Loader isAnimate={isLoading} />
         </SafeAreaView>
     );
 };

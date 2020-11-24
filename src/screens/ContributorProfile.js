@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
+import { useIsFocused } from '@react-navigation/native';
 import ContributorRepository from '../repositories/ContributorRepository';
 import UserRepository from '../repositories/UserRepository';
 
-import { TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, AsyncStorage } from "react-native";
+import { TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, FlatList, Modal, BackHandler, TouchableWithoutFeedback, AsyncStorage } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
 import Block from '../components/Block';
 import Text from '../components/Text';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Card from '../components/Card';
-import Icon from '../components/Icon';
+import Icon from "react-native-vector-icons/Entypo";
 import Label from '../components/Label';
 import menu from '../assets/images/icons/menu.png';
 import * as theme from '../constants/theme';
 import Auth from "@react-native-firebase/auth";
 import Header from "../components/Header";
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 const ProfileScreen = ({ navigation, route }) => {
     const styles = StyleSheet.create({
@@ -76,6 +77,11 @@ const ProfileScreen = ({ navigation, route }) => {
     });
 
     const [user, setUser] = useState(null);
+    const [contributor, setContributor] = useState({});
+    const [showModal, setshowModal] = useState(-1);
+    const [imageIndex, setimageIndex] = useState(0);
+    const [documentVisible, setDocumentVisible] = useState(false);
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         getCurrentUser()
@@ -88,19 +94,12 @@ const ProfileScreen = ({ navigation, route }) => {
                 setUser(null);
                 console.log(error);
             });
-    }, []);
-
-    const _storeData = () => {
-        AsyncStorage.getAllKeys()
-            .then(keys => AsyncStorage.multiRemove(keys))
-            .then(() => alert('success'));
-    };
+    }, [isFocused]);
 
     const signOut = () => {
         signOutUser()
             .then(() => {
                 updateStatus(user.uid);
-                _storeData();
                 BackHandler.exitApp();
             })
             .catch((error) => {
@@ -111,45 +110,31 @@ const ProfileScreen = ({ navigation, route }) => {
         UserRepository.updateUserStatusByUserId(userid, 'INACTIVE')
 
     }
-
-    const profileIcon = (
-        <Image
-            source={require('../assets/images/icons/profile.png')}
-            style={{ height: 60, width: 60 }}
-        />
-    );
-    const requestIcon = (
-        <Image
-            source={require('../assets/images/icons/request.png')}
-            style={{ height: 60, width: 60 }}
-        />
-    );
-
-    const maintenanceIcon = (
-        <Image
-            source={require('../assets/images/icons/maintenance.png')}
-            style={{ height: 60, width: 60 }}
-        />
-    );
-    //   const [user, setUser] = useState(null);
-
-    // const [driverdetailname, setDriverdetailname] = useState('');
-    //const [driverdetailphone, setDriverdetailphone] = useState('');
-    // const [driverdetailbirthdate, setDriverdetailbirthdate] = useState('');
-    // const [driverdetailaddress, setDriverdetailaddress] = useState('');
-    // const [driverdetailimage, setDriverdetailimage] = useState('');
-    const [contributor, setContributor] = useState(null);
-    //let Image_Http_URL = { uri: contributor.imageLink };
+    const renderImages = (item, parindex) => (
+        <FlatList
+            data={item["userDocumentImages"]}
+            horizontal={true}
+            renderItem={({ item, index }) =>
+                // <Image source={{ uri: item["imageLink"] }} style={{ height: 100, width: 100, marginBottom: 25, marginRight: 15 }} center />
+                //renderImages(item["imageLink"], index)
+                <TouchableOpacity onPress={() => {
+                    setimageIndex(index)
+                    setshowModal(parindex)
+                }}>
+                    <Image
+                        source={{ uri: item["imageLink"] }}
+                        style={{ height: 100, width: 100, marginBottom: 25, marginRight: 15 }}
+                        center />
+                </TouchableOpacity>
+            } />
+    )
     const init = userid => {
         ContributorRepository.getDetailContributor(userid)
             .then((response) => {
                 const result = Object.entries(response);
 
-                setContributor({
-                    ...contributor,
-                    result
-                })
-                console.log(contributor);
+                setContributor(response)
+                //console.log(contributor);
             })
             .catch((error) => {
                 console.log(error)
@@ -161,46 +146,154 @@ const ProfileScreen = ({ navigation, route }) => {
             <Header navigation={navigation} title="Profile" />
             <ScrollView contentContainerStyle={{ paddingVertical: 25 }}>
 
-                <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Personal profile">
+                <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 20, }} title="Personal profile">
                     <Block column center style={{ marginTop: 10 }}>
-                        {/* <Image source={Image_Http_URL} style={{ height: 100, width: 100, marginBottom: 25 }} center /> */}
+                        <Block style={{ marginBottom: 25 }}>
+                            <Image source={{ uri: contributor["imageLink"] }} style={{ height: 100, width: 100, marginBottom: 25 }} center />
+                            <TouchableOpacity
+                                onPress={() => {
+                                    signOut()
+                                }}
+                            >
+                                <Block row >
+                                    <Icon name="log-out" style={{ marginRight: 5 }} />
+                                    <Text medium caption>
+                                        LOG OUT
+                            </Text>
+
+                                </Block>
+
+                            </TouchableOpacity>
+                        </Block>
                         <Input
                             full
-                            email
+
                             label="Phone number"
-                            // value={}
+                            value={contributor["phoneNumber"]}
                             style={{ marginBottom: 25 }}
                             editable={false}
                         />
                         <Input
                             full
-                            email
+
                             label="Full name"
-                            // value={contributor.fullName}
+                            value={contributor["gender"] === true ? "Male" : "Female"}
                             style={{ marginBottom: 25 }}
                             editable={false}
                         />
                         <Input
                             full
-                            email
+
                             label="Birthdate"
-                            // value={contributor.dateOfBirth}
+                            value={contributor["dateOfBirth"]}
                             style={{ marginBottom: 25 }}
                             editable={false}
                         />
                         <Input
                             full
-                            email
+                            multiline={true}
                             label="Address"
-                            // value={contributor.address}
+                            value={contributor["address"]}
+                            style={{ marginBottom: 25, height: 80, textAlignVertical: "top" }}
+                            editable={false}
+                        />
+                        <Input
+                            full
+
+                            label="Total of contributed vehicle"
+                            value={JSON.stringify(contributor["totalVehicles"])}
                             style={{ marginBottom: 25 }}
                             editable={false}
                         />
-                        <Button full style={styles.margin} onPress={signOut}>
+                        <Input
+                            full
+                            label="Base Salary"
+                            value={JSON.stringify(contributor["baseSalary"])}
+                            style={{ marginBottom: 25 }}
+                            editable={false}
+                        />
+                        <Button full center style={styles.margin, { marginBottom: 10 }} onPress={() => {
+                            setDocumentVisible(!documentVisible);
+                        }}>
+                            <Block row center>
+                                <Text color="white">
+                                    View Documents
+                            </Text>
+                                {documentVisible ? <Icon name="chevron-small-up" size={15} color="white" style={{ alignItems: 'flex-end' }} /> : <Icon name="chevron-small-down" size={15} color="white" style={{ alignItems: 'flex-end' }} />}
+                            </Block>
+                        </Button>
+                        {documentVisible ?
+                            (<Block row style={{ marginTop: 10, marginBottom: 15 }}>
+                                <FlatList
+                                    data={contributor["userDocumentList"]}
+                                    renderItem={({ item, index }) =>
+                                        <TouchableWithoutFeedback
+
+                                            style={{ marginBottom: 15 }}
+                                        >
+                                            <Block
+                                                style={[
+                                                    styles.card,
+                                                    styles.active,
+                                                    { marginBottom: 15 }
+                                                ]}
+                                            >
+                                                <Block row >
+                                                    <Text h4 style={{ marginBottom: 15 }} color="brown">TYPE: {item["userDocumentType"]}</Text>
+                                                </Block>
+                                                <Block row>
+                                                    {renderImages(item, index)}
+                                                    <Modal visible={showModal === index} transparent={true} onSwipeDown={() => setshowModal(-1)}>
+                                                        {item["userDocumentImages"][1] === undefined ? item["userDocumentImages"][0] === undefined ? (<></>) :
+                                                            (<ImageViewer
+                                                                imageUrls={[{
+                                                                    url: item["userDocumentImages"][0]["imageLink"],
+
+                                                                    props: {
+                                                                    }
+                                                                }]}
+                                                                index={imageIndex}
+                                                                onSwipeDown={() => setshowModal(-1)}
+                                                                // onMove={data => console.log(data)}
+                                                                enableSwipeDown={true} />) :
+                                                            (<ImageViewer
+                                                                imageUrls={[{
+                                                                    url: item["userDocumentImages"][0]["imageLink"],
+
+                                                                    props: {
+                                                                    }
+                                                                }, {
+                                                                    url: item["userDocumentImages"][1]["imageLink"],
+
+                                                                    props: {
+                                                                    }
+                                                                }]}
+                                                                index={imageIndex}
+                                                                onSwipeDown={() => setshowModal(-1)}
+                                                                // onMove={data => console.log(data)}
+                                                                enableSwipeDown={true} />)}
+                                                    </Modal>
+
+                                                </Block>
+                                                <Block row>
+                                                    <Block column>
+
+                                                        <Text style={{ marginLeft: 10 }} color="black3">Registered Location: {item["registeredLocation"]}</Text>
+                                                        <Text style={{ marginLeft: 10 }} color="black3">Registered Date: {item["registeredDate"]}</Text>
+                                                        <Text style={{ marginLeft: 10 }} color="black3">Expiry Date: {item["expiryDate"]}</Text>
+                                                        <Text style={{ marginLeft: 10 }} color="black3">Other information: {item["otherInformation"]}</Text>
+                                                    </Block>
+                                                </Block>
+                                            </Block>
+                                        </TouchableWithoutFeedback>
+                                    } />
+                            </Block>) : (<></>)
+                        }
+                        {/* <Button full style={styles.margin} onPress={signOut}>
                             <Text color="white">
                                 Sign out
             </Text>
-                        </Button>
+                        </Button> */}
                     </Block>
 
 

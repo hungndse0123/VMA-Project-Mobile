@@ -22,6 +22,7 @@ import Icon from "react-native-vector-icons/Entypo";
 import Loader from '../components/Loader';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import StarRating from 'react-native-star-rating';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const { width } = Dimensions.get("window");
 
@@ -114,27 +115,28 @@ const DriverDetail = ({ navigation, route }) => {
                 }}>
                     <Image
                         source={{ uri: item["imageLink"] }}
-                        style={{ height: 100, width: 100, marginBottom: 25, marginRight: 15 }}
+                        style={{ height: width - 250, width: width - 225, marginBottom: 25, marginRight: 15 }}
                         center />
                 </TouchableOpacity>
             } />
     )
 
     useEffect(() => {
-        setIsLoading(true);
+
         getCurrentUser()
             .then((user) => {
                 setUser(user);
                 // init(user.uid);
                 init();
                 //console.log(Profile_Image);
-                setIsLoading(false);
+
             })
             .catch((error) => {
                 setUser(null);
                 console.log(error);
                 setIsLoading(false);
             });
+
     }, [isFocused]);
 
     const _storeData = () => {
@@ -145,8 +147,9 @@ const DriverDetail = ({ navigation, route }) => {
     const [driver, setDriver] = useState({})
     const [comment, setComment] = useState('');
     const [rate, setRate] = useState(0);
-    const init = () => {
-        DriverRepository.getDetailDriver(itemId)
+    const init = async () => {
+        setIsLoading(true);
+        await DriverRepository.getDetailDriver(itemId)
             .then((response) => {
                 //console.log(response);
                 const result = Object.entries(response);
@@ -155,6 +158,7 @@ const DriverDetail = ({ navigation, route }) => {
             .catch((error) => {
                 console.log(error)
             })
+        setIsLoading(false);
     }
 
     const sendFeedback = (driverId) => {
@@ -413,12 +417,9 @@ const DriverDetail = ({ navigation, route }) => {
                         }
 
                     </Block>
-
-
                 </Card>
-
             </ScrollView>
-
+            <Loader isAnimate={isLoading} />
         </SafeAreaView>
     );
 };

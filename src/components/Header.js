@@ -1,13 +1,4 @@
-// import React from 'react';
-// import { Text, View } from 'react-native';
 
-// const Header = () => {
-
-//   return <Text>App Header</Text>;
-// };
-
-// //export component để dùng ở 1 nơi khác
-// module.exports = Header;
 import React from "react";
 import {
   View,
@@ -15,28 +6,37 @@ import {
   StyleSheet,
   Text
 } from "react-native";
+
 import Icon from "react-native-vector-icons/Entypo";
+import Icon2 from "react-native-vector-icons/EvilIcons";
+import { HeaderBackButton } from '@react-navigation/stack';
 
 
 export default function Header({ navigation, title }) {
+  let isRootScreen = (title) => title === "Service";
+
   return (
     <View style={styles.header}>
       <View style={styles.left} >
-        <TouchableOpacity onPress={() => {
-          navigation.openDrawer()
-        }}>
-          <Icon
-            name="list" color="black" size={23}
-            style={{ paddingLeft: 10 }}
-          />
-        </TouchableOpacity>
+        {isRootScreen(title) ?
+          (<TouchableOpacity onPress={() => {
+            navigation.openDrawer()
+          }}>
+            <Icon
+              name="list" color="black" size={23}
+              style={{ paddingLeft: 10 }}
+            />
+          </TouchableOpacity>) : (<HeaderBackButton onPress={() => navigation.goBack(null)} />)}
       </View>
       <View style={styles.center} >
         <Text style={styles.text}>{title}</Text>
       </View>
-      <View style={styles.right} >
-        <Icon name="dots-three-vertical" color="black" size={23} style={{ padding: 5 }} />
-      </View>
+      <TouchableOpacity onPress={() => {
+
+      }}>
+        <Icon2 name="bell" color="black" size={30} style={styles.right, { padding: 5 }} />
+      </TouchableOpacity>
+
     </View>
   )
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import UserRepository from '../repositories/UserRepository';
+import { useIsFocused } from '@react-navigation/native'
 
 import { Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, TouchableOpacity, AsyncStorage } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
@@ -72,6 +73,7 @@ const ProfileScreen = ({ navigation }) => {
         }
     });
     const [user, setUser] = useState(null);
+    const isFocused = useIsFocused();
     useEffect(() => {
         getCurrentUser()
             .then((user) => {
@@ -81,7 +83,7 @@ const ProfileScreen = ({ navigation }) => {
                 setUser(null);
                 console.log(error);
             });
-    }, []);
+    }, [isFocused]);
 
     const profileIcon = (
         <Image
@@ -104,7 +106,7 @@ const ProfileScreen = ({ navigation }) => {
     );
     return (
         <SafeAreaView style={styles.overview}>
-            <Header navigation={navigation} title="Service" />
+            <Header navigation={navigation} title="Request Type" />
             <ScrollView contentContainerStyle={{ paddingVertical: 25 }}>
                 {/* <Text caption center onPress={signOut}>
                     Log out
@@ -112,7 +114,7 @@ const ProfileScreen = ({ navigation }) => {
                 <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 30, }} title="Choose Request Type">
                     <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
-                            //onPress={() => navigation.navigate("Assigned Driver")}
+                            onPress={() => navigation.navigate("ContributorVehicleRequest")}
                             style={styles.activeBorder}
                         >
                             <Block

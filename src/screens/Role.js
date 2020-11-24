@@ -14,15 +14,24 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import Icon from '../components/Icon';
+import UserRepository from '../repositories/UserRepository';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ThemeProvider } from '@react-navigation/native';
 import * as theme from '../constants/theme';
+import Loader from '../components/Loader';
 
 const { height } = Dimensions.get('window');
 
 class Register extends Component {
   state = {
     active: null,
+    userrole: '',
+    isLoading: true
+  }
+  componentDidMount() {
+    this.getRole()
+    //console.log(JSON.stringify(this.state.role))
+
   }
 
   handleType = id => {
@@ -30,14 +39,26 @@ class Register extends Component {
     this.setState({ active: active === id ? null : id });
   }
 
-  storeRole = async (role) => {
-    try {
-      //console.log("a" + role);
-      await AsyncStorage.setItem('@ROLE', role)
-    } catch (error) {
-      // Error saving data
-    }
-  };
+  // storeRole = async (role) => {
+  //   try {
+  //     //console.log("a" + role);
+  //     await AsyncStorage.setItem('@ROLE', role)
+  //   } catch (error) {
+  //     // Error saving data
+  //   }
+  // };
+  getRole = async () => {
+    const { role, userrole } = this.state;
+    await UserRepository.getUserrole()
+      .then((response) => {
+        response.data["roleList"].length === 2 ? this.setState({ userrole: 'BOTH' }) : response.data["roleList"][0]["roleName"] === 'CONTRIBUTOR' ? this.setState({ userrole: 'CONTRIBUTOR' }) : this.setState({ userrole: 'DRIVER' })
+      })
+      .catch((error) => {
+        console.log(error);
+
+      })
+    this.setState({ isLoading: false })
+  }
 
   handleRoute = id => {
     // id === 'driver' ? this.storeRole('DRIVER') : this.storeRole('CONTRIBUTOR');
@@ -79,67 +100,132 @@ class Register extends Component {
         </Block>
         <Block center>
           <Text h3 style={{ marginBottom: 6 }}>
-            Get started for free
+            Role
           </Text>
           <Text paragraph color="black3">
-            Free forever. No credit card needed.
+            Choose your role
           </Text>
           <Block row style={{ marginHorizontal: 10, marginTop: 40, }}>
-            <TouchableWithoutFeedback
-              onPress={() => this.handleType('driver')}
-              style={active === 'driver' ? styles.activeBorder : null}
-            >
-              <Block
-                center
-                middle
-                style={[
-                  styles.card,
-                  { marginRight: 20, },
-                  active === 'driver' ? styles.active : null
-                ]}
+            {this.state.userrole === 'BOTH' ? (<>
+              <TouchableWithoutFeedback
+                onPress={() => this.handleType('driver')}
+                style={active === 'driver' ? styles.activeBorder : null}
               >
-                {
-                  active === 'driver' ? (
-                    <Block center middle style={styles.check}>
-                      {checkIcon}
-                    </Block>
-                  ) : null
-                }
-                <Block center middle style={styles.icon}>
-                  {driverIcon}
+                <Block
+                  center
+                  middle
+                  style={[
+                    styles.card,
+                    { marginRight: 20, },
+                    active === 'driver' ? styles.active : null
+                  ]}
+                >
+                  {
+                    active === 'driver' ? (
+                      <Block center middle style={styles.check}>
+                        {checkIcon}
+                      </Block>
+                    ) : null
+                  }
+                  <Block center middle style={styles.icon}>
+                    {driverIcon}
+                  </Block>
+                  <Text h4 style={{ marginBottom: 11 }}>Driver</Text>
+                  <Text paragraph center color="black3">Login as driver</Text>
                 </Block>
-                <Text h4 style={{ marginBottom: 11 }}>Driver</Text>
-                <Text paragraph center color="black3">Login as driver</Text>
-              </Block>
-            </TouchableWithoutFeedback>
+              </TouchableWithoutFeedback>
 
-            <TouchableWithoutFeedback
-              onPress={() => this.handleType('contributor')}
-              style={active === 'contributor' ? styles.activeBorder : null}
-            >
-              <Block
-                center
-                middle
-                style={[
-                  styles.card,
-
-                  active === 'contributor' ? styles.active : null
-                ]}
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  this.handleType('contributor')
+                }}
+                style={active === 'contributor' ? styles.activeBorder : null}
               >
-                {
-                  active === 'contributor' ? (
-                    <Block center middle style={styles.check}>
-                      {checkIcon}
-                    </Block>
-                  ) : null
-                }
-                <Block center middle style={styles.icon}>
-                  {contributorIcon}
+                <Block
+                  center
+                  middle
+                  style={[
+                    styles.card,
+
+                    active === 'contributor' ? styles.active : null
+                  ]}
+                >
+                  {
+                    active === 'contributor' ? (
+                      <Block center middle style={styles.check}>
+                        {checkIcon}
+                      </Block>
+                    ) : null
+                  }
+                  <Block center middle style={styles.icon}>
+                    {contributorIcon}
+                  </Block>
+                  <Text h4 style={{ marginBottom: 11 }}>Contributor</Text>
+                  <Text paragraph center color="black3">Login as contributor</Text>
                 </Block>
-                <Text h4 style={{ marginBottom: 11 }}>Contributor</Text>
-                <Text paragraph center color="black3">Login as contributor</Text>
-              </Block>
-            </TouchableWithoutFeedback>
+              </TouchableWithoutFeedback></>) : this.state.userrole === 'CONTRIBUTOR' ? (<>
+                <Block center style={{ width: height - 200 }}>
+
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      this.handleType('contributor')
+                    }}
+                    style={active === 'contributor' ? styles.activeBorder : null}
+                  >
+                    <Block
+                      center
+                      middle
+                      style={[
+                        styles.card,
+
+                        active === 'contributor' ? styles.active : null
+                      ]}
+                    >
+                      {
+                        active === 'contributor' ? (
+                          <Block center middle style={styles.check}>
+                            {checkIcon}
+                          </Block>
+                        ) : null
+                      }
+                      <Block center middle style={styles.icon}>
+                        {contributorIcon}
+                      </Block>
+                      <Text h4 style={{ marginBottom: 11 }}>Contributor</Text>
+                      <Text paragraph center color="black3">Login as contributor</Text>
+                    </Block>
+                  </TouchableWithoutFeedback>
+                </Block>
+              </>) : this.state.userrole === 'DRIVER' ? (<>
+                <Block center style={{ width: height - 200 }}>
+                  <TouchableWithoutFeedback
+                    onPress={() => this.handleType('driver')}
+                    style={active === 'driver' ? styles.activeBorder : null}
+                  >
+                    <Block
+                      center
+                      style={[
+                        styles.card,
+
+                        active === 'driver' ? styles.active : null
+                      ]}
+                    >
+                      {
+                        active === 'driver' ? (
+                          <Block center middle style={styles.check}>
+                            {checkIcon}
+                          </Block>
+                        ) : null
+                      }
+                      <Block center middle style={styles.icon}>
+                        {driverIcon}
+                      </Block>
+                      <Text h4 style={{ marginBottom: 11 }}>Driver</Text>
+                      <Text paragraph center color="black3">Login as driver</Text>
+                    </Block>
+                  </TouchableWithoutFeedback>
+                </Block>
+              </>) : (<></>)}
 
           </Block>
           <Block center style={{ marginTop: 25 }}>
@@ -170,6 +256,7 @@ class Register extends Component {
             </Button>
           </Block>
         </Block>
+        <Loader isAnimate={this.state.isLoading} />
       </KeyboardAwareScrollView>
     )
   }

@@ -164,8 +164,9 @@ const ProfileScreen = ({ navigation, route }) => {
         });
     }
     const [driver, setDriver] = useState({})
-    const inituserdocument = (uid) => {
-        DocumentRepository.getUserDocument(uid)
+    const inituserdocument = async (uid) => {
+        setIsLoading(true)
+        await DocumentRepository.getUserDocument(uid)
             .then((response) => {
                 //console.log(response);
                 const result = Object.values(response);
@@ -181,10 +182,12 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 console.log(error)
             })
+        setIsLoading(false)
     }
-    const initdocument = (id) => {
+    const initdocument = async (id) => {
+        setIsLoading(true)
         setSelectedDocument(id)
-        DocumentRepository.getUserDetailDocument(id)
+        await DocumentRepository.getUserDetailDocument(id)
             .then((response) => {
                 //console.log(response);
                 //const result = Object.values(response);
@@ -203,10 +206,11 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 console.log(error)
             })
-
+        setIsLoading(false)
     }
-    const inituserdocumenttype = () => {
-        DocumentRepository.getUserDocumentType()
+    const inituserdocumenttype = async () => {
+        setIsLoading(true)
+        await DocumentRepository.getUserDocumentType()
             .then((response) => {
                 //console.log(response);
                 const result = Object.values(response);
@@ -223,16 +227,18 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 console.log(error)
             })
+        setIsLoading(false)
     }
     const createRequest = async () => {
+        setIsLoading(true)
         let urlf = await FirebaseRepository.uploadImageToFirebase(frontImgUri, requestType + "_FRONT", user.uid)
         let urlb = await FirebaseRepository.uploadImageToFirebase(backImgUri, requestType + "_BACK", user.uid)
         let requests = {
-            description: description,
+            description: description.trim(),
             requestType: requestType,
             userDocumentReq: {
                 expiryDate: expiryDate,
-                otherInformation: otherInformation,
+                otherInformation: otherInformation.trim(),
                 userDocumentImages: [
                     // frontImgLink,
                     // backImgLink
@@ -241,8 +247,8 @@ const ProfileScreen = ({ navigation, route }) => {
                     //"a", "b"
                 ],
                 registeredDate: registeredDate,
-                registeredLocation: registeredLocation,
-                userDocumentId: userDocumentId,
+                registeredLocation: registeredLocation.trim(),
+                userDocumentId: userDocumentId.trim(),
                 userDocumentType: userDocumentType,
             }
         }
@@ -281,32 +287,21 @@ const ProfileScreen = ({ navigation, route }) => {
                     { cancelable: false }
                 );
             })
-        //console.log("done");
-        // setDescription('')
-        // setRequestType('')
-        // setSelectedDocument('')
-        // setFrontImgUri('')
-        // setBackImgUri('')
-        // setUserDocumentType('')
-        // setExpiryDate('')
-        // setUserDocumentId('')
-        // setRegisteredLocation('')
-        // setRegisteredDate('')
-        // setOtherInformation('')
         clear()
-
+        setIsLoading(false)
     }
     const updateRequest = async () => {
+        setIsLoading(true)
         let urlf = ''
         let urlb = ''
         isfrontImgUpdate === true ? (urlf = await FirebaseRepository.uploadImageToFirebase(frontImgUri, requestType + "_FRONT", user.uid)) : (urlf = frontImgUri)
         isbackImgUpdate === true ? (urlb = await FirebaseRepository.uploadImageToFirebase(backImgUri, requestType + "_BACK", user.uid)) : (urlb = backImgUri)
         let requests = {
-            description: description,
+            description: description.trim(),
             requestType: requestType,
             userDocumentReq: {
                 expiryDate: expiryDate,
-                otherInformation: otherInformation,
+                otherInformation: otherInformation.trim(),
                 userDocumentImages: [
                     // frontImgLink,
                     // backImgLink
@@ -322,12 +317,12 @@ const ProfileScreen = ({ navigation, route }) => {
                     //"a", "b"
                 ],
                 registeredDate: registeredDate,
-                registeredLocation: registeredLocation,
+                registeredLocation: registeredLocation.trim(),
                 userDocumentId: userDocumentId,
                 userDocumentType: userDocumentType,
             }
         }
-        //console.log(JSON.stringify(requests))
+        console.log(JSON.stringify(requests))
         RequestRepository.createUserDocumentRequests(requests)
             .then((response) => {
                 console.log(response.status)
@@ -363,25 +358,11 @@ const ProfileScreen = ({ navigation, route }) => {
                     { cancelable: false }
                 );
             })
-        //console.log("done");
-        // setDescription('')
-        // setRequestType('')
-        // setSelectedDocument('')
-        // setFrontImgUri('')
-        // setBackImgUri('')
-        // setUserDocumentType('')
-        // setExpiryDate('')
-        // setUserDocumentId('')
-        // setRegisteredLocation('')
-        // setRegisteredDate('')
-        // setOtherInformation('')
         clear()
-
+        setIsLoading(false)
     }
     const clear = () => {
         setDescription('')
-        //setRequestType('')
-        //setSelectedDocument(userdocumentList)
         setFrontImgUri('')
         setBackImgUri('')
         setUserDocumentType(documentTypes[0]["value"])
@@ -396,8 +377,9 @@ const ProfileScreen = ({ navigation, route }) => {
         setIsbackImgUpdate(false)
     }
     const deleteRequest = async () => {
+        setIsLoading(true)
         let requests = {
-            description: description,
+            description: description.trim(),
             requestType: requestType,
             userDocumentReq: {
                 userDocumentId: selectedDocument
@@ -411,12 +393,8 @@ const ProfileScreen = ({ navigation, route }) => {
                     'Request Created!!',
                     [
                         {
-                            text: 'Back to menu',
-                            onPress: () => navigation.navigate("Service")
-                        },
-                        {
-                            text: 'Reset',
-                            onPress: () => navigation.navigate("Requests"),
+                            text: 'Close',
+                            onPress: () => navigation.navigate("CreateRequest"),
                             style: 'cancel'
                         },
                     ],
@@ -438,36 +416,73 @@ const ProfileScreen = ({ navigation, route }) => {
                     { cancelable: false }
                 );
             })
-        //console.log("done");
-        // setDescription('')
-        // setRequestType('')
-        // setSelectedDocument('')
         clear()
-
+        setIsLoading(false)
+    }
+    const chnageVehicleRequest = async () => {
+        setIsLoading(true)
+        let requests = {
+            description: description,
+            requestType: requestType,
+        }
+        RequestRepository.createChangeVehicleRequests(requests)
+            .then((response) => {
+                console.log(response.status)
+                Alert.alert(
+                    'Sent',
+                    'Request Created!!',
+                    [
+                        {
+                            text: 'Close',
+                            onPress: () => navigation.navigate("CreateRequest"),
+                            style: 'cancel'
+                        },
+                    ],
+                    { cancelable: false }
+                );
+            })
+            .catch((error) => {
+                Alert.alert(
+                    'Error',
+                    JSON.stringify(error),
+                    [
+                        {
+                            text: 'Cancel',
+                            onPress: () => console.log('Cancel Pressed'),
+                            style: 'cancel'
+                        },
+                        { text: 'OK', onPress: () => console.log('OK Pressed') }
+                    ],
+                    { cancelable: false }
+                );
+            })
+        clear()
+        setIsLoading(false)
     }
     const [userdocumentList, setUserDocumentList] = useState([])
     const [documentTypes, setDocumentTypes] = useState([])
 
     return (
         <SafeAreaView style={styles.overview}>
-            <Header navigation={navigation} title="Document Request" />
+            <Header navigation={navigation} title="Driver Request" />
             <ScrollView contentContainerStyle={{ paddingVertical: 25 }}>
 
-                <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 10, }} title="Document Request">
+                <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 10, }} title="Driver Request">
                     <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
                         Request type
                             </Text>
                     <DropDownPicker
                         items={[
-                            { label: 'Create Document', value: 'NEW_DOCUMENT' },
-                            { label: 'Update Document', value: 'UPDATE_DOCUMENT' },
-                            { label: 'Delete Document', value: 'DELETE_DOCUMENT' },
+                            { label: 'Create User Document', value: 'NEW_DOCUMENT' },
+                            { label: 'Update User Document', value: 'UPDATE_DOCUMENT' },
+                            { label: 'Delete User Document', value: 'DELETE_DOCUMENT' },
+                            { label: 'Change Vehicle', value: 'CHANGE_VEHICLE' },
                         ]}
                         defaultValue={requestType}
                         //dropDownMaxHeight={300}
                         itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
                         placeholder="Select type"
-                        containerStyle={{ height: 40, width: 250, marginBottom: 60 }}
+                        containerStyle={{ height: 40, width: 250, marginBottom: 100 }}
                         onChangeItem={item => setRequestType(item.value)}
                     />
                     {/* <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
@@ -490,6 +505,8 @@ const ProfileScreen = ({ navigation, route }) => {
                         <Block column center style={{ marginTop: 10 }}>
                             <Input
                                 full
+
+                                maxLength={20}
                                 label="Document ID"
                                 style={{ marginBottom: 15 }}
                                 value={userDocumentId}
@@ -498,6 +515,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             <Input
                                 multiline={true}
                                 full
+                                maxLength={100}
                                 label="Registered Location"
                                 value={registeredLocation}
                                 onChangeText={text => setRegisteredLocation(text)}
@@ -529,7 +547,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 mode="date"
                                 onConfirm={datetime => {
                                     //console.log(datetime)
-                                    setRegisteredDate(`${datetime.getFullYear()}-${datetime.getMonth()}-${datetime.getDate()}`)
+                                    setRegisteredDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
                                     //console.log(departureTime)
                                     setIsRegisteredDateVisible(false)
                                 }}
@@ -547,7 +565,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 mode="date"
                                 onConfirm={datetime => {
                                     //console.log(datetime)
-                                    setExpiryDate(`${datetime.getFullYear()}-${datetime.getMonth()}-${datetime.getDate()}`)
+                                    setExpiryDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
                                     //console.log(departureTime)
                                     setIsExpiryDateVisible(false)
                                 }}
@@ -608,6 +626,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             <Input
                                 multiline={true}
                                 full
+                                maxLength={50}
                                 label="Other information"
                                 value={otherInformation}
                                 onChangeText={text => setOtherInformation(text)}
@@ -667,6 +686,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 <Input
                                     multiline={true}
                                     full
+                                    maxLength={100}
                                     label="Description"
                                     value={description}
                                     onChangeText={text => setDescription(text)}
@@ -716,7 +736,9 @@ const ProfileScreen = ({ navigation, route }) => {
                                 />
                                 <Input
                                     full
+                                    editable={false}
                                     label="Document ID"
+                                    maxLength={20}
                                     style={{ marginBottom: 15 }}
                                     value={userDocumentId}
                                     onChangeText={text => setUserDocumentId(text)}
@@ -724,27 +746,38 @@ const ProfileScreen = ({ navigation, route }) => {
                                 <Input
                                     multiline={true}
                                     full
+                                    maxLength={100}
                                     label="Registered Location"
                                     value={registeredLocation}
                                     onChangeText={text => setRegisteredLocation(text)}
                                     style={{ marginBottom: 15, height: 80, textAlignVertical: "top" }}
                                 />
                                 <Block>
+                                    {/*
                                     <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left" }}>
                                         Document type
                             </Text>
-                                    <DropDownPicker
+                                     <DropDownPicker
                                         items={documentTypes}
                                         defaultValue={userDocumentType}
                                         itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
                                         placeholder="Select type"
                                         containerStyle={{ height: 40, width: width - 50, marginBottom: 25 }}
                                         onChangeItem={item => setUserDocumentType(item.value)}
+                                    /> */}
+                                    <Input
+                                        full
+                                        editable={false}
+                                        label="Document type"
+                                        style={{ marginBottom: 15 }}
+                                        value={userDocumentType}
+                                    //onFocus={() => setIsRegisteredDateVisible(true)}
                                     />
                                 </Block>
 
                                 <Input
                                     full
+
                                     label="Registered date"
                                     style={{ marginBottom: 15 }}
                                     value={registeredDate}
@@ -755,7 +788,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                     mode="date"
                                     onConfirm={datetime => {
                                         //console.log(datetime)
-                                        setRegisteredDate(`${datetime.getFullYear()}-${datetime.getMonth()}-${datetime.getDate()}`)
+                                        setRegisteredDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
                                         //console.log(departureTime)
                                         setIsRegisteredDateVisible(false)
                                     }}
@@ -773,7 +806,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                     mode="date"
                                     onConfirm={datetime => {
                                         //console.log(datetime)
-                                        setExpiryDate(`${datetime.getFullYear()}-${datetime.getMonth()}-${datetime.getDate()}`)
+                                        setExpiryDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
                                         //console.log(departureTime)
                                         setIsExpiryDateVisible(false)
                                     }}
@@ -834,6 +867,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 <Input
                                     multiline={true}
                                     full
+                                    maxLength={50}
                                     label="Other information"
                                     value={otherInformation}
                                     onChangeText={text => setOtherInformation(text)}
@@ -849,10 +883,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 />
                                 <Block row>
                                     <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
-                                        //uploadImage(frontImgUri, requestType, user.uid)
-                                        //console.log(vehicleList);
                                         updateRequest()
-                                        //createRequest()
                                     }}>
                                         <Block row center>
                                             <Text color="white" >
@@ -861,10 +892,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                         </Block>
                                     </Button>
                                     <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
-                                        //uploadImage(frontImgUri, requestType, user.uid)
-                                        //console.log(vehicleList);
                                         clear()
-                                        //createRequest()
                                     }}>
                                         <Block row center>
                                             <Text color="white" >
@@ -877,7 +905,48 @@ const ProfileScreen = ({ navigation, route }) => {
 
                             </Block>
 
-                        </Card>) : (<></>)))}
+                        </Card>) : (requestType === 'CHANGE_VEHICLE' ? (
+                            <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Change Vehicle">
+                                <Block column center style={{ marginTop: 10 }}>
+                                    <Input
+                                        multiline={true}
+                                        full
+                                        maxLength={100}
+                                        label="Description"
+                                        value={description}
+                                        onChangeText={text => setDescription(text)}
+                                        style={{ marginBottom: 15, height: 80, textAlignVertical: "top" }}
+                                    />
+                                    <Block row>
+                                        <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
+                                            //uploadImage(frontImgUri, requestType, user.uid)
+                                            //console.log(vehicleList);
+                                            chnageVehicleRequest()
+                                            //createRequest()
+                                        }}>
+                                            <Block row center>
+                                                <Text color="white" >
+                                                    Send Request
+                                            </Text>
+                                            </Block>
+                                        </Button>
+                                        <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
+                                            //uploadImage(frontImgUri, requestType, user.uid)
+                                            //console.log(vehicleList);
+                                            clear()
+                                            //createRequest()
+                                        }}>
+                                            <Block row center>
+                                                <Text color="white" >
+                                                    Reset
+                                            </Text>
+                                            </Block>
+                                        </Button>
+                                    </Block>
+
+                                </Block>
+
+                            </Card>) : (<></>))))}
 
 
             </ScrollView>

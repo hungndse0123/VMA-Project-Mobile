@@ -1,4 +1,5 @@
 import Repository from "./Repository";
+import firebase from "@react-native-firebase/app";
 
 const resource = "/drivers";
 
@@ -38,13 +39,14 @@ export default {
         });
     });
   },
-  getIssuedDrivers(filter) {
+  getIssuedDrivers(id, filter) {
     return new Promise((resolve, reject) => {
-      Repository.get(`${resource}/contributors/${filter}`)
+      Repository.get(`${resource}/contributors/${id}/issued-drivers${filter}`)
         .then((res) => {
           resolve(res.data);
         })
         .catch((err) => {
+          console.log(err)
           reject(err.response.data);
         });
     });

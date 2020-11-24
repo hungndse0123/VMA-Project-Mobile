@@ -3,7 +3,7 @@ import axios from 'axios';
 import UserRepository from '../repositories/UserRepository';
 
 import { Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, TouchableOpacity, AsyncStorage } from "react-native";
-import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
+import { signOutUser, getCurrentUser, getRegToken } from "../services/FireAuthHelper";
 import Block from '../components/Block';
 import Text from '../components/Text';
 import Button from '../components/Button';
@@ -77,6 +77,7 @@ const ProfileScreen = ({ navigation }) => {
             .then((user) => {
                 setUser(user);
                 updateStatus(user.uid)
+                //getRegToken()
             })
             .catch((error) => {
                 setUser(null);
@@ -162,7 +163,9 @@ const ProfileScreen = ({ navigation }) => {
                     </Block>
                     <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
-                            onPress={() => navigation.navigate("Request Menu")}
+                            onPress={() => navigation.navigate("Request Menu", {
+                                lastRefresh: Date(Date.now()).toString(),
+                            })}
                             style={styles.activeBorder}
                         >
                             <Block

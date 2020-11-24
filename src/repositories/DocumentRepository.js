@@ -61,4 +61,15 @@ export default {
                 });
         });
     },
+    getVehicleDocumentType() {
+        return new Promise((resolve, reject) => {
+            Repository.get(`${vehicle_doc_resource}/types`)
+                .then((res) => {
+                    resolve(res.data.vehicleDocumentTypes);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
 }

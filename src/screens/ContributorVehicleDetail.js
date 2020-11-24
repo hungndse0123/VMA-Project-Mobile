@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useIsFocused } from '@react-navigation/native'
-import axios from 'axios';
-import ContributorRepository from '../repositories/ContributorRepository';
-import UserRepository from '../repositories/UserRepository';
-import DriverRepository from '../repositories/DriverRepository';
 import VehicleRepository from '../repositories/VehicleRepository';
 
 import { TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, FlatList, AsyncStorage } from "react-native";
@@ -19,6 +15,7 @@ import * as theme from '../constants/theme';
 import Auth from "@react-native-firebase/auth";
 import Header from "../components/Header";
 import Icon from "react-native-vector-icons/Entypo";
+import Loader from '../components/Loader';
 
 const VehicleDetail = ({ navigation, route }) => {
     const styles = StyleSheet.create({
@@ -85,6 +82,7 @@ const VehicleDetail = ({ navigation, route }) => {
     const [vehicleType, setVehicleType] = useState('');
     const [brandName, setBrandName] = useState('');
     const [driverName, setDriverName] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
 
 
     useEffect(() => {
@@ -109,8 +107,9 @@ const VehicleDetail = ({ navigation, route }) => {
             .then(() => alert('success'));
     };
     const [vehicle, setVehicle] = useState({})
-    const init = () => {
-        VehicleRepository.getDetailVehicle(itemId)
+    const init = async () => {
+        setIsLoading(true)
+        await VehicleRepository.getDetailVehicle(itemId)
             .then((response) => {
                 //console.log(response);
                 const result = Object.entries(response);
@@ -128,6 +127,7 @@ const VehicleDetail = ({ navigation, route }) => {
             .catch((error) => {
                 console.log(error)
             })
+        setIsLoading(false)
     }
     //const [contributor, setContributor] = useState(null);
 
@@ -237,7 +237,7 @@ const VehicleDetail = ({ navigation, route }) => {
                     </Card>
                 ) : (<></>)}
             </ScrollView>
-
+            <Loader isAnimate={isLoading} />
         </SafeAreaView>
     );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 // import { Auth } from "../setup/firebase/FirebaseSetup";
 import Auth from "@react-native-firebase/auth";
+import messaging from '@react-native-firebase/messaging';
 /**
  * @description Function to Login with Phone number.
  * @param phoneNumber -Phone of Facebook which get from facebook API.
@@ -174,4 +175,15 @@ export const getCurrentUser = () => {
     }
   });
 };
+
+export async function getRegToken() {
+  // Register the device with FCM
+  await messaging().registerDeviceForRemoteMessages();
+
+  // Get the token
+  const token = await messaging().getToken();
+
+  // Save the token
+  console.log(token)
+}
 

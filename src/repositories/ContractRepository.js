@@ -26,6 +26,17 @@ export default {
                 });
         });
     },
+    getContractVehicleStatus() {
+        return new Promise((resolve, reject) => {
+            Repository.get(`${resource}/vehicles/status`)
+                .then((res) => {
+                    resolve(res.data.contractVehicleStatus);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
     // Create driver
     create(contract) {
         return new Promise((resolve, reject) => {
@@ -109,5 +120,27 @@ export default {
                     reject(err.response.data);
                 });
         });
-    }
+    },
+    startContractVehicle(data) {
+        return new Promise((resolve, reject) => {
+            Repository.patch(`${resource}/vehicles/start`, data)
+                .then((res) => {
+                    resolve(res);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
+    endContractVehicle(data) {
+        return new Promise((resolve, reject) => {
+            Repository.patch(`${resource}/vehicles/end`, data)
+                .then((res) => {
+                    resolve(res);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
 }

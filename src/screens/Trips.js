@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useIsFocused } from '@react-navigation/native'
 import axios from 'axios';
 import Repository from "../repositories/Repository";
 import ContractRepository from "../repositories/ContractRepository";
@@ -120,16 +121,22 @@ const TripsScreen = ({ navigation, route }) => {
             marginBottom: 8
         },
     });
-
+    const { lastRefresh } = route.params;
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [issuedvehicleid, setIssuedvehicleid] = useState('');
-
+    const [vehicleId, setVehicleId] = useState('');
+    const [vehicleStatusList, setVehicleStatusList] = useState([])
+    const isFocused = useIsFocused();
     useEffect(() => {
-
+        console.log(tripList.length)
+        setVehicleStatusList([])
         getCurrentUser()
             .then((user) => {
                 setUser(user);
+                initVehicleStatusList();
+                setImage_Http_URL({ uri: user["photoURL"] });
+                setUsername(user["displayName"]);
                 init(user.uid)
             })
             .catch((error) => {
@@ -140,21 +147,20 @@ const TripsScreen = ({ navigation, route }) => {
 
         //console.log(driverList);
         setIsLoading(false);
-    }, []);
-    const init = (uid) => {
-        VehicleRepository.getCurrentlyAssignedVehicleByDriverId(uid)
+    }, [isFocused]);
+    const init = async (uid) => {
+        setIsLoading(true)
+        await VehicleRepository.getCurrentlyAssignedVehicleByDriverId(uid)
             .then((response) => {
+                setVehicleId(response["vehicleId"])
                 // console.log(response)
                 // setIssuedvehicleid(response["issuedVehicleId"])
                 VehicleRepository.getVehicleTrip(response["issuedVehicleId"], '')
                     .then((response) => {
                         //console.log(response);
-                        const result = Object.values(response.tripList);
+                        const result = Object.values(response);
                         //console.log(result);
-                        setTripList({
-                            ...tripList,
-                            result
-                        })
+                        setTripList(response)
                     })
                     .catch((error) => {
                         console.log(JSON.stringify(error))
@@ -163,10 +169,10 @@ const TripsScreen = ({ navigation, route }) => {
             .catch((error) => {
                 console.log(JSON.stringify(error))
             })
-
+        setIsLoading(false)
 
     }
-    const filter = filterstring => {
+    const filter = async (filterstring) => {
         //console.log(filterstring);
         // ContractRepository.getContract(filterstring)
         //     .then((response) => {
@@ -182,19 +188,17 @@ const TripsScreen = ({ navigation, route }) => {
         //     .catch((error) => {
         //         console.log(error)
         //     })
-        VehicleRepository.getCurrentlyAssignedVehicleByDriverId(user.uid)
+        setIsLoading(true)
+        await VehicleRepository.getCurrentlyAssignedVehicleByDriverId(user.uid)
             .then((response) => {
                 // console.log(response)
                 // setIssuedvehicleid(response["issuedVehicleId"])
                 VehicleRepository.getVehicleTrip(response["issuedVehicleId"], filterstring)
                     .then((response) => {
                         //console.log(response);
-                        const result = Object.values(response.tripList);
+                        //const result = Object.values(response.tripList);
                         //console.log(result);
-                        setTripList({
-                            ...tripList,
-                            result
-                        })
+                        setTripList(response)
                     })
                     .catch((error) => {
                         console.log(JSON.stringify(error))
@@ -203,14 +207,37 @@ const TripsScreen = ({ navigation, route }) => {
             .catch((error) => {
                 console.log(JSON.stringify(error))
             })
+        resetFilter()
+        setIsLoading(false)
+
+    }
+    const resetFilter = () => {
         setSelectedStatus("");
         setDepartureTime("");
         setDestinationTime("");
     }
-
-    const [tripList, setTripList] = useState([{
+    const initVehicleStatusList = async () => {
+        setIsLoading(true)
+        await ContractRepository.getContractVehicleStatus()
+            .then((response) => {
+                //console.log(response);
+                const result = Object.values(response);
+                //console.log(result);
+                for (let i = 0; i < result.length; i++)
+                    setVehicleStatusList(prevArray => [
+                        ...prevArray, {
+                            label: result[i],
+                            value: result[i]
+                        }
+                    ])
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        setIsLoading(false)
     }
-    ])
+
+    const [tripList, setTripList] = useState([])
     const [isNull, setIsNull] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState("");
@@ -218,22 +245,24 @@ const TripsScreen = ({ navigation, route }) => {
     const [isDepartureVisible, setIsDepartureVisible] = useState(false);
     const [destinationTime, setDestinationTime] = useState("");
     const [isDestinationVisible, setIsDestinationVisible] = useState(false);
-    let Image_Http_URL = { uri: "https://scontent.fsgn2-5.fna.fbcdn.net/v/t1.0-9/80742826_2481110258768067_7881332290297528320_o.jpg?_nc_cat=104&ccb=2&_nc_sid=09cbfe&_nc_ohc=xABpuTzKeNkAX9UlkVS&_nc_ht=scontent.fsgn2-5.fna&oh=ba9257d410d63d4dd10fc28bf9d9bfb6&oe=5FBF8173" };
+    const [username, setUsername] = useState("");
+    const [Image_Http_URL, setImage_Http_URL] = useState({});
     return (
         <SafeAreaView style={styles.overview}>
-            <Header navigation={navigation} title="Drivers" />
+            <Header navigation={navigation} title="Trips" />
             <ScrollView>
                 <Modal
                     animationType="fade"
                     transparent={true}
                     visible={modalVisible}
                     onRequestClose={() => {
-                        Alert.alert("Modal has been closed.");
+
+                        setModalVisible(!modalVisible);
                     }}
                 >
                     <ScrollView style={styles.centeredView, { marginTop: 90 }}>
                         <Card style={styles.margin} title="Filter options">
-                            <Block row style={{ marginBottom: 25 }}>
+                            {/* <Block row style={{ marginBottom: 25 }}>
                                 <Input
                                     label="Departure from"
                                     style={{ marginRight: 15, width: width - 200 }}
@@ -272,25 +301,22 @@ const TripsScreen = ({ navigation, route }) => {
                                     }}
                                     onCancel={text => setIsDestinationVisible(false)}
                                 />
-                            </Block>
+                            </Block> */}
                             <Text caption medium style={styles.label}>
                                 Trip status
                             </Text>
                             <DropDownPicker
-                                items={[
-                                    { label: 'FINISHED', value: 'FINISHED' },
-                                    { label: 'UNFINISHED', value: 'UNFINISHED' },
-                                ]}
+                                items={vehicleStatusList}
                                 defaultValue={selectedStatus}
                                 itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
                                 placeholder="Select type"
-                                containerStyle={{ height: 40, width: 250, marginBottom: 25 }}
+                                containerStyle={{ height: 40, width: 250, marginBottom: 60 }}
                                 onChangeItem={item => setSelectedStatus(item.value)}
                             />
                             <Button center style={styles.margin}
                                 onPress={() => {
                                     //selectedStatus === "" ? (filter(`?departureTime=${departureTime}&destinationTime=${destinationTime}&viewOption=0`)) : (filter(`?departureTime=${departureTime}&destinationTime=${destinationTime}&contractStatus=${selectedStatus}&viewOption=1`))
-                                    filter(`?departureTime=${departureTime}&destinationTime=${destinationTime}`);
+                                    filter(`?vehicleStatus=${selectedStatus}`);
                                     setModalVisible(!modalVisible);
                                 }}
                             >
@@ -305,7 +331,7 @@ const TripsScreen = ({ navigation, route }) => {
                     <Block flex={1.2} row style={{ marginRight: 20 }}>
                         <Image source={Image_Http_URL} style={{ height: 50, width: 50, borderRadius: 400 / 2 }} />
                         <Block>
-                            <Text style={{ paddingHorizontal: 16, marginTop: 3 }}>Nguyen Duc Hung</Text>
+                            <Text style={{ paddingHorizontal: 16, marginTop: 3 }}>{username}</Text>
                             <Text ligth caption style={{ paddingHorizontal: 16, marginTop: 3 }}>Driver</Text>
                         </Block>
 
@@ -313,6 +339,7 @@ const TripsScreen = ({ navigation, route }) => {
                     <Block row>
 
                         <Button style={styles.marginButton} onPress={() => {
+                            //setVehicleStatusList([]);
                             setModalVisible(true);
                         }}>
                             <Text color="white">
@@ -335,7 +362,7 @@ const TripsScreen = ({ navigation, route }) => {
                 <Card row style={[styles.marginCard], { backgroundColor: theme.colors.gray2, height: 30 }} border="false" shadow="false">
                     <Block style={{ flex: 0.4 }} >
                         <Text medium caption style={[styles.label]}>
-                            ID
+                            No
                     </Text>
                     </Block>
                     <Block style={{ flex: 1.5 }}>
@@ -354,25 +381,33 @@ const TripsScreen = ({ navigation, route }) => {
         </Text>
                     </Block>
                 </Card>
-                {isNull === true ? (
-                    <Block >
-                        <Text medium caption style={[styles.label, { marginLeft: 14 }]}>
-                            Status
+                {tripList.length === 0 ? (
+                    <Block style={{ marginTop: 15 }} center>
+                        <Image
+                            style={{ width: width - 100, height: width - 100 }}
+                            source={ // if clicked a new img
+                                require('../assets/images/emptylist.png')} //else show random
+                        />
+                        <Text large center caption >
+                            LIST IS EMPTY
                     </Text>
                     </Block>
                 ) : (
                         <FlatList
-                            data={tripList.result}
-                            renderItem={({ item }) =>
+                            data={tripList}
+                            renderItem={({ item, index }) =>
                                 <TouchableOpacity
                                     onPress={() => {
                                         // setIsLoading(true);
                                         // setIsLoading(false);
                                         navigation.navigate("TripDetail", {
-                                            itemId: item["contractId"],
+                                            contractId: item["contractId"],
                                             contractVehicleId: item["contractVehicleId"],
-                                            vehicleStatus: item["contractVehicleStatus"]
+                                            vehicleStatus: item["contractVehicleStatus"],
+                                            vehicleId: vehicleId,
+                                            contractTrips: item["contractTrips"]
                                         })
+                                        console.log(item["vehicleId"])
                                     }}
                                 >
                                     <Card center row style={[styles.marginCard]} style={{
@@ -381,21 +416,21 @@ const TripsScreen = ({ navigation, route }) => {
                                     }}>
                                         <Block style={{ flex: 0.4 }} >
                                             <Text medium>
-                                                {item["contractId"]}
+                                                {index}
                                             </Text>
                                         </Block>
                                         <Block style={{ flex: 1.5 }}>
                                             <Text medium>
-                                                {item["departureTime"]}
+                                                {item["contractTrips"][0]["departureTime"]}
                                             </Text>
                                         </Block>
                                         <Block style={{ flex: 1.5 }}>
                                             <Text medium>
-                                                {item["destinationTime"]}
+                                                {item["contractTrips"][0]["destinationTime"]}
                                             </Text>
                                         </Block>
                                         <Block style={{ flex: 1.3 }}>
-                                            {item["contractVehicleStatus"] === "FINISHED" ? (<Text color="green" medium>
+                                            {item["contractVehicleStatus"] === "COMPLETED" ? (<Text color="green" medium>
                                                 {item["contractVehicleStatus"]}
                                             </Text>) : (<Text medium color="yellow">
                                                 {item["contractVehicleStatus"]}

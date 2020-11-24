@@ -17,9 +17,10 @@ export default {
     },
     getVehicle(filter) {
         return new Promise((resolve, reject) => {
+            console.log(`${resource}${filter}`)
             Repository.get(`${resource}${filter}`)
                 .then((res) => {
-                    resolve(res.data);
+                    resolve(res.data.vehicleList);
                 })
                 .catch((err) => {
                     reject(err.response.data);
@@ -43,7 +44,40 @@ export default {
             console.log(`/contracts${resource}/${id}/trips${filter}`)
             Repository.get(`contracts${resource}/${id}/trips${filter}`)
                 .then((res) => {
-                    resolve(res.data);
+                    resolve(res.data.tripList);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
+    getVehicleBrand() {
+        return new Promise((resolve, reject) => {
+            Repository.get(`${resource}/misc/brands`)
+                .then((res) => {
+                    resolve(res.data.brands);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
+    getVehicleType() {
+        return new Promise((resolve, reject) => {
+            Repository.get(`${resource}/misc/types`)
+                .then((res) => {
+                    resolve(res.data.vehicleTypes);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
+    getVehicleStatusList() {
+        return new Promise((resolve, reject) => {
+            Repository.get(`${resource}/status`)
+                .then((res) => {
+                    resolve(res.data.vehicleStatus);
                 })
                 .catch((err) => {
                     reject(err.response.data);

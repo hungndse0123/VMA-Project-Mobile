@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import VehicleRepository from "../repositories/VehicleRepository";
 
-import { TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, Modal, View, TouchableHighlight, Picker, FlatList } from "react-native";
+import { Dimensions, TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, Modal, View, TouchableHighlight, Picker, FlatList } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
 import Block from '../components/Block';
 import Text from '../components/Text';
@@ -11,6 +11,9 @@ import Card from '../components/Card';
 import * as theme from '../constants/theme';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Header from "../components/Header";
+import Loader from '../components/Loader';
+
+const { width } = Dimensions.get("window");
 
 const ProfileScreen = ({ navigation, route }) => {
     const styles = StyleSheet.create({
@@ -75,7 +78,6 @@ const ProfileScreen = ({ navigation, route }) => {
         },
         centeredView: {
             flex: 1,
-            justifyContent: "center",
             marginTop: 22,
         },
         modalView: {
@@ -115,11 +117,14 @@ const ProfileScreen = ({ navigation, route }) => {
     const [user, setUser] = useState(null);
     const [Image_Http_URL, setImage_Http_URL] = useState({});
     const [username, setUsername] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         getCurrentUser()
             .then((user) => {
                 setUser(user);
+                initvehicletype();
+                initvehiclestatus();
                 setImage_Http_URL({ uri: user["photoURL"] });
                 setUsername(user.displayName);
                 init(user.uid)
@@ -131,33 +136,30 @@ const ProfileScreen = ({ navigation, route }) => {
 
         console.log(vehicleList);
     }, []);
-    const init = (uid) => {
-        VehicleRepository.getVehicle(`?ownerId=${uid}`)
+    const init = async (uid) => {
+        setIsLoading(true)
+        await VehicleRepository.getVehicle(`?ownerId=${uid}`)
             .then((response) => {
                 //console.log(response);
-                const result = Object.values(response.vehicleList);
+                // const result = Object.values(response.vehicleList);
                 //console.log(result);
-                setVehicleList({
-                    ...vehicleList,
-                    result
-                })
+                setVehicleList(response)
             })
             .catch((error) => {
                 console.log(error)
             })
+        setIsLoading(false)
     }
-    const filter = filterstring => {
-        console.log(filterstring)
-        VehicleRepository.getVehicle(filterstring)
+
+    const filter = async (filterstring) => {
+        setIsLoading(true)
+        await VehicleRepository.getVehicle(filterstring)
             .then((response) => {
                 //console.log(response);
-                const result = Object.values(response.vehicleList);
+                //const result = Object.values(response.vehicleList);
                 //console.log(result);
                 //(result === null ? setIsNull(true) : setIsNull(false))
-                setVehicleList({
-                    ...vehicleList,
-                    result
-                })
+                setVehicleList(response)
             })
             .catch((error) => {
                 console.log(error + "asd")
@@ -166,10 +168,55 @@ const ProfileScreen = ({ navigation, route }) => {
         setFilterfrom("");
         setFilterto("");
         setSelectedType("");
+        setIsLoading(false)
     }
-    const [vehicleList, setVehicleList] = useState([{
+    const initvehicletype = async () => {
+        setIsLoading(true)
+        setVehicleTypeList([])
+        await VehicleRepository.getVehicleType()
+            .then((response) => {
+                //console.log(response);
+                const result = Object.values(response);
+                //console.log(result);
+                for (let i = 0; i < result.length; i++)
+                    setVehicleTypeList(prevArray => [
+                        ...prevArray, {
+                            label: result[i]["vehicleTypeName"],
+                            value: result[i]["vehicleTypeId"]
+                        }
+
+                    ])
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        setIsLoading(false)
     }
-    ])
+    const initvehiclestatus = async () => {
+        setIsLoading(true)
+        setVehicleStatusList([])
+        await VehicleRepository.getVehicleStatusList()
+            .then((response) => {
+                //console.log(response);
+                const result = Object.values(response);
+                //console.log(result);
+                for (let i = 0; i < result.length; i++)
+                    setVehicleStatusList(prevArray => [
+                        ...prevArray, {
+                            label: result[i],
+                            value: result[i]
+                        }
+
+                    ])
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        setIsLoading(false)
+    }
+    const [vehicletypeList, setVehicleTypeList] = useState([]);
+    const [vehiclestatusList, setVehicleStatusList] = useState([]);
+    const [vehicleList, setVehicleList] = useState([])
     const [isNull, setIsNull] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState("");
@@ -186,15 +233,16 @@ const ProfileScreen = ({ navigation, route }) => {
                     transparent={true}
                     visible={modalVisible}
                     onRequestClose={() => {
-                        Alert.alert("Modal has been closed.");
+                        setModalVisible(!modalVisible)
                     }}
                 >
-                    <View style={styles.centeredView}>
+                    <ScrollView style={styles.centeredView}>
+
                         <Card style={styles.margin, { marginHorizontal: 10, marginTop: 70, marginBottom: 10 }} title="Filter options">
                             <Text caption medium style={styles.label}>
                                 Vehicle type
           </Text>
-                            <DropDownPicker
+                            {/* <DropDownPicker
                                 items={[
                                     { label: 'Car', value: '&vehicleTypeId=1' },
                                     { label: 'Coach', value: '&vehicleTypeId=2' },
@@ -208,25 +256,39 @@ const ProfileScreen = ({ navigation, route }) => {
                                 onChangeItem={(item) => {
                                     setSelectedType(item.value)
                                 }}
+                            /> */}
+                            <DropDownPicker
+                                items={vehicletypeList}
+                                //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
+                                placeholder="Select type"
+                                defaultValue={selectedType}
+                                containerStyle={{ height: 40, width: width - 75, marginBottom: 25 }}
+                                onChangeItem={item => {
+                                    setSelectedType(item.value)
+                                    //initdocument(item.value)
+                                }}
                             />
-                            <Input
-                                number
-                                full
-                                label="Distance From"
-                                style={{ marginBottom: 25, width: 250 }}
-                                onChangeText={text => setFilterfrom(`&vehicleMinDis=${text}`)}
-                            />
-                            <Input
-                                number
-                                full
-                                label="Distance To"
-                                style={{ marginBottom: 25, width: 250 }}
-                                onChangeText={text => setFilterto(`&vehicleMaxDis=${text}`)}
-                            />
+                            <Block row>
+                                <Input
+                                    number
+                                    full
+                                    label="Distance From"
+                                    style={{ marginBottom: 25, width: width - 210, marginRight: 20 }}
+                                    onChangeText={text => setFilterfrom(`&vehicleMinDis=${text}`)}
+                                />
+                                <Input
+                                    number
+                                    full
+                                    label="Distance To"
+                                    style={{ marginBottom: 25, width: width - 210 }}
+                                    onChangeText={text => setFilterto(`&vehicleMaxDis=${text}`)}
+                                />
+                            </Block>
+
                             <Text caption medium style={styles.label}>
                                 Request status
           </Text>
-                            <DropDownPicker
+                            {/* <DropDownPicker
                                 items={[
                                     { label: 'AVAILABLE', value: '&vehicleStatus=AVAILABLE' },
                                     { label: 'ON ROUTE', value: '&vehicleStatus=ON_ROUTE' },
@@ -239,9 +301,20 @@ const ProfileScreen = ({ navigation, route }) => {
                                 placeholder="Select type"
                                 containerStyle={{ height: 40, width: 250, marginBottom: 25 }}
                                 onChangeItem={item => setSelectedStatus(item.value)}
+                            /> */}
+                            <DropDownPicker
+                                items={vehiclestatusList}
+                                //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
+                                placeholder="Select status"
+                                defaultValue={selectedStatus}
+                                containerStyle={{ height: 40, width: width - 75, marginBottom: 25 }}
+                                onChangeItem={item => {
+                                    setSelectedStatus(item.value)
+                                    //initdocument(item.value)
+                                }}
                             />
                             <Button center style={styles.margin} onPress={() => {
-                                selectedStatus === "" ? (filter(`?${filterfrom}${filterto}${selectedType}&viewOption=0&ownerId=${user.uid}`)) : (filter(`?${filterfrom}${filterto}${selectedStatus}${selectedType}&viewOption=1&ownerId=${user.uid}`))
+                                selectedStatus === "" ? (filter(`?${filterfrom}${filterto}&vehicleTypeId=${selectedType}&viewOption=0&ownerId=${user.uid}`)) : (filter(`?${filterfrom}${filterto}&vehicleStatus=${selectedStatus}&vehicleTypeId=${selectedType}&viewOption=1&ownerId=${user.uid}`))
 
                                 setModalVisible(!modalVisible);
                             }}>
@@ -250,7 +323,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 </Text>
                             </Button>
                         </Card>
-                    </View>
+                    </ScrollView>
                 </Modal>
                 <Card column middle>
                     <Block flex={1.2} row style={{ marginRight: 20 }}>
@@ -289,15 +362,20 @@ const ProfileScreen = ({ navigation, route }) => {
         </Text>
                     </Block>
                 </Card>
-                {isNull === true ? (
-                    <Block >
-                        <Text medium caption style={[styles.label, { marginLeft: 14 }]}>
-                            Status
+                {vehicleList.length === 1 ? (
+                    <Block style={{ marginTop: 15 }} center>
+                        <Image
+                            style={{ width: width - 100, height: width - 100 }}
+                            source={ // if clicked a new img
+                                require('../assets/images/emptylist.png')} //else show random
+                        />
+                        <Text large center caption >
+                            LIST IS EMPTY
                     </Text>
                     </Block>
                 ) : (
                         <FlatList
-                            data={vehicleList.result}
+                            data={vehicleList}
                             renderItem={({ item }) =>
                                 <TouchableOpacity onPress={() =>
                                     navigation.navigate("VehicleDetail", {
@@ -332,7 +410,7 @@ const ProfileScreen = ({ navigation, route }) => {
                     )
                 }
             </ScrollView>
-
+            <Loader isAnimate={isLoading} />
         </SafeAreaView>
     );
 };

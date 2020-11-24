@@ -434,7 +434,7 @@ const RequestScreen = ({ navigation }) => {
   );
   return (
     <SafeAreaView style={styles.overview}>
-      <Header navigation={navigation} title="Service" />
+      <Header navigation={navigation} title="Request Menu" />
       <ScrollView contentContainerStyle={{ paddingVertical: 25 }}>
         {/* <Text caption center onPress={signOut}>
                     Log out
@@ -443,6 +443,7 @@ const RequestScreen = ({ navigation }) => {
           <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
             <TouchableWithoutFeedback
               //onPress={() => navigation.navigate("Assigned Driver")}
+              onPress={() => navigation.navigate("RecentRequests")}
               style={styles.activeBorder}
             >
               <Block

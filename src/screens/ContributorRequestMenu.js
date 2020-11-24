@@ -14,7 +14,7 @@ import Header from "../components/Header";
 
 
 
-const ProfileScreen = ({ navigation }) => {
+const ContributorRequestMenu = ({ navigation }) => {
     const styles = StyleSheet.create({
         overview: {
             flex: 1,
@@ -104,7 +104,7 @@ const ProfileScreen = ({ navigation }) => {
     );
     return (
         <SafeAreaView style={styles.overview}>
-            <Header navigation={navigation} title="Service" />
+            <Header navigation={navigation} title="Request Menu" />
             <ScrollView contentContainerStyle={{ paddingVertical: 25 }}>
                 {/* <Text caption center onPress={signOut}>
                     Log out
@@ -112,7 +112,7 @@ const ProfileScreen = ({ navigation }) => {
                 <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 30, }} title="Request Menu">
                     <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
-                            //onPress={() => navigation.navigate("Assigned Driver")}
+                            onPress={() => navigation.navigate("RecentRequests")}
                             style={styles.activeBorder}
                         >
                             <Block
@@ -186,4 +186,4 @@ const ProfileScreen = ({ navigation }) => {
     );
 };
 
-export default ProfileScreen;
+export default ContributorRequestMenu;

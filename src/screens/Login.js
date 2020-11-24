@@ -212,9 +212,6 @@ const Login = ({ navigation }) => {
           <Text paragraph color="black3">
             Please enter your credentials to proceed.
                     </Text>
-
-
-
           <Block center style={{ marginTop: 70 }}>
             <Block center style={{ marginBottom: 70, alignSelf: 'center', width: '85%' }}>
               <PhoneNoInput

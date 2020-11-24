@@ -188,7 +188,9 @@ const ProfileScreen = ({ navigation }) => {
                     </Block>
                     <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
-                            onPress={() => navigation.navigate("Trips")}
+                            onPress={() => navigation.navigate("Trips", {
+                                lastRefresh: Date(Date.now()).toString(),
+                            })}
                             style={styles.activeBorder}
                         >
                             <Block
