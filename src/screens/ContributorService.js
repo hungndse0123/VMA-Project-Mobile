@@ -117,7 +117,9 @@ const ProfileScreen = ({ navigation }) => {
                 <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 30, }} title="Service">
                     <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
-                            onPress={() => navigation.navigate("Assigned Driver")}
+                            onPress={() => navigation.navigate("Assigned Driver", {
+                                lastRefresh: Date(Date.now()).toString(),
+                            })}
                             style={styles.activeBorder}
                         >
                             <Block
@@ -140,7 +142,9 @@ const ProfileScreen = ({ navigation }) => {
                     </Block>
                     <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
-                            onPress={() => navigation.navigate("Contributor Vehicle")}
+                            onPress={() => navigation.navigate("Contributor Vehicle", {
+                                lastRefresh: Date(Date.now()).toString(),
+                            })}
                             style={styles.activeBorder}
                         >
                             <Block

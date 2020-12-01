@@ -21,7 +21,7 @@ export default {
         return new Promise((resolve, reject) => {
             Repository.get(`${vehicle_doc_resource}${filter}`)
                 .then((res) => {
-                    resolve(res.data);
+                    resolve(res.data.vehicleDocuments);
                 })
                 .catch((err) => {
                     reject(err.response.data);

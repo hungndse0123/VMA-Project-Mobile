@@ -106,7 +106,7 @@ export default {
         return new Promise((resolve, reject) => {
             Repository.get(`${resource}${filter}`)
                 .then((res) => {
-                    resolve(res.data);
+                    resolve(res.data.requestRes);
                 })
                 .catch((err) => {
                     reject(err.response.data);

@@ -203,16 +203,17 @@ const ProfileScreen = ({ navigation, route }) => {
     }
     const [driver, setDriver] = useState({})
     const initvehicle = (uid) => {
+        setVehicleList([])
         VehicleRepository.getVehicle(`?ownerId=${uid}`)
             .then((response) => {
                 //console.log(response);
-                const result = Object.values(response.vehicleList);
+                //const result = Object.values(response.vehicleList);
                 //console.log(result);
-                for (let i = 0; i < result.length; i++)
+                for (let i = 0; i < response.length; i++)
                     setVehicleList(prevArray => [
                         ...prevArray, {
-                            label: result[i]["vehicleId"],
-                            value: result[i]["vehicleId"]
+                            label: response[i]["vehicleId"],
+                            value: response[i]["vehicleId"]
                         }
                     ])
             })
@@ -249,6 +250,8 @@ const ProfileScreen = ({ navigation, route }) => {
                 imageLinks: [
                     frontImgUri,
                     backImgUri
+                    // "https://firebasestorage.googleapis.com/v0/b/vma-fa20se28.appspot.com/o/VEHICLE_REGISTRATION_CERTIFICATE-undefined-20201104154407?alt=media&token=41b1790a-42a5-4b30-a242-deef7ab9a718",
+                    // "https://firebasestorage.googleapis.com/v0/b/vma-fa20se28.appspot.com/o/VEHICLE_REGISTRATION_CERTIFICATE-undefined-20201104154408?alt=media&token=6b39ecce-7d7b-4abf-880e-cab1e3136b62"
                 ],
                 registeredDate: registeredDate,
                 registeredLocation: registeredLocation.trim(),
@@ -340,19 +343,18 @@ const ProfileScreen = ({ navigation, route }) => {
     }
     const createRequest = async () => {
         setIsLoading(true)
-        vehicleDocumentList.length !== 0 ? await getFBLink() : null
-
-        //let urlf = await FirebaseRepository.uploadImageToFirebase(frontImgUri, requestType + "_FRONT", user.uid)
+        await getFBLink()
         let imageLink_url = await FirebaseRepository.uploadImageToFirebase(imageLink, requestType + "_VEHICLE_IMAGE", user.uid)
         let requests = {
             description: description.trim(),
             requestType: requestType,
             vehicleReq: {
-                brandId: selectedBrand.trim(),
+                brandId: selectedBrand,
                 chassisNumber: chassisNumber.trim(),
                 distanceDriven: parseInt(distanceDriven),
                 //distanceDriven: 54,
                 engineNumber: engineNumber.trim(),
+                //imageLink: imageLink_url,
                 imageLink: imageLink_url,
                 model: model.trim(),
                 origin: origin.trim(),
@@ -866,16 +868,29 @@ const ProfileScreen = ({ navigation, route }) => {
                                                     </TouchableWithoutFeedback>
 
                                                 </Block>
-                                                <Button full center style={styles.margin, { width: width - 100 }} onPress={() => {
-                                                    addVehiceDocument()
-                                                    setIsDocumentVisible(!isDocumentVisible)
-                                                }}>
-                                                    <Block row center>
-                                                        <Text color="white" >
-                                                            Add Document
+                                                <Block row style={{ marginTop: 15 }}>
+                                                    <Button full center style={styles.margin, { width: width - 210 }} onPress={() => {
+                                                        addVehiceDocument()
+                                                        setIsDocumentVisible(!isDocumentVisible)
+                                                    }}>
+                                                        <Block row center>
+                                                            <Text color="white" >
+                                                                Add Document
                                             </Text>
-                                                    </Block>
-                                                </Button>
+                                                        </Block>
+                                                    </Button>
+                                                    <Button center style={styles.margin, { marginBottom: 10, width: width - 210, marginHorizontal: 10 }} onPress={() => {
+                                                        //resetVehicle()
+                                                        resetVehicleDocument()
+                                                    }}>
+                                                        <Block row center>
+                                                            <Text color="white" >
+                                                                Reset
+                                            </Text>
+                                                        </Block>
+                                                    </Button>
+                                                </Block>
+
                                             </Block>
                                         </Card>
                                     </ScrollView>
@@ -893,21 +908,34 @@ const ProfileScreen = ({ navigation, route }) => {
                                     onChangeText={text => setDescription(text)}
                                     style={{ marginBottom: 15, height: 80, textAlignVertical: "top" }}
                                 />
-                                <Button full center style={styles.margin, { marginBottom: 10 }} onPress={() => {
-                                    //setIsDocumentVisible(!isDocumentVisible)
-                                    //initPassengerList()
-                                    createRequest()
-                                }}>
-                                    <Block row center>
-                                        <Text color="white">
-                                            Send Request
+                                <Block row>
+                                    <Button full center style={styles.margin, { marginBottom: 10, width: width - 200 }} onPress={() => {
+                                        //setIsDocumentVisible(!isDocumentVisible)
+                                        //initPassengerList()
+                                        createRequest()
+                                    }}>
+                                        <Block row center>
+                                            <Text color="white">
+                                                Send Request
                             </Text>
-                                    </Block>
-                                </Button>
+                                        </Block>
+                                    </Button>
+                                    <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
+                                        resetVehicle()
+                                        //resetVehicleDocument()
+                                    }}>
+                                        <Block row center>
+                                            <Text color="white" >
+                                                Reset
+                                            </Text>
+                                        </Block>
+                                    </Button>
+                                </Block>
+
                             </Block>
                         </Card>
                     </>) : (requestType === 'WITHDRAW_VEHICLE' ? (
-                        <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Delete Document">
+                        <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Withdraw Vehicle">
                             <Block column center style={{ marginTop: 10 }}>
                                 <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
                                     Vehicle ID

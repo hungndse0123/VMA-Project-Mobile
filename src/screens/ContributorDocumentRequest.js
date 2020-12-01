@@ -219,14 +219,14 @@ const ProfileScreen = ({ navigation, route }) => {
         await DocumentRepository.getVehicleDocument(`?vehicleId=${uid}&viewOption=0`)
             .then((response) => {
                 //console.log(response);
-                const result = Object.values(response.vehicleDocuments);
+                //const result = Object.values(response.vehicleDocuments);
                 //console.log(result);
-                for (let i = 0; i < result.length; i++) {
+                for (let i = 0; i < response.length; i++) {
 
                     setDocumentList(prevArray => [
                         ...prevArray, {
-                            label: result[i]["vehicleDocumentId"],
-                            value: result[i]["vehicleDocumentId"]
+                            label: response[i]["vehicleDocumentId"],
+                            value: response[i]["vehicleDocumentId"]
                         }
                     ])
                 }
@@ -318,11 +318,6 @@ const ProfileScreen = ({ navigation, route }) => {
                         {
                             text: 'Back to menu',
                             onPress: () => navigation.navigate("RequestType")
-                        },
-                        {
-                            text: 'Reset',
-                            onPress: () => navigation.navigate("DocumentRequest"),
-                            style: 'cancel'
                         },
                     ],
                     { cancelable: false }

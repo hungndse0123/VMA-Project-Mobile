@@ -21,6 +21,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 
 const { width } = Dimensions.get("window");
 
+
 const VehicleDetail = ({ navigation, route }) => {
     const styles = StyleSheet.create({
         overview: {
@@ -81,10 +82,10 @@ const VehicleDetail = ({ navigation, route }) => {
 
     const [user, setUser] = useState(null);
     const [documentVisible, setDocumentVisible] = useState(false);
-    const { itemId } = route.params;
-    const isFocused = useIsFocused();
     const [showModal, setshowModal] = useState(-1);
     const [imageIndex, setimageIndex] = useState(0);
+    //const { itemId } = route.params;
+    const isFocused = useIsFocused();
     const [vehicleType, setVehicleType] = useState('');
     const [brandName, setBrandName] = useState('');
     const [driverName, setDriverName] = useState('');
@@ -97,7 +98,8 @@ const VehicleDetail = ({ navigation, route }) => {
             .then((user) => {
                 setUser(user);
                 // init(user.uid);
-                init();
+                initvehicleid(user.uid)
+                //init();
                 //console.log(Profile_Image);
             })
             .catch((error) => {
@@ -136,6 +138,63 @@ const VehicleDetail = ({ navigation, route }) => {
     )
     const [vehicle, setVehicle] = useState({})
     const [vehicleDocument, setVehicleDocument] = useState([])
+    const initvehicleid = async (userId) => {
+        setIsLoading(true)
+        await VehicleRepository.getCurrentlyAssignedVehicleByDriverId(userId)
+            .then(async (response) => {
+                //console.log(response);
+                //const result = Object.entries(response);
+                //console.log(response["userId"]);
+                //console.log(result["userId"]);
+                // setDriver({
+                //     ...driver,
+                //     result
+                // })
+                await VehicleRepository.getDetailVehicle(response.vehicleId)
+                    .then((response) => {
+                        //console.log(response);
+                        //const result = Object.entries(response);
+                        //console.log(response["userId"]);
+                        //console.log(result["userId"]);
+                        // setDriver({
+                        //     ...driver,
+                        //     result
+                        // })
+
+                        setVehicle(response);
+                        setVehicleType(response["vehicleType"]["vehicleTypeName"])
+                        setBrandName(response["brand"]["brandName"])
+                        setDriverName(response["assignedDriver"]["userName"])
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    })
+                await DocumentRepository.getVehicleDocument(`?vehicleId=${response.vehicleId}`)
+                    .then((response) => {
+                        //console.log(response);
+                        //const result = Object.entries(response);
+                        //console.log(response["userId"]);
+                        //console.log(result["userId"]);
+                        // setDriver({
+                        //     ...driver,
+                        //     result
+                        // })
+
+                        setVehicleDocument(response)
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    })
+                // setVehicle(response);
+                // setVehicleType(response["vehicleType"]["vehicleTypeName"])
+                // setBrandName(response["brand"]["brandName"])
+                // setDriverName(response["assignedDriver"]["userName"])
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        setIsLoading(false)
+    }
     const init = async () => {
         setIsLoading(true)
         await VehicleRepository.getDetailVehicle(itemId)
@@ -152,22 +211,6 @@ const VehicleDetail = ({ navigation, route }) => {
                 setVehicleType(response["vehicleType"]["vehicleTypeName"])
                 setBrandName(response["brand"]["brandName"])
                 setDriverName(response["assignedDriver"]["userName"])
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await DocumentRepository.getVehicleDocument(`?vehicleId=${itemId}`)
-            .then((response) => {
-                //console.log(response);
-                //const result = Object.entries(response);
-                //console.log(response["userId"]);
-                //console.log(result["userId"]);
-                // setDriver({
-                //     ...driver,
-                //     result
-                // })
-
-                setVehicleDocument(response)
             })
             .catch((error) => {
                 console.log(error)
@@ -276,6 +319,7 @@ const VehicleDetail = ({ navigation, route }) => {
                                 style={{ marginBottom: 25 }}
                                 editable={false}
                             />
+
                             <Button full center style={styles.margin, { marginBottom: 10 }} onPress={() => {
                                 setDocumentVisible(!documentVisible);
                             }}>
@@ -353,8 +397,6 @@ const VehicleDetail = ({ navigation, route }) => {
                                 </Block>) : (<></>)
                             }
                         </Block>
-
-
                     </Card>
                 ) : (<></>)}
             </ScrollView>

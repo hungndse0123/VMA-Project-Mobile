@@ -30,6 +30,7 @@
     "react": "^16.13.1",
     "react-dom": "^17.0.1",
     "react-native": "0.63.2",
+    "react-native-chart-kit": "^6.7.0",
     "react-native-country-picker-modal": "^2.0.0",
     "react-native-dropdown-picker": "^3.7.1",
     "react-native-gesture-handler": "^1.7.0",
@@ -45,6 +46,7 @@
     "react-native-screens": "^2.10.1",
     "react-native-splash-screen": "^3.2.0",
     "react-native-star-rating": "^1.1.0",
+    "react-native-svg": "^12.1.0",
     "react-native-vector-icons": "^7.0.0",
     "react-navigation": "^4.4.2",
     "redux": "^4.0.5"

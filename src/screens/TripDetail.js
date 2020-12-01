@@ -482,8 +482,8 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 <Text style={{ marginLeft: 10 }} color="black3">Destination Location: {item["destinationLocation"]}</Text>
                                                 <Text style={{ marginLeft: 10 }} color="black3">Departure Time: {item["departureTime"]}</Text>
                                                 <Text style={{ marginLeft: 10 }} color="black3">Destination Time: {item["destinationTime"]}</Text>
-                                                <Text style={{ marginLeft: 10 }} color="black3">Schedule: </Text>
-                                                <FlatList data={item["schedule"]} renderItem={({ item, index }) => <Text column style={{ marginLeft: 10 }} color="black3">+ Location {index + 1}: {item["location"]}</Text>} />
+                                                <Text style={{ marginLeft: 10 }} color="black3">Locations: </Text>
+                                                <FlatList data={item["locations"]} renderItem={({ item, index }) => <Text column style={{ marginLeft: 10 }} color="black3">+ Location {index + 1}: {item["location"]}</Text>} />
                                             </Block>
                                         </Block>
                                     </Block>

@@ -94,15 +94,6 @@ const DriverDetail = ({ navigation, route }) => {
     const [ratingModalVisible, setRatingModalVisible] = useState(false);
 
     const renderImages = (item, parindex) => (
-        // <TouchableOpacity onPress={() => {
-        //     setimageIndex(index)
-        //     setshowModal(1)
-        // }}>
-        //     <Image
-        //         source={{ uri: item }}
-        //         style={{ height: 100, width: 100, marginBottom: 25, marginRight: 15 }}
-        //         center />
-        // </TouchableOpacity>
         <FlatList
             data={item["userDocumentImages"]}
             horizontal={true}

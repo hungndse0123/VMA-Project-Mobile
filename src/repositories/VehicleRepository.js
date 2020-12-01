@@ -27,6 +27,18 @@ export default {
                 });
         });
     },
+    getVehicleCount(filter) {
+        return new Promise((resolve, reject) => {
+            //console.log(`${resource}/count${filter}`)
+            Repository.get(`${resource}/count${filter}`)
+                .then((res) => {
+                    resolve(res.data);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
 
     getCurrentlyAssignedVehicleByDriverId(id) {
         return new Promise((resolve, reject) => {

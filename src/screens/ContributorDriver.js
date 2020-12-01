@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import Repository from "../repositories/Repository";
 import DriverRepository from "../repositories/DriverRepository";
+import { useIsFocused } from '@react-navigation/native'
 
 import { Dimensions, TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, Modal, View, TouchableHighlight, Picker, FlatList } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
@@ -123,6 +124,8 @@ const ContributorDriver = ({ navigation, route }) => {
 
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const { lastRefresh } = route.params;
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         getCurrentUser()
@@ -138,18 +141,15 @@ const ContributorDriver = ({ navigation, route }) => {
                 console.log(error);
             });
         setIsLoading(false);
-    }, []);
+    }, [isFocused]);
 
     const init = async (uid) => {
         setIsLoading(true);
         await DriverRepository.getIssuedDrivers(uid, '')
             .then((response) => {
-                const result = Object.values(response.drivers);
-                setDriverList({
-                    ...driverList,
-                    result
-                })
-                console.log(JSON.stringify(driverList))
+                //const result = Object.values(response.drivers);
+                setDriverList(response)
+                //console.log(JSON.stringify(driverList))
             })
             .catch((error) => {
                 console.log(JSON.stringify(error))
@@ -161,12 +161,9 @@ const ContributorDriver = ({ navigation, route }) => {
         await DriverRepository.getIssuedDrivers(uid, `${filterstring}`)
             .then((response) => {
                 //console.log(response);
-                const result = Object.values(response.drivers);
+                //const result = Object.values(response.drivers);
                 //console.log(result);
-                setDriverList({
-                    ...driverList,
-                    result
-                })
+                setDriverList(response)
 
             })
             .catch((error) => {
@@ -178,8 +175,7 @@ const ContributorDriver = ({ navigation, route }) => {
         setIsLoading(false);
     }
 
-    const [driverList, setDriverList] = useState([{
-    }
+    const [driverList, setDriverList] = useState([
     ])
     const [isNull, setIsNull] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
@@ -295,7 +291,7 @@ const ContributorDriver = ({ navigation, route }) => {
                         </Text>
                     </Block> */}
                 </Card>
-                {driverList.length === 1 ? (
+                {driverList.length === 0 ? (
                     <Block style={{ marginTop: 15 }} center>
                         <Image
                             style={{ width: width - 100, height: width - 100 }}
@@ -308,7 +304,7 @@ const ContributorDriver = ({ navigation, route }) => {
                     </Block>
                 ) : (
                         <FlatList
-                            data={driverList.result}
+                            data={driverList}
                             renderItem={({ item, index }) =>
                                 <TouchableOpacity onPress={() => {
                                     setIsLoading(true);

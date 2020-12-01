@@ -149,12 +149,9 @@ const RecentRequestScreen = ({ navigation, route }) => {
         await RequestRepository.getRecentRequest(`?userId=${uid}&sort=DESC`)
             .then((response) => {
                 //console.log(response);
-                const result = Object.values(response.requestRes);
+                //const result = Object.values(response.requestRes);
                 //console.log(result);
-                setRequestList({
-                    ...requestList,
-                    result
-                })
+                setRequestList(response)
                 // for (let i = 0; i < result.length; i++)
                 //     setIsDetailShow(prevArray => [
                 //         ...prevArray, {
@@ -171,11 +168,8 @@ const RecentRequestScreen = ({ navigation, route }) => {
         setIsLoading(true)
         await RequestRepository.getRecentRequest(`?userId=${user.uid}&sort=DESC${filterstring}`)
             .then((response) => {
-                const result = Object.values(response.requestRes);
-                setRequestList({
-                    ...requestList,
-                    result
-                })
+                //const result = Object.values(response.requestRes);
+                setRequestList(response)
             })
             .catch((error) => {
                 console.log(error)
@@ -209,8 +203,7 @@ const RecentRequestScreen = ({ navigation, route }) => {
         newArr[index] = !isDetailShow[index]
         setIsDetailShow(newArr);
     }
-    const [requestList, setRequestList] = useState([{
-    }
+    const [requestList, setRequestList] = useState([
     ])
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedType, setSelectedType] = useState("");
@@ -252,7 +245,7 @@ const RecentRequestScreen = ({ navigation, route }) => {
                                     mode="date"
                                     onConfirm={datetime => {
                                         //console.log(datetime)
-                                        setFromDate(`${datetime.getFullYear()}-${datetime.getMonth()}-${datetime.getDate()}`)
+                                        setFromDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
                                         console.log(fromDate)
                                         setIsFromDateVisible(false)
                                     }}
@@ -271,7 +264,7 @@ const RecentRequestScreen = ({ navigation, route }) => {
                                     mode="date"
                                     onConfirm={datetime => {
                                         //console.log(datetime)
-                                        setToDate(`${datetime.getFullYear()}-${datetime.getMonth()}-${datetime.getDate()}`)
+                                        setToDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
                                         console.log(destinationTime)
                                         setIsToDateVisible(false)
                                     }}
@@ -336,7 +329,7 @@ const RecentRequestScreen = ({ navigation, route }) => {
                         </Button>
                     </Block>
                 </Card>
-                {requestList.length === 1 ? (
+                {requestList.length === 0 ? (
                     <Block style={{ marginTop: 15 }} center>
                         <Image
                             style={{ width: width - 100, height: width - 100 }}
@@ -371,7 +364,7 @@ const RecentRequestScreen = ({ navigation, route }) => {
                     </Block> */}
                     </Card>
                     <FlatList
-                        data={requestList.result}
+                        data={requestList}
                         renderItem={({ item, index }) =>
                             <>
                                 <TouchableOpacity onPress={() => {

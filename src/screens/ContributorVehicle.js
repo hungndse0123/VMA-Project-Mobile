@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import VehicleRepository from "../repositories/VehicleRepository";
+import { useIsFocused } from '@react-navigation/native'
 
 import { Dimensions, TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, Modal, View, TouchableHighlight, Picker, FlatList } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
@@ -117,6 +118,8 @@ const ProfileScreen = ({ navigation, route }) => {
     const [user, setUser] = useState(null);
     const [Image_Http_URL, setImage_Http_URL] = useState({});
     const [username, setUsername] = useState("");
+    const isFocused = useIsFocused();
+    const { lastRefresh } = route.params;
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -135,7 +138,7 @@ const ProfileScreen = ({ navigation, route }) => {
             });
 
         console.log(vehicleList);
-    }, []);
+    }, [isFocused]);
     const init = async (uid) => {
         setIsLoading(true)
         await VehicleRepository.getVehicle(`?ownerId=${uid}`)
@@ -362,7 +365,7 @@ const ProfileScreen = ({ navigation, route }) => {
         </Text>
                     </Block>
                 </Card>
-                {vehicleList.length === 1 ? (
+                {vehicleList.length === 0 ? (
                     <Block style={{ marginTop: 15 }} center>
                         <Image
                             style={{ width: width - 100, height: width - 100 }}

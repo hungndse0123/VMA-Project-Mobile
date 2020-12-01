@@ -43,7 +43,7 @@ export default {
     return new Promise((resolve, reject) => {
       Repository.get(`${resource}/contributors/${id}/issued-drivers${filter}`)
         .then((res) => {
-          resolve(res.data);
+          resolve(res.data.drivers);
         })
         .catch((err) => {
           console.log(err)

@@ -263,11 +263,6 @@ const ProfileScreen = ({ navigation, route }) => {
                             text: 'Back to menu',
                             onPress: () => navigation.navigate("Service")
                         },
-                        {
-                            text: 'Reset',
-                            onPress: () => navigation.navigate("Requests"),
-                            style: 'cancel'
-                        },
                     ],
                     { cancelable: false }
                 );
@@ -333,11 +328,6 @@ const ProfileScreen = ({ navigation, route }) => {
                         {
                             text: 'Back to menu',
                             onPress: () => navigation.navigate("Service")
-                        },
-                        {
-                            text: 'Reset',
-                            onPress: () => navigation.navigate("Requests"),
-                            style: 'cancel'
                         },
                     ],
                     { cancelable: false }
