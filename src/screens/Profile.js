@@ -3,8 +3,9 @@ import { useIsFocused } from '@react-navigation/native'
 import axios from 'axios';
 import DriverRepository from '../repositories/DriverRepository';
 import UserRepository from '../repositories/UserRepository';
+import ReportRepository from "../repositories/ReportRepository";
 
-import { TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, FlatList, Modal, BackHandler, TouchableWithoutFeedback, AsyncStorage } from "react-native";
+import { SectionList, View, TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, FlatList, Modal, BackHandler, TouchableWithoutFeedback, AsyncStorage } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
 import Block from '../components/Block';
 import Text from '../components/Text';
@@ -19,6 +20,17 @@ import Auth from "@react-native-firebase/auth";
 import Header from "../components/Header";
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Loader from '../components/Loader';
+import { Dimensions } from "react-native";
+import {
+    LineChart,
+    BarChart,
+    PieChart,
+    ProgressChart,
+    ContributionGraph,
+    StackedBarChart
+} from "react-native-chart-kit";
+
+const screenWidth = Dimensions.get("window").width;
 
 const ProfileScreen = ({ navigation, route }) => {
     const styles = StyleSheet.create({
@@ -75,23 +87,39 @@ const ProfileScreen = ({ navigation, route }) => {
             position: 'absolute',
             right: -9,
             top: -9,
-        }
+        },
+        item: {
+            padding: 10,
+            fontSize: 18,
+            height: 44,
+        },
+        sectionHeader: {
+            paddingTop: 2,
+            paddingLeft: 10,
+            paddingRight: 10,
+            paddingBottom: 2,
+            fontSize: 14,
+            fontWeight: 'bold',
+            backgroundColor: 'rgba(247,247,247,1.0)',
+        },
     });
 
     const [user, setUser] = useState(null);
 
     useEffect(() => {
         getCurrentUser()
-            .then((user) => {
+            .then(async (user) => {
                 setUser(user);
                 // init(user.uid);
+                initmonthlyIncome(user.uid);
                 init(user.uid);
+
             })
             .catch((error) => {
                 setUser(null);
                 console.log(error);
             });
-    }, [isFocused]);
+    }, []);
 
     // const _storeData = () => {
     //     AsyncStorage.getAllKeys()
@@ -110,6 +138,203 @@ const ProfileScreen = ({ navigation, route }) => {
                 alert(error);
             });
     };
+    const [T1Income, setT1Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [T2Income, setT2Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [T3Income, setT3Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [T4Income, setT4Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [T5Income, setT5Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [T6Income, setT6Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [T7Income, setT7Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [T8Income, setT8Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [T9Income, setT9Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [T10Income, setT10Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [T11Income, setT11Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [T12Income, setT12Income] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const [TIncome, setTIncome] = useState({
+        earnedValue: -1,
+        driverIncomes: [
+            {
+            }
+        ]
+    });
+    const chartConfig = {
+        backgroundGradientFrom: "#FFFFFF",
+        backgroundGradientFromOpacity: 0,
+        backgroundGradientTo: "#FFFFFF",
+        backgroundGradientToOpacity: 0.5,
+        color: (opacity = 1) => `rgba(0,191,255, ${opacity})`,
+        strokeWidth: 2, // optional, default 3
+        barPercentage: 0.5,
+        useShadowColorFromDataset: false // optional
+    };
+    const initmonthlyIncome = async (id) => {
+        setIsLoading(true)
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data`)
+            .then((response) => {
+                setTIncome(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=JANUARY`)
+            .then((response) => {
+                setT1Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=FEBRUARY`)
+            .then((response) => {
+                setT2Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=MARCH`)
+            .then((response) => {
+                setT3Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=APRIL`)
+            .then((response) => {
+                setT4Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=MAY`)
+            .then((response) => {
+                setT5Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=JUNE`)
+            .then((response) => {
+                setT6Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=JULY`)
+            .then((response) => {
+                setT7Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=AUGUST`)
+            .then((response) => {
+                setT8Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=SEPTEMBER`)
+            .then((response) => {
+                setT9Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=OCTOBER`)
+            .then((response) => {
+                setT10Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=NOVEMBER`)
+            .then((response) => {
+                setT11Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=DECEMBER`)
+            .then((response) => {
+                setT12Income(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        //console.log(JSON.stringify(T10Income))
+        setIsLoading(false)
+    }
     const updateStatus = (userid) => {
         UserRepository.updateUserStatusByUserId(userid, 'INACTIVE')
 
@@ -318,6 +543,79 @@ const ProfileScreen = ({ navigation, route }) => {
                     </Block>
 
 
+                </Card>
+                <Card title="CURRENT YEAR INCOME" style={[{ marginTop: 18 }]}>
+                    {/* <Block>
+            <LineChart
+              data={{
+                labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+                datasets: [
+                  {
+                    //data: [T1Income["earned"] + T1Income["estimated"], T2Income["earned"] + T2Income["estimated"], T3Income["earned"] + T3Income["estimated"], T4Income["earned"] + T4Income["estimated"], T5Income["earned"] + T5Income["estimated"], T6Income["earned"] + T6Income["estimated"], T7Income["earned"] + T7Income["estimated"], T8Income["earned"] + T8Income["estimated"], T9Income["earned"] + T9Income["estimated"], T10Income["earned"] + T10Income["estimated"], T11Income["earned"] + T11Income["estimated"], T12Income["earned"] + T12Income["estimated"]],
+                    data: [T1Income["earned"] / 1000000, T2Income["earned"] / 1000000, T3Income["earned"] / 1000000, T4Income["earned"] / 1000000, T5Income["earned"] / 1000000, T6Income["earned"] / 1000000, T7Income["earned"] / 1000000, T8Income["earned"] / 1000000, T9Income["earned"] / 1000000, T10Income["earned"] / 1000000, T11Income["earned"] / 1000000, T12Income["earned"] / 1000000],
+                    color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
+                    strokeWidth: 2 // optional
+                  }
+                ],
+                legend: ["Revenue from Trips (per 1.000.000 VND)"] // optional
+              }}
+              width={screenWidth - 30}
+              height={screenWidth - 150}
+              chartConfig={chartConfig}
+            />
+          </Block> */}
+                    <Block style={[{ marginTop: 18, marginBottom: 18 }]}>
+                        <LineChart
+                            data={{
+                                labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+                                datasets: [
+                                    {
+                                        //data: [T1Income["earned"] + T1Income["estimated"], T2Income["earned"] + T2Income["estimated"], T3Income["earned"] + T3Income["estimated"], T4Income["earned"] + T4Income["estimated"], T5Income["earned"] + T5Income["estimated"], T6Income["earned"] + T6Income["estimated"], T7Income["earned"] + T7Income["estimated"], T8Income["earned"] + T8Income["estimated"], T9Income["earned"] + T9Income["estimated"], T10Income["earned"] + T10Income["estimated"], T11Income["earned"] + T11Income["estimated"], T12Income["earned"] + T12Income["estimated"]],
+                                        data: [T1Income["earnedValue"] / 1000000, T2Income["earnedValue"] / 1000000, T3Income["earnedValue"] / 1000000, T4Income["earnedValue"] / 1000000, T5Income["earnedValue"] / 1000000, T6Income["earnedValue"] / 1000000, T7Income["earnedValue"] / 1000000, T8Income["earnedValue"] / 1000000, T9Income["earnedValue"] / 1000000, T10Income["earnedValue"] / 1000000, T11Income["earnedValue"] / 1000000, T12Income["earnedValue"] / 1000000],
+                                        color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
+                                        strokeWidth: 2 // optional
+                                    }
+                                ],
+                                legend: ["Basic Revenue (per 1.000.000 VND)"] // optional
+                            }}
+                            width={screenWidth - 30}
+                            height={screenWidth - 150}
+                            chartConfig={chartConfig}
+                        />
+                        <SectionList
+                            sections={[
+                                { title: 'JANUARY', data: [`Revenue: ${T1Income["earnedValue"]}`] },
+                                { title: 'FEBRUARY', data: [`Revenue: ${T2Income["earnedValue"]}`] },
+                                { title: 'MARCH', data: [`Revenue: ${T3Income["earnedValue"]}`] },
+                                { title: 'APRIL', data: [`Revenue: ${T4Income["earnedValue"]}`] },
+                                { title: 'MAY', data: [`Revenue: ${T5Income["earnedValue"]}`] },
+                                { title: 'JUNE', data: [`Revenue: ${T6Income["earnedValue"]}`] },
+                                { title: 'JULY', data: [`Revenue: ${T7Income["earnedValue"]}`] },
+                                { title: 'AUGUST', data: [`Revenue: ${T8Income["earnedValue"]}`] },
+                                { title: 'SEPTEMBER', data: [`Revenue: ${T9Income["earnedValue"]}`] },
+                                { title: 'OCTOBER', data: [`Revenue: ${T10Income["earnedValue"]}`] },
+                                { title: 'NOVEMBER', data: [`Revenue: ${T11Income["earnedValue"]}`] },
+                                { title: 'DECEMBER', data: [`Revenue: ${T12Income["earnedValue"]}`] },
+                            ]}
+                            renderItem={({ item }) => <Text style={styles.item}>{item}</Text>}
+                            renderSectionHeader={({ section }) => <Text style={styles.sectionHeader}>{section.title}</Text>}
+                            keyExtractor={(item, index) => index}
+                        />
+
+                    </Block>
+                </Card>
+                <Card title="TRIPS INCOME DETAIL" style={[{ marginTop: 18 }]}>
+                    <Block>
+                        <FlatList
+                            data={TIncome["driverIncomes"]}
+                            renderItem={({ item, index }) => <>
+                                <Text style={styles.sectionHeader}>Contract Id: {item.contractId}</Text>
+                                <Text style={styles.item}>Vehicle Id: {item.vehicleId}</Text>
+                                <Text style={styles.item}>Driver Earned: {item.driverEarned}</Text>
+
+                            </>}
+                        />
+                    </Block>
                 </Card>
             </ScrollView>
             <Loader isAnimate={isLoading} />

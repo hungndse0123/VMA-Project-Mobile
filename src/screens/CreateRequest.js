@@ -711,7 +711,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
                             </Block>
 
-                        </Card>) : (requestType === 'UPDATE_DOCUMENT' ? (<Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="New User Document">
+                        </Card>) : (requestType === 'UPDATE_DOCUMENT' ? (<Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Update User Document">
                             <Block column center style={{ marginTop: 10 }}>
                                 <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
                                     Document to update

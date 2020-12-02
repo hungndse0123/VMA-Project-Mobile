@@ -39,6 +39,7 @@ const App = () => {
 
     function onRegister(token) {
       console.log("[App] onRegister: ", token)
+      UserRepository.createClientRegistrationToken(token)
     }
 
     function onNotification(notify) {
@@ -60,7 +61,7 @@ const App = () => {
 
     function onOpenNotification(notify) {
       console.log("[App] onOpenNotification: ", notify)
-      alert("Open Notification: " + notify.body)
+      alert("Open Notification: " + notify.title)
     }
 
     return () => {

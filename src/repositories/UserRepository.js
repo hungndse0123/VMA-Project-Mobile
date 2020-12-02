@@ -42,4 +42,18 @@ export default {
 
     });
   },
-};
+  createClientRegistrationToken(token) {
+    return new Promise((resolve, reject) => {
+      Repository.post(`${resource}/registration-token`, {
+        token: token
+      })
+        .then((res) => {
+          resolve(res);
+          console.log("Create token done")
+        })
+        .catch((err) => {
+          reject(err.response.data);
+        });
+    });
+  }
+}

@@ -5,25 +5,20 @@ import VehicleRepository from "../repositories/VehicleRepository";
 import RequestRepository from "../repositories/RequestRepository";
 import DocumentRepository from "../repositories/DocumentRepository";
 
-import { Alert, Dimensions, View, Modal, TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, FlatList, AsyncStorage } from "react-native";
-import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
+import { Alert, Dimensions, Modal, TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, FlatList, AsyncStorage } from "react-native";
+import { getCurrentUser } from "../services/FireAuthHelper";
 import Block from '../components/Block';
 import Text from '../components/Text';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Card from '../components/Card';
-import Label from '../components/Label';
-import menu from '../assets/images/icons/menu.png';
 import * as theme from '../constants/theme';
-import Auth from "@react-native-firebase/auth";
 import Header from "../components/Header";
-import Icon from "react-native-vector-icons/Entypo";
 import Loader from '../components/Loader';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import DropDownPicker from 'react-native-dropdown-picker';
 import ImagePicker from 'react-native-image-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { number } from "prop-types";
 
 const { width } = Dimensions.get("window");
 
@@ -515,39 +510,37 @@ const ProfileScreen = ({ navigation, route }) => {
                                 value={vehicleNumber}
                                 onChangeText={text => setVehicleNumber(text)}
                             />
-                            <Block row>
-                                <Block>
-                                    <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
-                                        Vehicle Brand
+                            <Block>
+                                <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
+                                    Vehicle Brand
                             </Text>
-                                    <DropDownPicker
-                                        items={brandList}
-                                        //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
-                                        placeholder="Select brand"
-                                        defaultValue={selectedBrand}
-                                        containerStyle={{ height: 40, width: width - 200, marginBottom: 25 }}
-                                        onChangeItem={item => {
-                                            setSelectedBrand(item.value)
-                                            //initdocument(item.value)
-                                        }}
-                                    />
-                                </Block>
-                                <Block style={{ marginLeft: 25 }}>
-                                    <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
-                                        Vehicle Type
+                                <DropDownPicker
+                                    items={brandList}
+                                    //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
+                                    placeholder="Select brand"
+                                    defaultValue={selectedBrand}
+                                    containerStyle={{ height: 40, width: width - 50, marginBottom: 25 }}
+                                    onChangeItem={item => {
+                                        setSelectedBrand(item.value)
+                                        //initdocument(item.value)
+                                    }}
+                                />
+                            </Block>
+                            <Block>
+                                <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
+                                    Vehicle Type
                             </Text>
-                                    <DropDownPicker
-                                        items={vehicletypeList}
-                                        //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
-                                        placeholder="Select type"
-                                        defaultValue={selectedVehicletype}
-                                        containerStyle={{ height: 40, width: width - 200, marginBottom: 25 }}
-                                        onChangeItem={item => {
-                                            setSelectedVehicletype(item.value)
-                                            //initdocument(item.value)
-                                        }}
-                                    />
-                                </Block>
+                                <DropDownPicker
+                                    items={vehicletypeList}
+                                    //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
+                                    placeholder="Select type"
+                                    defaultValue={selectedVehicletype}
+                                    containerStyle={{ height: 40, width: width - 50, marginBottom: 25 }}
+                                    onChangeItem={item => {
+                                        setSelectedVehicletype(item.value)
+                                        //initdocument(item.value)
+                                    }}
+                                />
                             </Block>
                             <Input
                                 full
@@ -591,25 +584,23 @@ const ProfileScreen = ({ navigation, route }) => {
                                 value={yearOfManufacture}
                                 onChangeText={text => setYearOfManufacture(text)}
                             />
-                            <Block row>
-                                <Input
+                            <Input
 
-                                    number
-                                    label="Number of seats"
-                                    style={{ marginBottom: 15, marginRight: 25, width: width - 200 }}
-                                    value={seats}
-                                    onChangeText={text => setSeats(text)}
-                                />
-                                <Input
-                                    numeric
-                                    number
-                                    label="Distance Driven"
-                                    placeholder="...(km)"
-                                    style={{ marginBottom: 15, width: width - 200 }}
-                                    value={distanceDriven}
-                                    onChangeText={(newNum) => setDistanceDriven(newNum)}
-                                />
-                            </Block>
+                                number
+                                label="Number of seats"
+                                style={{ marginBottom: 15, width: width - 50 }}
+                                value={seats}
+                                onChangeText={text => setSeats(text)}
+                            />
+                            <Input
+                                numeric
+                                number
+                                label="Distance Driven"
+                                placeholder="...(km)"
+                                style={{ marginBottom: 15, width: width - 50 }}
+                                value={distanceDriven}
+                                onChangeText={(newNum) => setDistanceDriven(newNum)}
+                            />
                         </Block>
 
                     </Card>
@@ -822,74 +813,70 @@ const ProfileScreen = ({ navigation, route }) => {
                                                     }}
                                                     onCancel={text => setIsExpiryDateVisible(false)}
                                                 />
-                                                <Block row>
-                                                    <TouchableWithoutFeedback
-                                                        onPress={() => chooseImage("frontImgUri")}
+                                                <TouchableWithoutFeedback
+                                                    onPress={() => chooseImage("frontImgUri")}
+                                                >
+                                                    <Block
                                                     >
-                                                        <Block
-                                                        >
-                                                            <Text caption medium style={styles.label, { marginBottom: 5, textTransform: 'uppercase' }}>
-                                                                Front side
+                                                        <Text caption medium style={styles.label, { marginBottom: 5, textTransform: 'uppercase' }}>
+                                                            Front side
                             </Text>
-                                                            <Block style={{ marginBottom: 15 }}>
-                                                                <Image
-                                                                    style={{ width: width - 250, height: width - 250 }}
-                                                                    source={frontImgUri ? { uri: frontImgUri } : // if clicked a new img
-                                                                        require('../assets/images/uploadimage.png')} //else show random
-                                                                />
-
-                                                            </Block>
-
+                                                        <Block style={{ marginBottom: 15 }}>
+                                                            <Image
+                                                                style={{ width: width - 250, height: width - 250 }}
+                                                                source={frontImgUri ? { uri: frontImgUri } : // if clicked a new img
+                                                                    require('../assets/images/uploadimage.png')} //else show random
+                                                            />
 
                                                         </Block>
 
-                                                    </TouchableWithoutFeedback>
-                                                    <TouchableWithoutFeedback
-                                                        onPress={() => chooseImage("backImgUri")}
+
+                                                    </Block>
+
+                                                </TouchableWithoutFeedback>
+                                                <TouchableWithoutFeedback
+                                                    onPress={() => chooseImage("backImgUri")}
+                                                >
+                                                    <Block
                                                     >
-                                                        <Block
-                                                        >
-                                                            <Text caption medium style={styles.label, { marginBottom: 5, textTransform: 'uppercase' }}>
-                                                                Back side
+                                                        <Text caption medium style={styles.label, { marginBottom: 5, textTransform: 'uppercase' }}>
+                                                            Back side
                             </Text>
-                                                            <Block style={{ marginBottom: 15 }}>
-                                                                <Image
-                                                                    style={{ width: width - 250, height: width - 250 }}
-                                                                    source={backImgUri ? { uri: backImgUri } : // if clicked a new img
-                                                                        require('../assets/images/uploadimage.png')
-                                                                    }
-                                                                />
-
-                                                            </Block>
-
+                                                        <Block style={{ marginBottom: 15 }}>
+                                                            <Image
+                                                                style={{ width: width - 250, height: width - 250 }}
+                                                                source={backImgUri ? { uri: backImgUri } : // if clicked a new img
+                                                                    require('../assets/images/uploadimage.png')
+                                                                }
+                                                            />
 
                                                         </Block>
 
-                                                    </TouchableWithoutFeedback>
 
-                                                </Block>
-                                                <Block row style={{ marginTop: 15 }}>
-                                                    <Button full center style={styles.margin, { width: width - 210 }} onPress={() => {
-                                                        addVehiceDocument()
-                                                        setIsDocumentVisible(!isDocumentVisible)
-                                                    }}>
-                                                        <Block row center>
-                                                            <Text color="white" >
-                                                                Add Document
+                                                    </Block>
+
+                                                </TouchableWithoutFeedback>
+
+                                                <Button full center style={styles.margin, { width: width - 100, marginBottom: 10, }} onPress={() => {
+                                                    addVehiceDocument()
+                                                    setIsDocumentVisible(!isDocumentVisible)
+                                                }}>
+                                                    <Block row center>
+                                                        <Text color="white" >
+                                                            Add Document
                                             </Text>
-                                                        </Block>
-                                                    </Button>
-                                                    <Button center style={styles.margin, { marginBottom: 10, width: width - 210, marginHorizontal: 10 }} onPress={() => {
-                                                        //resetVehicle()
-                                                        resetVehicleDocument()
-                                                    }}>
-                                                        <Block row center>
-                                                            <Text color="white" >
-                                                                Reset
+                                                    </Block>
+                                                </Button>
+                                                <Button center style={styles.margin, { width: width - 100 }} onPress={() => {
+                                                    //resetVehicle()
+                                                    resetVehicleDocument()
+                                                }}>
+                                                    <Block row center>
+                                                        <Text color="white" >
+                                                            Reset
                                             </Text>
-                                                        </Block>
-                                                    </Button>
-                                                </Block>
+                                                    </Block>
+                                                </Button>
 
                                             </Block>
                                         </Card>
@@ -908,31 +895,29 @@ const ProfileScreen = ({ navigation, route }) => {
                                     onChangeText={text => setDescription(text)}
                                     style={{ marginBottom: 15, height: 80, textAlignVertical: "top" }}
                                 />
-                                <Block row>
-                                    <Button full center style={styles.margin, { marginBottom: 10, width: width - 200 }} onPress={() => {
-                                        //setIsDocumentVisible(!isDocumentVisible)
-                                        //initPassengerList()
-                                        createRequest()
-                                    }}>
-                                        <Block row center>
-                                            <Text color="white">
-                                                Send Request
+                                <Button full center style={styles.margin, { marginBottom: 10, width: width - 50 }} onPress={() => {
+                                    //setIsDocumentVisible(!isDocumentVisible)
+                                    //initPassengerList()
+                                    createRequest()
+                                }}>
+                                    <Block row center>
+                                        <Text color="white">
+                                            Send Request
                             </Text>
-                                        </Block>
-                                    </Button>
-                                    <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
-                                        resetVehicle()
-                                        //resetVehicleDocument()
-                                    }}>
-                                        <Block row center>
-                                            <Text color="white" >
-                                                Reset
+                                    </Block>
+                                </Button>
+                                <Button center style={styles.margin, { marginBottom: 10, width: width - 50, marginHorizontal: 10 }} onPress={() => {
+                                    resetVehicle()
+                                    //resetVehicleDocument()
+                                }}>
+                                    <Block row center>
+                                        <Text color="white" >
+                                            Reset
                                             </Text>
-                                        </Block>
-                                    </Button>
-                                </Block>
-
+                                    </Block>
+                                </Button>
                             </Block>
+
                         </Card>
                     </>) : (requestType === 'WITHDRAW_VEHICLE' ? (
                         <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Withdraw Vehicle">

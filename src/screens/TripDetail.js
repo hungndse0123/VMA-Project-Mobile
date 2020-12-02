@@ -336,6 +336,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             </Text>) : (<Text medium color="yellow">
                                 STATUS: {vehicleStatus}
                             </Text>)}
+
                             {/* <Modal
                                 animationType="fade"
                                 transparent={true}
