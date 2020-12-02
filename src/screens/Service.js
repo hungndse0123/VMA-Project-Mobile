@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import UserRepository from '../repositories/UserRepository';
 
-import { Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback } from "react-native";
+import { Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, TouchableOpacity } from "react-native";
 import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
 import Block from '../components/Block';
 import Text from '../components/Text';
 import Button from '../components/Button';
 import Card from '../components/Card';
+import Icon from '../components/Icon';
 import * as theme from '../constants/theme';
+import Header from "../components/Header";
+
 
 const ProfileScreen = ({ navigation }) => {
     const styles = StyleSheet.create({
@@ -71,30 +75,43 @@ const ProfileScreen = ({ navigation }) => {
     const signOut = () => {
         signOutUser()
             .then(() => {
-                updateStatus(user.uid);
+                //updateStatus(user.uid);
                 BackHandler.exitApp();
             })
             .catch((error) => {
                 alert(error);
             });
     };
-    const updateStatus = userid => {
-        axios({
-          method: 'POST',
-          url: "http://localhost:9000/api/v1/users/"+userid+"?userStatusId=1",
-        });
-      }
+    // const updateStatus = (userid) => {
+    //     axios({
+    //         method: 'PATCH',
+    //         url: "http://192.168.43.125:9000/api/v1/users/" + userid + "?userStatusId=2",
+    //         //   url: "http://192.168.1.3:9000/api/v1/users/941287851231?userStatusId=2",
+    //         params: {
+
+    //         }
+    //     }).then((response) => {
+    //     })
+    //         .catch((error) => {
+    //             console.log(error)
+    //         });
+
+    // }
 
     useEffect(() => {
         getCurrentUser()
             .then((user) => {
                 setUser(user);
+                updateStatus(user.uid)
             })
             .catch((error) => {
                 setUser(null);
                 console.log(error);
             });
     }, []);
+    const updateStatus = (userid) => {
+        UserRepository.updateUserStatusByUserId(userid, 'ACTIVE')
+    }
 
     const profileIcon = (
         <Image
@@ -117,13 +134,12 @@ const ProfileScreen = ({ navigation }) => {
     );
     return (
         <SafeAreaView style={styles.overview}>
+            <Header navigation={navigation} title="Service" />
             <ScrollView contentContainerStyle={{ paddingVertical: 25 }}>
-                <Button full style={styles.margin} onPress={signOut}>
-                    <Text color="white">
-                        Log out
-            </Text>
-                </Button>
-                <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Service">
+                {/* <Text caption center onPress={signOut}>
+                    Log out
+            </Text> */}
+                <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 30, }} title="Service">
                     <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
                             onPress={() => navigation.navigate("Profile")}
@@ -144,15 +160,12 @@ const ProfileScreen = ({ navigation }) => {
                                         <Text style={{ marginLeft: 10 }} color="black3">View personal info</Text>
                                     </Block>
                                 </Block>
-
-
                             </Block>
                         </TouchableWithoutFeedback>
-
                     </Block>
                     <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
-                            onPress={() => navigation.navigate("Profile")}
+                            onPress={() => navigation.navigate("Requests")}
                             style={styles.activeBorder}
                         >
                             <Block
@@ -170,15 +183,14 @@ const ProfileScreen = ({ navigation }) => {
                                         <Text style={{ marginLeft: 10 }} color="black3">View list request</Text>
                                     </Block>
                                 </Block>
-
-
                             </Block>
                         </TouchableWithoutFeedback>
-
                     </Block>
                     <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
                         <TouchableWithoutFeedback
-                            onPress={() => navigation.navigate("Profile")}
+                            onPress={() => navigation.navigate("Trips", {
+                                lastRefresh: Date(Date.now()).toString(),
+                            })}
                             style={styles.activeBorder}
                         >
                             <Block
@@ -192,18 +204,36 @@ const ProfileScreen = ({ navigation }) => {
                                         {maintenanceIcon}
                                     </Block>
                                     <Block style={{ marginLeft: 17, marginTop: 10 }}>
-                                        <Text h4 style={{ marginBottom: 5, marginLeft: 10 }} >Maintenance</Text>
-                                        <Text style={{ marginLeft: 10 }} color="black3">Maintenance report</Text>
+                                        <Text h4 style={{ marginBottom: 5, marginLeft: 10 }} >Trips</Text>
+                                        <Text style={{ marginLeft: 10 }} color="black3">View Trips</Text>
                                     </Block>
                                 </Block>
-
-
                             </Block>
                         </TouchableWithoutFeedback>
-
                     </Block>
-
-
+                    <Block row style={{ marginHorizontal: 2, marginTop: 10, }}>
+                        <TouchableWithoutFeedback
+                            onPress={() => navigation.navigate("AssignedVehicle")}
+                            style={styles.activeBorder}
+                        >
+                            <Block
+                                style={[
+                                    styles.card,
+                                    styles.active
+                                ]}
+                            >
+                                <Block row>
+                                    <Block style={styles.icon}>
+                                        {maintenanceIcon}
+                                    </Block>
+                                    <Block style={{ marginLeft: 17, marginTop: 10 }}>
+                                        <Text h4 style={{ marginBottom: 5, marginLeft: 10 }} >Assigned Vehicle</Text>
+                                        <Text style={{ marginLeft: 10 }} color="black3">View Assigned Vehicle info</Text>
+                                    </Block>
+                                </Block>
+                            </Block>
+                        </TouchableWithoutFeedback>
+                    </Block>
                 </Card>
             </ScrollView>
 
@@ -212,7 +242,3 @@ const ProfileScreen = ({ navigation }) => {
 };
 
 export default ProfileScreen;
-
-const styles = StyleSheet.create({
-
-});

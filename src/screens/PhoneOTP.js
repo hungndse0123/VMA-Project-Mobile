@@ -11,6 +11,7 @@ import { StyleSheet, Alert, Dimensions, Image, LogBox } from "react-native";
 import Loader from '../components/Loader';
 import Auth from "@react-native-firebase/auth";
 import axios from 'axios';
+import UserRepository from '../repositories/UserRepository'
 
 const SignUpScreen = ({ navigation, route }) => {
   const [OTP, setOTP] = useState("");
@@ -25,7 +26,6 @@ const SignUpScreen = ({ navigation, route }) => {
     'Non-serializable values were found in the navigation state',
   ]);
 
-
   // checkAuthState()
   // .then((user) => {
   //   console.log("checkOnAuthStateChanged =>", user);
@@ -39,52 +39,52 @@ const SignUpScreen = ({ navigation, route }) => {
   //   setOTP("");
   //   alert(error.message);
   // });
-
-  // const updateStatus = userid => {
-  //   axios({
-  //     method: 'POST',
-  //     url: "http://localhost:9000/api/v1/users/"+userid+"?userStatusId=1",
-  //   });
-  // }
+  const updateStatus = (userid) => {
+    UserRepository.updateUserStatusByUserId(userid, 'ACTIVE')
+  }
 
   const handleVerifyCode = code => {
     // Request for OTP verification
-    if (Auth.currentUser) {
-      console.log("currentUser =>", user);
-    setOTP("");
-    setIsLoading(false);
-    //updateStatus(user.uid);
-    navigation.navigate("Service");
-    } else {
-
-    
-    setOTP(code);
-    console.log("Code is", code);
-    const confirmResult = route.params.confirmResult;
-    console.log("-------------Confirm result ---------------- ", confirmResult);
-
-      setIsLoading(true);
-      if (code.length == 6) {
-     
-      confirmResult
-        .confirm(code)
-        .then((user) => {
-          console.log("User in OTP screen :--------- ", user);
-          setOTP("");
-          setIsLoading(false);
-          //updateStatus(user.uid);
-          navigation.navigate("Service");
-        })
-        .catch((error) => {
-          setIsLoading(false);
-          console.log("Error while verifying OTP :-- ", error);
-          setOTP("");
-          alert(error.message);
-        });
+    Auth().onAuthStateChanged(function (curuser) {
+      if (curuser) {
+        console.log("currentUser =>", curuser);
+        setOTP("");
+        setIsLoading(false);
+        updateStatus(curuser.uid);
+        navigation.navigate("Role");
       } else {
-        alert("Please enter the code in the sms we sent you.");
+
+
+        setOTP(code);
+        console.log("Code is", code);
+        const confirmResult = route.params.confirmResult;
+        //console.log("-------------Confirm result ---------------- ", confirmResult);
+
+        setIsLoading(true);
+        if (code.length == 6) {
+
+          confirmResult
+            .confirm(code)
+            .then((user) => {
+              console.log("User in OTP screen :--------- ", user);
+              setOTP("");
+              setIsLoading(false);
+              updateStatus(user.uid);
+              navigation.navigate("Role");
+            })
+            .catch((error) => {
+              setIsLoading(false);
+              console.log("Error while verifying OTP :-- ", error);
+              setOTP("");
+              alert(error.message);
+            });
+        } else {
+          alert("Please enter the code in the sms we sent you.");
+        }
+      }
     }
-  }
+
+    )
   };
 
   return (
@@ -154,10 +154,11 @@ const SignUpScreen = ({ navigation, route }) => {
                 //onCodeChanged = {code => {setOTP(code) }}
                 onCodeFilled={(code) => {
 
-                  handleVerifyCode(code)}}
+                  handleVerifyCode(code)
+                }}
                 codeInputFieldStyle={styles.underlineStyleBase}
                 codeInputHighlightStyle={styles.underlineStyleHighLighted}
-                
+
               />
             </Block>
             <Text paragraph color="gray">
@@ -190,18 +191,18 @@ const styles = StyleSheet.create({
     width: 30,
     height: 45
   },
- 
+
   borderStyleHighLighted: {
     borderColor: "#03DAC6",
   },
- 
+
   underlineStyleBase: {
     width: 30,
     height: 45,
     borderWidth: 0,
     borderBottomWidth: 1,
   },
- 
+
   underlineStyleHighLighted: {
     borderColor: "#03DAC6",
   },

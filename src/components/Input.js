@@ -16,8 +16,8 @@ export default class Input extends Component {
 
     const inputType = email
       ? 'email-address' : number
-      ? 'numeric' : phone
-      ? 'phone-pad' : 'default';
+        ? 'numeric' : phone
+          ? 'phone-pad' : 'default';
 
     return (
       <View>

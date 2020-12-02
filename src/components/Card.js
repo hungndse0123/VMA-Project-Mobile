@@ -20,9 +20,7 @@ export default class Card extends Component {
     return (
       <Block row space="between" style={styles.header}>
         <Text caption>{title}</Text>
-        <TouchableOpacity>
-          <Icon options />
-        </TouchableOpacity>
+        
       </Block>
     )
   }

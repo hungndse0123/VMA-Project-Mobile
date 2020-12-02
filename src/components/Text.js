@@ -7,6 +7,7 @@ export default class Typography extends Component {
     const {
       center,
       right,
+      left,
       color,
       size,
       height,
@@ -42,6 +43,7 @@ export default class Typography extends Component {
       button && styles.button,
       center && styles.center,
       right && styles.right,
+      left && styles.left,
       color && { color },
       color && color === 'blue' && styles.blue,
       color && color === 'lightblue' && styles.lightblue,
@@ -84,6 +86,7 @@ const styles = StyleSheet.create({
   light: { fontFamily: 'Rubik-Light' },
   center: { textAlign: 'center' },
   right: { textAlign: 'right' },
+  left: { textAlign: 'left' },
   blue: { color: theme.colors.blue, },
   lightblue: { color: theme.colors.lightblue, },
   green: { color: theme.colors.green, },
