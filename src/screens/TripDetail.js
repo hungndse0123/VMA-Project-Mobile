@@ -189,6 +189,8 @@ const ProfileScreen = ({ navigation, route }) => {
         ContractRepository.createPassengerList(listpassenger)
             .then((response) => {
                 console.log(response.status)
+                setPassengerVisible(!passengerVisible)
+                initPassengerList()
                 Alert.alert(
                     'Created',
                     'Request Created!!',
@@ -284,6 +286,7 @@ const ProfileScreen = ({ navigation, route }) => {
         console.log(JSON.stringify(vehicleId))
         await ContractRepository.endContractVehicle(data)
             .then((response) => {
+
                 console.log(response.status)
                 Alert.alert(
                     'End',
@@ -336,72 +339,6 @@ const ProfileScreen = ({ navigation, route }) => {
                             </Text>) : (<Text medium color="yellow">
                                 STATUS: {vehicleStatus}
                             </Text>)}
-
-                            {/* <Modal
-                                animationType="fade"
-                                transparent={true}
-                                visible={statusModalVisible}
-                                onRequestClose={() => {
-                                    setStatusModalVisible(!statusModalVisible)
-                                }}
-                            >
-                                <ScrollView style={styles.centeredView, { marginTop: 90 }}>
-                                    <Card style={styles.margin} title="List passenger">
-                                        <Block column style={{ marginBottom: 25 }}>
-                                            <Text caption medium style={styles.label}>
-                                                Select status to update
-                            </Text>
-                                            <DropDownPicker
-                                                items={vehicleStatusList}
-                                                defaultValue={selectedVehicleStatus}
-                                                //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
-                                                placeholder="Select status"
-                                                containerStyle={{ height: 40, width: width - 100, marginBottom: 25 }}
-                                                onChangeItem={item => setSelectedVehicleStatus(item.value)}
-                                            />
-                                        </Block>
-                                        <Button center style={styles.margin, { marginBottom: 15 }}
-                                            onPress={() => {
-                                                updatestatus()
-                                                setStatusModalVisible(!statusModalVisible)
-                                            }}
-                                        >
-                                            <Text color="white">
-                                                Update
-            </Text>
-                                        </Button>
-                                        <Block row style={{ marginTop: 10, marginBottom: 15 }}>
-                                            <FlatList
-                                                data={passengerAddList}
-                                                renderItem={({ item, index }) =>
-                                                    <TouchableWithoutFeedback
-
-                                                        style={{ marginBottom: 15 }}
-                                                    >
-                                                        <Block
-                                                            style={[
-                                                                styles.card,
-                                                                styles.active,
-                                                                { marginBottom: 15 }
-                                                            ]}
-                                                        >
-
-                                                            <Block row>
-                                                                <Block column>
-
-                                                                    <Text style={{ marginLeft: 10 }} color="black3">Full name: {item["fullName"]}</Text>
-                                                                    <Text style={{ marginLeft: 10 }} color="black3">Phone number: {item["phoneNumber"]}</Text>
-                                                                    <Text style={{ marginLeft: 10 }} color="black3">Date of birth: {item["dateOfBirth"]}</Text>
-                                                                    <Text style={{ marginLeft: 10 }} color="black3">Address: {item["address"]}</Text>
-                                                                </Block>
-                                                            </Block>
-                                                        </Block>
-                                                    </TouchableWithoutFeedback>
-                                                } />
-                                        </Block>
-                                    </Card>
-                                </ScrollView>
-                            </Modal> */}
                             {vehicleStatus === "NOT_STARTED" ?
                                 (<TouchableOpacity
                                     onPress={() => {
@@ -493,7 +430,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         <Block center style={{ marginTop: 10 }}>
                             <Button full center style={styles.margin, { marginBottom: 10 }} onPress={() => {
                                 setPassengerVisible(!passengerVisible)
-                                //initPassengerList()
+
                             }}>
                                 <Block row center>
                                     <Text color="white">

@@ -139,6 +139,9 @@ const ProfileScreen = ({ navigation, route }) => {
                 skipBackup: true,
                 path: 'Images',
             },
+            maxWidth: 200,
+            maxHeight: 200,
+            quality: 0.4
         };
         ImagePicker.showImagePicker(options, (response) => {
             //console.log('Response = ', response);

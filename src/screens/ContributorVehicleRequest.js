@@ -166,7 +166,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 setUser(null);
                 console.log(error);
             });
-    }, [isFocused]);
+    }, []);
     const chooseImage = (image) => {
         let options = {
             title: 'Select Avatar',
@@ -176,6 +176,9 @@ const ProfileScreen = ({ navigation, route }) => {
                 skipBackup: true,
                 path: 'Images',
             },
+            maxWidth: 200,
+            maxHeight: 200,
+            quality: 0.4
         };
         ImagePicker.showImagePicker(options, (response) => {
             //console.log('Response = ', response);
@@ -239,12 +242,14 @@ const ProfileScreen = ({ navigation, route }) => {
     }
     const addVehiceDocument = async () => {
         setIsLoading(true)
+        let urlf = await FirebaseRepository.uploadImageToFirebase(frontImgUri, requestType + "_DOCUMENT_FRONT", user.uid)
+        let urlb = await FirebaseRepository.uploadImageToFirebase(backImgUri, requestType + "_DOCUMENT_BACK", user.uid)
         setVehicleDocumentList(prevArray => [
             ...prevArray, {
                 expiryDate: expiryDate,
                 imageLinks: [
-                    frontImgUri,
-                    backImgUri
+                    urlf,
+                    urlb
                     // "https://firebasestorage.googleapis.com/v0/b/vma-fa20se28.appspot.com/o/VEHICLE_REGISTRATION_CERTIFICATE-undefined-20201104154407?alt=media&token=41b1790a-42a5-4b30-a242-deef7ab9a718",
                     // "https://firebasestorage.googleapis.com/v0/b/vma-fa20se28.appspot.com/o/VEHICLE_REGISTRATION_CERTIFICATE-undefined-20201104154408?alt=media&token=6b39ecce-7d7b-4abf-880e-cab1e3136b62"
                 ],
@@ -338,7 +343,7 @@ const ProfileScreen = ({ navigation, route }) => {
     }
     const createRequest = async () => {
         setIsLoading(true)
-        await getFBLink()
+        //await getFBLink()
         let imageLink_url = await FirebaseRepository.uploadImageToFirebase(imageLink, requestType + "_VEHICLE_IMAGE", user.uid)
         let requests = {
             description: description.trim(),

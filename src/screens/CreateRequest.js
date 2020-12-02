@@ -131,7 +131,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 setUser(null);
                 console.log(error);
             });
-    }, [isFocused]);
+    }, []);
     const chooseImage = (image) => {
         let options = {
             title: 'Select Avatar',
@@ -141,6 +141,9 @@ const ProfileScreen = ({ navigation, route }) => {
                 skipBackup: true,
                 path: 'Images',
             },
+            maxWidth: 200,
+            maxHeight: 200,
+            quality: 0.4
         };
         ImagePicker.showImagePicker(options, (response) => {
             //console.log('Response = ', response);
@@ -260,9 +263,10 @@ const ProfileScreen = ({ navigation, route }) => {
                     'Request Created!!',
                     [
                         {
-                            text: 'Back to menu',
-                            onPress: () => navigation.navigate("Service")
-                        },
+                            text: 'Close',
+                            onPress: () => navigation.navigate("CreateRequest"),
+                            style: 'cancel'
+                        }
                     ],
                     { cancelable: false }
                 );
@@ -326,9 +330,10 @@ const ProfileScreen = ({ navigation, route }) => {
                     'Request Created!!',
                     [
                         {
-                            text: 'Back to menu',
-                            onPress: () => navigation.navigate("Service")
-                        },
+                            text: 'Close',
+                            onPress: () => navigation.navigate("CreateRequest"),
+                            style: 'cancel'
+                        }
                     ],
                     { cancelable: false }
                 );
@@ -386,7 +391,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             text: 'Close',
                             onPress: () => navigation.navigate("CreateRequest"),
                             style: 'cancel'
-                        },
+                        }
                     ],
                     { cancelable: false }
                 );
@@ -426,7 +431,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             text: 'Close',
                             onPress: () => navigation.navigate("CreateRequest"),
                             style: 'cancel'
-                        },
+                        }
                     ],
                     { cancelable: false }
                 );
