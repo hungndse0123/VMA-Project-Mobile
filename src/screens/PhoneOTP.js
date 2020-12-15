@@ -161,14 +161,6 @@ const SignUpScreen = ({ navigation, route }) => {
 
               />
             </Block>
-            <Text paragraph color="gray">
-              Don't have an account? <Text
-                height={18}
-                color="blue"
-                onPress={() => navigation.navigate('Register')}>
-                Sign up
-                        </Text>
-            </Text>
           </Block>
         </Block>
       </Block>

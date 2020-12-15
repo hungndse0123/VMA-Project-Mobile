@@ -186,7 +186,7 @@ const DriverDetail = ({ navigation, route }) => {
                     .catch((error) => {
                         Alert.alert(
                             'Error',
-                            JSON.stringify(error),
+                            JSON.stringify(error["debugMessage"]),
                             [
                                 {
                                     text: 'Cancel',
@@ -209,7 +209,7 @@ const DriverDetail = ({ navigation, route }) => {
     return (
         <SafeAreaView style={styles.overview}>
             <Loader isAnimate={isLoading} />
-            <Header navigation={navigation} title="Profile" />
+            <Header navigation={navigation} title="Driver profile" />
             <ScrollView contentContainerStyle={{ paddingVertical: 25 }}>
 
                 <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Driver profile">
@@ -395,7 +395,7 @@ const DriverDetail = ({ navigation, route }) => {
                                                 </Block>
                                                 <Block row>
                                                     <Block column>
-
+                                                        <Text style={{ marginLeft: 10 }} color="black3">Document ID: {item["userDocumentId"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Registered Location: {item["registeredLocation"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Registered Date: {item["registeredDate"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Expiry Date: {item["expiryDate"]}</Text>

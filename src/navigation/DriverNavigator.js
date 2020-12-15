@@ -13,6 +13,7 @@ import TripDetail from '../screens/TripDetail';
 import CreateRequest from '../screens/CreateRequest';
 import RecentRequests from '../screens/RecentRequests';
 import AssignedVehicle from '../screens/AssignedVehicle';
+import RepairContact from '../screens/RepairContact';
 import { signOutUser } from "../services/FireAuthHelper";
 
 import Icon from "react-native-vector-icons/Entypo";
@@ -80,6 +81,7 @@ const DrawerNavigation = () => {
             <Drawer.Screen name="CreateRequest" options={{ headerShown: false, drawerIcon: () => <Icon name="home" size={30} /> }} component={CreateRequest} />
             <Drawer.Screen name="RecentRequests" options={{ headerShown: false, drawerIcon: () => <Icon name="home" size={30} /> }} component={RecentRequests} />
             <Drawer.Screen name="AssignedVehicle" options={{ headerShown: false, drawerIcon: () => <Icon name="home" size={30} /> }} component={AssignedVehicle} />
+            <Drawer.Screen name="Repair Contact" options={{ headerShown: false, drawerIcon: () => <Icon name="user" size={30} /> }} component={RepairContact} />
         </Drawer.Navigator>
     );
 };

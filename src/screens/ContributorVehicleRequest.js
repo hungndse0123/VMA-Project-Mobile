@@ -5,7 +5,7 @@ import VehicleRepository from "../repositories/VehicleRepository";
 import RequestRepository from "../repositories/RequestRepository";
 import DocumentRepository from "../repositories/DocumentRepository";
 
-import { Alert, Dimensions, Modal, TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, FlatList, AsyncStorage } from "react-native";
+import { View, Alert, Dimensions, Modal, TouchableOpacity, Image, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableWithoutFeedback, FlatList, AsyncStorage } from "react-native";
 import { getCurrentUser } from "../services/FireAuthHelper";
 import Block from '../components/Block';
 import Text from '../components/Text';
@@ -19,6 +19,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import DropDownPicker from 'react-native-dropdown-picker';
 import ImagePicker from 'react-native-image-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import ModalCountryPicker from "../components/ModalCountryPicker";
 
 const { width } = Dimensions.get("window");
 
@@ -394,7 +395,7 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 Alert.alert(
                     'Error',
-                    JSON.stringify(error),
+                    JSON.stringify(error["debugMessage"]),
                     [
                         {
                             text: 'Cancel',
@@ -441,7 +442,7 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 Alert.alert(
                     'Error',
-                    JSON.stringify(error),
+                    JSON.stringify(error["debugMessage"]),
                     [
                         {
                             text: 'Cancel',
@@ -458,6 +459,282 @@ const ProfileScreen = ({ navigation, route }) => {
         setIsLoading(false)
 
     }
+
+    const [isfiled1err, setIsfiled1err] = useState(false)
+    const [isfiled2err, setIsfiled2err] = useState(false)
+    const [isfiled3err, setIsfiled3err] = useState(false)
+    const [isfiled4err, setIsfiled4err] = useState(false)
+    const [isfiled5err, setIsfiled5err] = useState(false)
+    const [isfiled5err2, setIsfiled5err2] = useState(false)
+    const [isfiled6err, setIsfiled6err] = useState(false)
+    const [isfiled7err, setIsfiled7err] = useState(false)
+    const [isfiled8err, setIsfiled8err] = useState(false)
+    const [isfiled9err, setIsfiled9err] = useState(false)
+    const [isfiled10err, setIsfiled10err] = useState(false)
+
+    const [isfiled11err, setIsfiled11err] = useState(false)
+    const [isfiled12err, setIsfiled12err] = useState(false)
+    const [isfiled13err, setIsfiled13err] = useState(false)
+    const [isfiled13err2, setIsfiled13err2] = useState(false)
+    const [isfiled14err, setIsfiled14err] = useState(false)
+    const [isfiled15err, setIsfiled15err] = useState(false)
+    const [isfiled16err, setIsfiled16err] = useState(false)
+    const [isfiled17err, setIsfiled17err] = useState(false)
+    const [visibleCountryPicker, setVisibleCountryPicker] = useState(false)
+    const [cityData, setCityData] = useState([
+        {
+            label: "Thành phố Cần Thơ",
+            value: "Thành phố Cần Thơ"
+        },
+        {
+            label: "Tỉnh Bạc Liêu",
+            value: "Tỉnh Bạc Liêu"
+        },
+        {
+            label: "Tỉnh Bắc Ninh",
+            value: "Tỉnh Bắc Ninh"
+        },
+        {
+            label: "Tỉnh Bến Tre",
+            value: "Tỉnh Bến Tre"
+        },
+        {
+            label: "Tỉnh Bình Định",
+            value: "Tỉnh Bình Định"
+        },
+        {
+            label: "Tỉnh Bình Dương",
+            value: "Tỉnh Bình Dương"
+        },
+        {
+            label: "Tỉnh Bình Phước",
+            value: "Tỉnh Bình Phước"
+        },
+        {
+            label: "Tỉnh Bình Thuận",
+            value: "Tỉnh Bình Thuận"
+        },
+        {
+            label: "Tỉnh Cà Mau",
+            value: "Tỉnh Cà Mau"
+        },
+        {
+            label: "Tỉnh Cao Bằng",
+            value: "Tỉnh Cao Bằng"
+        },
+        {
+            label: "Tỉnh Đắk Lắk",
+            value: "Tỉnh Đắk Lắk"
+        },
+        {
+            label: "Thành phố Đà Nẵng",
+            value: "Thành phố Đà Nẵng"
+        },
+        {
+            label: "Tỉnh Đắk Nông",
+            value: "Tỉnh Đắk Nông"
+        },
+        {
+            label: "Tỉnh Điện Biên",
+            value: "Tỉnh Điện Biên"
+        },
+        {
+            label: "Tỉnh Đồng Nai",
+            value: "Tỉnh Đồng Nai"
+        },
+        {
+            label: "Tỉnh Đồng Tháp",
+            value: "Tỉnh Đồng Tháp"
+        },
+        {
+            label: "Tỉnh Gia Lai",
+            value: "Tỉnh Gia Lai"
+        },
+        {
+            label: "Tỉnh Hà Giang",
+            value: "Tỉnh Hà Giang"
+        },
+        {
+            label: "Tỉnh Hà Nam",
+            value: "Tỉnh Hà Nam"
+        },
+        {
+            label: "Tỉnh Hà Tĩnh",
+            value: "Tỉnh Hà Tĩnh"
+        },
+        {
+            label: "Tỉnh Hải Dương",
+            value: "Tỉnh Hải Dương"
+        },
+        {
+            label: "Tỉnh Hậu Giang",
+            value: "Tỉnh Hậu Giang"
+        },
+        {
+            label: "Thành phố Hà Nội",
+            value: "Thành phố Hà Nội"
+        },
+        {
+            label: "Tỉnh Hoà Bình",
+            value: "Tỉnh Hoà Bình"
+        },
+        {
+            label: "Tỉnh Hưng Yên",
+            value: "Tỉnh Hưng Yên"
+        },
+        {
+            label: "Tỉnh Khánh Hòa",
+            value: "Tỉnh Khánh Hòa"
+        },
+        {
+            label: "Tỉnh Kiên Giang",
+            value: "Tỉnh Kiên Giang"
+        },
+        {
+            label: "Tỉnh Kon Tum",
+            value: "Tỉnh Kon Tum"
+        },
+        {
+            label: "Tỉnh Lào Cai",
+            value: "Tỉnh Lào Cai"
+        },
+        {
+            label: "Tỉnh Lai Châu",
+            value: "Tỉnh Lai Châu"
+        },
+        {
+            label: "Tỉnh Lâm Đồng",
+            value: "Tỉnh Lâm Đồng"
+        },
+        {
+            label: "Tỉnh Lạng Sơn",
+            value: "Tỉnh Lạng Sơn"
+        },
+        {
+            label: "Tỉnh Long An",
+            value: "Tỉnh Long An"
+        },
+        {
+            label: "Thành phố Hải Phòng",
+            value: "Thành phố Hải Phòng"
+        },
+        {
+            label: "Tỉnh Nam Định",
+            value: "Tỉnh Nam Định"
+        },
+        {
+            label: "Tỉnh Nghệ An",
+            value: "Tỉnh Nghệ An"
+        },
+        {
+            label: "Tỉnh Ninh Bình",
+            value: "Tỉnh Ninh Bình"
+        },
+        {
+            label: "Tỉnh Ninh Thuận",
+            value: "Tỉnh Ninh Thuận"
+        },
+        {
+            label: "Tỉnh Phú Thọ",
+            value: "Tỉnh Phú Thọ"
+        },
+        {
+            label: "Tỉnh Phú Yên",
+            value: "Tỉnh Phú Yên"
+        },
+        {
+            label: "Tỉnh Quảng Bình",
+            value: "Tỉnh Quảng Bình"
+        },
+        {
+            label: "Tỉnh Quảng Nam",
+            value: "Tỉnh Quảng Nam"
+        },
+        {
+            label: "Tỉnh Quảng Ngãi",
+            value: "Tỉnh Quảng Ngãi"
+        },
+        {
+            label: "Tỉnh Quảng Ninh",
+            value: "Tỉnh Quảng Ninh"
+        },
+        {
+            label: "Thành phố Hồ Chí Minh",
+            value: "Thành phố Hồ Chí Minh"
+        },
+        {
+            label: "Tỉnh Quảng Trị",
+            value: "Tỉnh Quảng Trị"
+        },
+        {
+            label: "Tỉnh Sóc Trăng",
+            value: "Tỉnh Sóc Trăng"
+        },
+        {
+            label: "Tỉnh Sơn La",
+            value: "Tỉnh Sơn La"
+        },
+        {
+            label: "Tỉnh Tây Ninh",
+            value: "Tỉnh Tây Ninh"
+        },
+        {
+            label: "Tỉnh Thái Bình",
+            value: "Tỉnh Thái Bình"
+        },
+        {
+            label: "Tỉnh Thái Nguyên",
+            value: "Tỉnh Thái Nguyên"
+        },
+        {
+            label: "Tỉnh Thanh Hóa",
+            value: "Tỉnh Thanh Hóa"
+        },
+        {
+            label: "Tỉnh Thừa Thiên Huế",
+            value: "Tỉnh Thừa Thiên Huế"
+        },
+        {
+            label: "Tỉnh Tiền Giang",
+            value: "Tỉnh Tiền Giang"
+        },
+        {
+            label: "Tỉnh Trà Vinh",
+            value: "Tỉnh Trà Vinh"
+        },
+        {
+            label: "Tỉnh An Giang",
+            value: "Tỉnh An Giang"
+        },
+        {
+            label: "Tỉnh Tuyên Quang",
+            value: "Tỉnh Tuyên Quang"
+        },
+        {
+            label: "Tỉnh Vĩnh Long",
+            value: "Tỉnh Vĩnh Long"
+        },
+        {
+            label: "Tỉnh Vĩnh Phúc",
+            value: "Tỉnh Vĩnh Phúc"
+        },
+        {
+            label: "Tỉnh Yên Bái",
+            value: "Tỉnh Yên Bái"
+        },
+        {
+            label: "Tỉnh Bà Rịa - Vũng Tàu",
+            value: "Tỉnh Bà Rịa - Vũng Tàu"
+        },
+        {
+            label: "Tỉnh Bắc Giang",
+            value: "Tỉnh Bắc Giang"
+        },
+        {
+            label: "Tỉnh Bắc Kạn",
+            value: "Tỉnh Bắc Kạn"
+        },
+    ])
 
 
     return (
@@ -477,7 +754,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         defaultValue={requestType}
                         //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
                         placeholder="Select type"
-                        containerStyle={{ height: 40, width: 250, marginBottom: 25 }}
+                        containerStyle={{ height: 40, width: 250, marginBottom: 60 }}
                         onChangeItem={item => setRequestType(item.value)}
                     />
 
@@ -494,6 +771,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                     <Text caption center medium style={styles.label, { marginBottom: 5, textTransform: 'uppercase' }}>
                                         Vehicle Image
                             </Text>
+                                    {
+                                        isfiled1err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                            Must not be empty
+                                        </Text>) : (<></>)}
                                     <Block style={{ marginBottom: 15 }}>
                                         <Image
                                             style={{ width: width - 200, height: width - 200 }}
@@ -510,11 +791,15 @@ const ProfileScreen = ({ navigation, route }) => {
                             <Input
                                 full
                                 maxLength={20}
-                                label="Vehicle number"
+                                label="License plate number"
                                 style={{ marginBottom: 15 }}
                                 value={vehicleNumber}
                                 onChangeText={text => setVehicleNumber(text)}
                             />
+                            {
+                                isfiled2err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    License plate number need to be from 8 - 12 characters
+                                </Text>) : (<></>)}
                             <Block>
                                 <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
                                     Vehicle Brand
@@ -530,6 +815,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                         //initdocument(item.value)
                                     }}
                                 />
+                                {
+                                    isfiled3err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Must select Vehicle Brand
+                                    </Text>) : (<></>)}
                             </Block>
                             <Block>
                                 <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
@@ -546,15 +835,23 @@ const ProfileScreen = ({ navigation, route }) => {
                                         //initdocument(item.value)
                                     }}
                                 />
+                                {
+                                    isfiled4err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Must select Vehicle Type
+                                    </Text>) : (<></>)}
                             </Block>
                             <Input
                                 full
                                 maxLength={17}
-                                label="Chassis number"
+                                label="Chassis number/VIN"
                                 style={{ marginBottom: 15 }}
                                 value={chassisNumber}
                                 onChangeText={text => setChassisNumber(text)}
                             />
+                            {
+                                isfiled5err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Chassis number/VIN must be 17 characters
+                                </Text>) : (<></>)}
                             <Input
                                 full
                                 maxLength={12}
@@ -563,6 +860,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                 value={engineNumber}
                                 onChangeText={text => setEngineNumber(text)}
                             />
+                            {
+                                isfiled6err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Engine number must be 12 characters
+                                </Text>) : (<></>)}
                             <Input
                                 full
                                 maxLength={30}
@@ -571,32 +872,58 @@ const ProfileScreen = ({ navigation, route }) => {
                                 value={model}
                                 onChangeText={text => setModel(text)}
                             />
+                            {
+                                isfiled7err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Vehicle Model need to be from 1 to 30 characters
+                                </Text>) : (<></>)}
                             <Input
                                 full
                                 maxLength={50}
                                 label="Vehicle Origin"
-                                style={{ marginBottom: 15 }}
+                                //style={{ marginBottom: 5 }}
                                 value={origin}
-                                onChangeText={text => setOrigin(text)}
+                                //onChangeText={text => setOrigin(text)}
+                                onFocus={() => setVisibleCountryPicker(true)}
                             />
+                            {
+                                isfiled8err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Vehicle Origin must not be empty
+                                </Text>) : (<></>)}
+                            <View opacity={0} >
+                                <ModalCountryPicker
+                                    //withFlag={false}
+                                    //style={{ flex: 0 }}
+                                    selectCountryCode={(code) => setOrigin(code)}
+                                    showPhikerModal={visibleCountryPicker}
+                                    onClose={() => setVisibleCountryPicker(false)}
+                                />
+                            </View>
+
                             <Input
                                 full
                                 number
                                 maxLength={4}
                                 label="Year Of Manufacture"
-                                placeholder="yyyy"
+                                placeholder="Year Of Manufacture (YYYY)"
                                 style={{ marginBottom: 15 }}
                                 value={yearOfManufacture}
                                 onChangeText={text => setYearOfManufacture(text)}
                             />
+                            {
+                                isfiled9err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Year Of Manufacture must be 4 characters
+                                </Text>) : (<></>)}
                             <Input
-
                                 number
                                 label="Number of seats"
                                 style={{ marginBottom: 15, width: width - 50 }}
                                 value={seats}
                                 onChangeText={text => setSeats(text)}
                             />
+                            {
+                                isfiled10err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Number of seats is required
+                                </Text>) : (<></>)}
                             <Input
                                 numeric
                                 number
@@ -606,6 +933,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                 value={distanceDriven}
                                 onChangeText={(newNum) => setDistanceDriven(newNum)}
                             />
+                            {
+                                isfiled11err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Distance Driven is required
+                                </Text>) : (<></>)}
                         </Block>
 
                     </Card>
@@ -618,6 +949,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                     value={startDate}
                                     onFocus={() => setIsStartDateVisible(true)}
                                 />
+                                {
+                                    isfiled12err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Contribute from date must not be empty
+                                    </Text>) : (<></>)}
                                 <DateTimePickerModal
                                     isVisible={isStartDateVisible}
                                     mode="date"
@@ -636,6 +971,14 @@ const ProfileScreen = ({ navigation, route }) => {
                                     value={endDate}
                                     onFocus={() => setIsEndDateVisible(true)}
                                 />
+                                {
+                                    isfiled13err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Contribute to date must not be empty
+                                    </Text>) : (<></>)}
+                                {
+                                    isfiled14err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Contribute to date must not be sooner than Contribute from date
+                                    </Text>) : (<></>)}
                                 <DateTimePickerModal
                                     isVisible={isEndDateVisible}
                                     mode="date"
@@ -650,12 +993,16 @@ const ProfileScreen = ({ navigation, route }) => {
                                 <Input
                                     full
                                     number
-                                    label="Vehicle Value"
+                                    label="Vehicle Value (Per month)"
                                     placeholder="...(VND)"
                                     style={{ marginBottom: 15 }}
                                     value={value}
                                     onChangeText={text => setValue(text)}
                                 />
+                                {
+                                    isfiled15err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Vehicle Value (Per month) is required
+                                    </Text>) : (<></>)}
                             </Block>
                         </Card>
                         <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Vehicle Documents">
@@ -760,14 +1107,32 @@ const ProfileScreen = ({ navigation, route }) => {
                                                     value={vehicleDocumentId}
                                                     onChangeText={text => setVehicleDocumentId(text)}
                                                 />
-                                                <Input
+                                                <Block>
+                                                    <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left" }}>
+                                                        Registered Location
+                                </Text>
+                                                    <DropDownPicker
+                                                        items={cityData}
+                                                        defaultValue={registeredLocation}
+                                                        itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
+                                                        placeholder="Select city"
+                                                        containerStyle={{ height: 40, width: width - 100, marginBottom: 15 }}
+                                                        onChangeItem={item => setRegisteredLocation(item.value)}
+                                                    />
+                                                    {/* {
+                                    isfiled2err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Must select Registered Location
+                                    </Text>) : (<></>)} */}
+
+                                                </Block>
+                                                {/* <Input
                                                     multiline={true}
                                                     maxLength={100}
                                                     label="Registered Location"
                                                     value={registeredLocation}
                                                     onChangeText={text => setRegisteredLocation(text)}
                                                     style={{ marginBottom: 15, height: 80, width: width - 100, textAlignVertical: "top" }}
-                                                />
+                                                /> */}
                                                 <Block>
                                                     <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left" }}>
                                                         Document type
@@ -900,6 +1265,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                     onChangeText={text => setDescription(text)}
                                     style={{ marginBottom: 15, height: 80, textAlignVertical: "top" }}
                                 />
+                                {
+                                    isfiled16err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Description need to be from 1 to 100 characters
+                                    </Text>) : (<></>)}
                                 <Button full center style={styles.margin, { marginBottom: 10, width: width - 50 }} onPress={() => {
                                     //setIsDocumentVisible(!isDocumentVisible)
                                     //initPassengerList()

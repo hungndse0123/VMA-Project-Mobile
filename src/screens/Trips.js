@@ -405,7 +405,7 @@ const TripsScreen = ({ navigation, route }) => {
                                             contractVehicleId: item["contractVehicleId"],
                                             vehicleStatus: item["contractVehicleStatus"],
                                             vehicleId: vehicleId,
-                                            contractTrips: item["contractTrips"]
+                                            contractTrips: item["contractTrip"]
                                         })
                                         console.log(item["vehicleId"])
                                     }}
@@ -416,17 +416,17 @@ const TripsScreen = ({ navigation, route }) => {
                                     }}>
                                         <Block style={{ flex: 0.4 }} >
                                             <Text medium>
-                                                {index}
+                                                {index + 1}
                                             </Text>
                                         </Block>
                                         <Block style={{ flex: 1.5 }}>
                                             <Text medium>
-                                                {item["contractTrips"][0]["departureTime"]}
+                                                {item["contractTrip"]["departureTime"]}
                                             </Text>
                                         </Block>
                                         <Block style={{ flex: 1.5 }}>
                                             <Text medium>
-                                                {item["contractTrips"][0]["destinationTime"]}
+                                                {item["contractTrip"]["destinationTime"]}
                                             </Text>
                                         </Block>
                                         <Block style={{ flex: 1.3 }}>

@@ -96,4 +96,16 @@ export default {
                 });
         });
     },
+
+    getVehicleOverview(filter) {
+        return new Promise((resolve, reject) => {
+            Repository.get(`${resource}/overview${filter}`)
+                .then((res) => {
+                    resolve(res.data);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
 }

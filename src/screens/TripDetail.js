@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useIsFocused } from '@react-navigation/native'
-import axios from 'axios';
 import ContributorRepository from '../repositories/ContributorRepository';
 import UserRepository from '../repositories/UserRepository';
 import ContractRepository from '../repositories/ContractRepository';
@@ -97,6 +96,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         setIsLoading(true);
+        console.log(lastRefresh);
         getCurrentUser()
             .then((user) => {
                 setUser(user);
@@ -125,7 +125,261 @@ const ProfileScreen = ({ navigation, route }) => {
     const [addBirth, setAddBirth] = useState('')
     const [addAddress, setAddAddress] = useState('')
     const [isBirthDateVisible, setIsBirthDateVisible] = useState(false)
-
+    //const [selectedContractTripId, setSelectedContractTripId] = useState(contractTrips[0])
+    const [cityData, setCityData] = useState([
+        {
+            label: "Thành phố Cần Thơ",
+            value: "Thành phố Cần Thơ"
+        },
+        {
+            label: "Tỉnh Bạc Liêu",
+            value: "Tỉnh Bạc Liêu"
+        },
+        {
+            label: "Tỉnh Bắc Ninh",
+            value: "Tỉnh Bắc Ninh"
+        },
+        {
+            label: "Tỉnh Bến Tre",
+            value: "Tỉnh Bến Tre"
+        },
+        {
+            label: "Tỉnh Bình Định",
+            value: "Tỉnh Bình Định"
+        },
+        {
+            label: "Tỉnh Bình Dương",
+            value: "Tỉnh Bình Dương"
+        },
+        {
+            label: "Tỉnh Bình Phước",
+            value: "Tỉnh Bình Phước"
+        },
+        {
+            label: "Tỉnh Bình Thuận",
+            value: "Tỉnh Bình Thuận"
+        },
+        {
+            label: "Tỉnh Cà Mau",
+            value: "Tỉnh Cà Mau"
+        },
+        {
+            label: "Tỉnh Cao Bằng",
+            value: "Tỉnh Cao Bằng"
+        },
+        {
+            label: "Tỉnh Đắk Lắk",
+            value: "Tỉnh Đắk Lắk"
+        },
+        {
+            label: "Thành phố Đà Nẵng",
+            value: "Thành phố Đà Nẵng"
+        },
+        {
+            label: "Tỉnh Đắk Nông",
+            value: "Tỉnh Đắk Nông"
+        },
+        {
+            label: "Tỉnh Điện Biên",
+            value: "Tỉnh Điện Biên"
+        },
+        {
+            label: "Tỉnh Đồng Nai",
+            value: "Tỉnh Đồng Nai"
+        },
+        {
+            label: "Tỉnh Đồng Tháp",
+            value: "Tỉnh Đồng Tháp"
+        },
+        {
+            label: "Tỉnh Gia Lai",
+            value: "Tỉnh Gia Lai"
+        },
+        {
+            label: "Tỉnh Hà Giang",
+            value: "Tỉnh Hà Giang"
+        },
+        {
+            label: "Tỉnh Hà Nam",
+            value: "Tỉnh Hà Nam"
+        },
+        {
+            label: "Tỉnh Hà Tĩnh",
+            value: "Tỉnh Hà Tĩnh"
+        },
+        {
+            label: "Tỉnh Hải Dương",
+            value: "Tỉnh Hải Dương"
+        },
+        {
+            label: "Tỉnh Hậu Giang",
+            value: "Tỉnh Hậu Giang"
+        },
+        {
+            label: "Thành phố Hà Nội",
+            value: "Thành phố Hà Nội"
+        },
+        {
+            label: "Tỉnh Hoà Bình",
+            value: "Tỉnh Hoà Bình"
+        },
+        {
+            label: "Tỉnh Hưng Yên",
+            value: "Tỉnh Hưng Yên"
+        },
+        {
+            label: "Tỉnh Khánh Hòa",
+            value: "Tỉnh Khánh Hòa"
+        },
+        {
+            label: "Tỉnh Kiên Giang",
+            value: "Tỉnh Kiên Giang"
+        },
+        {
+            label: "Tỉnh Kon Tum",
+            value: "Tỉnh Kon Tum"
+        },
+        {
+            label: "Tỉnh Lào Cai",
+            value: "Tỉnh Lào Cai"
+        },
+        {
+            label: "Tỉnh Lai Châu",
+            value: "Tỉnh Lai Châu"
+        },
+        {
+            label: "Tỉnh Lâm Đồng",
+            value: "Tỉnh Lâm Đồng"
+        },
+        {
+            label: "Tỉnh Lạng Sơn",
+            value: "Tỉnh Lạng Sơn"
+        },
+        {
+            label: "Tỉnh Long An",
+            value: "Tỉnh Long An"
+        },
+        {
+            label: "Thành phố Hải Phòng",
+            value: "Thành phố Hải Phòng"
+        },
+        {
+            label: "Tỉnh Nam Định",
+            value: "Tỉnh Nam Định"
+        },
+        {
+            label: "Tỉnh Nghệ An",
+            value: "Tỉnh Nghệ An"
+        },
+        {
+            label: "Tỉnh Ninh Bình",
+            value: "Tỉnh Ninh Bình"
+        },
+        {
+            label: "Tỉnh Ninh Thuận",
+            value: "Tỉnh Ninh Thuận"
+        },
+        {
+            label: "Tỉnh Phú Thọ",
+            value: "Tỉnh Phú Thọ"
+        },
+        {
+            label: "Tỉnh Phú Yên",
+            value: "Tỉnh Phú Yên"
+        },
+        {
+            label: "Tỉnh Quảng Bình",
+            value: "Tỉnh Quảng Bình"
+        },
+        {
+            label: "Tỉnh Quảng Nam",
+            value: "Tỉnh Quảng Nam"
+        },
+        {
+            label: "Tỉnh Quảng Ngãi",
+            value: "Tỉnh Quảng Ngãi"
+        },
+        {
+            label: "Tỉnh Quảng Ninh",
+            value: "Tỉnh Quảng Ninh"
+        },
+        {
+            label: "Thành phố Hồ Chí Minh",
+            value: "Thành phố Hồ Chí Minh"
+        },
+        {
+            label: "Tỉnh Quảng Trị",
+            value: "Tỉnh Quảng Trị"
+        },
+        {
+            label: "Tỉnh Sóc Trăng",
+            value: "Tỉnh Sóc Trăng"
+        },
+        {
+            label: "Tỉnh Sơn La",
+            value: "Tỉnh Sơn La"
+        },
+        {
+            label: "Tỉnh Tây Ninh",
+            value: "Tỉnh Tây Ninh"
+        },
+        {
+            label: "Tỉnh Thái Bình",
+            value: "Tỉnh Thái Bình"
+        },
+        {
+            label: "Tỉnh Thái Nguyên",
+            value: "Tỉnh Thái Nguyên"
+        },
+        {
+            label: "Tỉnh Thanh Hóa",
+            value: "Tỉnh Thanh Hóa"
+        },
+        {
+            label: "Tỉnh Thừa Thiên Huế",
+            value: "Tỉnh Thừa Thiên Huế"
+        },
+        {
+            label: "Tỉnh Tiền Giang",
+            value: "Tỉnh Tiền Giang"
+        },
+        {
+            label: "Tỉnh Trà Vinh",
+            value: "Tỉnh Trà Vinh"
+        },
+        {
+            label: "Tỉnh An Giang",
+            value: "Tỉnh An Giang"
+        },
+        {
+            label: "Tỉnh Tuyên Quang",
+            value: "Tỉnh Tuyên Quang"
+        },
+        {
+            label: "Tỉnh Vĩnh Long",
+            value: "Tỉnh Vĩnh Long"
+        },
+        {
+            label: "Tỉnh Vĩnh Phúc",
+            value: "Tỉnh Vĩnh Phúc"
+        },
+        {
+            label: "Tỉnh Yên Bái",
+            value: "Tỉnh Yên Bái"
+        },
+        {
+            label: "Tỉnh Bà Rịa - Vũng Tàu",
+            value: "Tỉnh Bà Rịa - Vũng Tàu"
+        },
+        {
+            label: "Tỉnh Bắc Giang",
+            value: "Tỉnh Bắc Giang"
+        },
+        {
+            label: "Tỉnh Bắc Kạn",
+            value: "Tỉnh Bắc Kạn"
+        },
+    ])
 
     const init = () => {
         setVehicleStatusList([])
@@ -136,6 +390,18 @@ const ProfileScreen = ({ navigation, route }) => {
     const initPassengerList = async () => {
         setIsLoading(true)
         await ContractRepository.getPassengerList(`?contractVehicleId=${contractVehicleId}`)
+            .then((response) => {
+                setPassengerList(response);
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        setIsLoading(false)
+        //console.log(contractVehicleId)
+    }
+    const initContractVehicleStatus = async () => {
+        setIsLoading(true)
+        await ContractRepository.getVehicleStatusByVehicleIdAndContractDetailId()
             .then((response) => {
                 setPassengerList(response);
             })
@@ -182,56 +448,60 @@ const ProfileScreen = ({ navigation, route }) => {
         console.log(contractVehicleId)
     }
     const createPassengerList = () => {
-        let listpassenger = {
-            contractVehicleId: contractVehicleId,
-            passengerList: passengerAddList
+        if (passengerAddList.length > 0) {
+            let listpassenger = {
+                contractVehicleId: contractVehicleId,
+                passengerList: passengerAddList
+            }
+            ContractRepository.createPassengerList(listpassenger)
+                .then((response) => {
+                    console.log(response.status)
+                    setPassengerVisible(!passengerVisible)
+                    initPassengerList()
+                    Alert.alert(
+                        'Created',
+                        'Request Created!!',
+                        [
+                            {
+                                text: 'Back to trip detail',
+                                onPress: () => navigation.navigate("TripDetail", {
+                                    lastRefresh: Date(Date.now()).toString(),
+                                    contractId: contractId,
+                                    contractVehicleId: contractVehicleId,
+                                    vehicleId: vehicleId,
+                                    contractTrips: contractTrips,
+                                    vehicleStatus: selectedVehicleStatus
+                                })
+                            },
+                        ],
+                        { cancelable: false }
+                    );
+                })
+                .catch((error) => {
+                    Alert.alert(
+                        'Error',
+                        JSON.stringify(error["debugMessage"]),
+                        [
+                            {
+                                text: 'Cancel',
+                                onPress: () => console.log('Cancel Pressed'),
+                                style: 'cancel'
+                            },
+                            { text: 'OK', onPress: () => console.log('OK Pressed') }
+                        ],
+                        { cancelable: false }
+                    );
+                })
+            setPassengerAddList([])
         }
-        ContractRepository.createPassengerList(listpassenger)
-            .then((response) => {
-                console.log(response.status)
-                setPassengerVisible(!passengerVisible)
-                initPassengerList()
-                Alert.alert(
-                    'Created',
-                    'Request Created!!',
-                    [
-                        {
-                            text: 'Back to trip detail',
-                            onPress: () => navigation.navigate("TripDetail", {
-                                lastRefresh: Date(Date.now()).toString(),
-                                contractId: contractId,
-                                contractVehicleId: contractVehicleId,
-                                vehicleId: vehicleId,
-                                contractTrips: contractTrips,
-                                vehicleStatus: selectedVehicleStatus
-                            })
-                        },
-                    ],
-                    { cancelable: false }
-                );
-            })
-            .catch((error) => {
-                Alert.alert(
-                    'Error',
-                    JSON.stringify(error),
-                    [
-                        {
-                            text: 'Cancel',
-                            onPress: () => console.log('Cancel Pressed'),
-                            style: 'cancel'
-                        },
-                        { text: 'OK', onPress: () => console.log('OK Pressed') }
-                    ],
-                    { cancelable: false }
-                );
-            })
-        setPassengerAddList([])
+
     }
-    const startstatus = async () => {
+    const startstatus = async (DetailId) => {
         setIsLoading(true)
         let data = {
             contractId: contractId,
             vehicleId: vehicleId,
+            contractDetailId: DetailId,
         }
         console.log(JSON.stringify(data))
         console.log(JSON.stringify(vehicleId))
@@ -250,7 +520,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 contractVehicleId: contractVehicleId,
                                 vehicleId: vehicleId,
                                 contractTrips: contractTrips,
-                                vehicleStatus: selectedVehicleStatus
+                                vehicleStatus: "IN_PROGRESS"
                             })
                         },
                     ],
@@ -260,7 +530,7 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 Alert.alert(
                     'Error',
-                    JSON.stringify(error),
+                    JSON.stringify(error["debugMessage"]),
                     [
                         {
                             text: 'Cancel',
@@ -276,11 +546,12 @@ const ProfileScreen = ({ navigation, route }) => {
         //setPassengerAddList([])
     }
 
-    const endstatus = async () => {
+    const endstatus = async (DetailId) => {
         setIsLoading(true)
         let data = {
             contractId: contractId,
             vehicleId: vehicleId,
+            contractDetailId: DetailId,
         }
         console.log(JSON.stringify(data))
         console.log(JSON.stringify(vehicleId))
@@ -300,7 +571,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 contractVehicleId: contractVehicleId,
                                 vehicleId: vehicleId,
                                 contractTrips: contractTrips,
-                                vehicleStatus: selectedVehicleStatus
+                                vehicleStatus: "COMPLETED"
                             })
                         },
                     ],
@@ -310,7 +581,7 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 Alert.alert(
                     'Error',
-                    JSON.stringify(error),
+                    JSON.stringify(error["debugMessage"]),
                     [
                         {
                             text: 'Cancel',
@@ -349,7 +620,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                         //     contractVehicleId: item["contractVehicleId"]
                                         // })
                                         setSelectedVehicleStatus("IN_PROGRESS")
-                                        startstatus()
+                                        startstatus(contractTrips["contractTripId"])
                                     }}
                                 >
                                     <Block center row style={{ marginTop: 5 }}>
@@ -369,7 +640,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                         //     contractVehicleId: item["contractVehicleId"]
                                         // })
                                         setSelectedVehicleStatus("COMPLETED")
-                                        endstatus()
+                                        endstatus(contractTrips["contractTripId"])
                                     }}
                                 >
                                     <Block row style={{ marginTop: 5 }}>
@@ -395,38 +666,38 @@ const ProfileScreen = ({ navigation, route }) => {
                         CONTRACT TRIPS
                             </Text>
                     <Block column style={{ marginTop: 10 }}>
-                        <FlatList
-                            data={contractTrips}
-                            renderItem={({ item, index }) =>
-                                <TouchableWithoutFeedback
 
-                                    style={{ marginBottom: 15 }}
-                                >
-                                    <Block
-                                        style={[
-                                            styles.card,
-                                            styles.active,
-                                            { marginBottom: 15 }
-                                        ]}
-                                    >
-                                        <Block row >
-                                            <Text h4 style={{ marginBottom: 15 }} color="brown">Trip No: {index + 1}</Text>
-                                        </Block>
-                                        <Block row>
-                                            <Block column>
+                        <TouchableWithoutFeedback
 
-                                                <Text style={{ marginLeft: 10 }} color="black3">Contract Trip Id: {item["contractTripId"]}</Text>
-                                                <Text style={{ marginLeft: 10 }} color="black3">Departure Location: {item["departureLocation"]}</Text>
-                                                <Text style={{ marginLeft: 10 }} color="black3">Destination Location: {item["destinationLocation"]}</Text>
-                                                <Text style={{ marginLeft: 10 }} color="black3">Departure Time: {item["departureTime"]}</Text>
-                                                <Text style={{ marginLeft: 10 }} color="black3">Destination Time: {item["destinationTime"]}</Text>
-                                                <Text style={{ marginLeft: 10 }} color="black3">Locations: </Text>
-                                                <FlatList data={item["locations"]} renderItem={({ item, index }) => <Text column style={{ marginLeft: 10 }} color="black3">+ Location {index + 1}: {item["location"]}</Text>} />
-                                            </Block>
-                                        </Block>
+                            style={{ marginBottom: 15 }}
+                        >
+                            <Block
+                                style={[
+                                    styles.card,
+                                    styles.active,
+                                    { marginBottom: 15 }
+                                ]}
+                            >
+                                <Block row >
+                                    <Text h4 style={{ marginBottom: 15 }} color="brown">Trip</Text>
+
+                                </Block>
+                                <Block row>
+                                    <Block column>
+
+                                        <Text style={{ marginLeft: 10 }} color="black">Contract Trip Id: <Text style={{ marginLeft: 10 }} color="black3">{contractTrips["contractTripId"]}</Text></Text>
+                                        <Text style={{ marginLeft: 10 }} color="black">Departure Location: <Text style={{ marginLeft: 10 }} color="black3">{contractTrips["departureLocation"]}</Text></Text>
+                                        <Text style={{ marginLeft: 10 }} color="black">Destination Location: <Text style={{ marginLeft: 10 }} color="black3">{contractTrips["destinationLocation"]}</Text></Text>
+                                        <Text style={{ marginLeft: 10 }} color="black">Departure Time: <Text style={{ marginLeft: 10 }} color="black3">{contractTrips["departureTime"]}</Text></Text>
+                                        <Text style={{ marginLeft: 10 }} color="black">Destination Time: <Text style={{ marginLeft: 10 }} color="black3">{contractTrips["destinationTime"]}</Text></Text>
+                                        <Text style={{ marginLeft: 10 }} color="black">Locations: </Text>
+                                        <FlatList data={contractTrips["locations"]} renderItem={({ item, index }) => <Text column style={{ marginLeft: 10 }} color="black3">+ Location {index + 1}: {item["location"]}</Text>} />
+
                                     </Block>
-                                </TouchableWithoutFeedback>
-                            } />
+                                </Block>
+                            </Block>
+                        </TouchableWithoutFeedback>
+
                         <Block center style={{ marginTop: 10 }}>
                             <Button full center style={styles.margin, { marginBottom: 10 }} onPress={() => {
                                 setPassengerVisible(!passengerVisible)
@@ -536,7 +807,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                                     mode="date"
                                                     onConfirm={datetime => {
                                                         //console.log(datetime)
-                                                        setAddBirth(`${datetime.getFullYear()}-${datetime.getMonth()}-${datetime.getDate()}`)
+                                                        setAddBirth(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
                                                         //console.log(departureTime)
                                                         setIsBirthDateVisible(!isBirthDateVisible)
                                                     }}

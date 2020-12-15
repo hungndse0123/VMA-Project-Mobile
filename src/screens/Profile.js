@@ -111,9 +111,9 @@ const ProfileScreen = ({ navigation, route }) => {
             .then(async (user) => {
                 setUser(user);
                 // init(user.uid);
-                initmonthlyIncome(user.uid);
-                init(user.uid);
 
+                init(user.uid);
+                initmonthlyIncome(user.uid);
             })
             .catch((error) => {
                 setUser(null);
@@ -135,7 +135,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 BackHandler.exitApp();
             })
             .catch((error) => {
-                alert(error);
+                alert(error["debugMessage"]);
             });
     };
     const [T1Income, setT1Income] = useState({
@@ -248,86 +248,20 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 console.log(error)
             })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=JANUARY`)
+        await ReportRepository.getDriverIncomesSummaryReportData(`/${id}/summary/data`)
             .then((response) => {
-                setT1Income(response)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=FEBRUARY`)
-            .then((response) => {
-                setT2Income(response)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=MARCH`)
-            .then((response) => {
-                setT3Income(response)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=APRIL`)
-            .then((response) => {
-                setT4Income(response)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=MAY`)
-            .then((response) => {
-                setT5Income(response)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=JUNE`)
-            .then((response) => {
-                setT6Income(response)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=JULY`)
-            .then((response) => {
-                setT7Income(response)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=AUGUST`)
-            .then((response) => {
-                setT8Income(response)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=SEPTEMBER`)
-            .then((response) => {
-                setT9Income(response)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=OCTOBER`)
-            .then((response) => {
-                setT10Income(response)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=NOVEMBER`)
-            .then((response) => {
-                setT11Income(response)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        await ReportRepository.getDriverIncomesReportData(`/${id}/data?quarter=DECEMBER`)
-            .then((response) => {
-                setT12Income(response)
+                setT1Income(response["driverIncomeSummaryMonthResList"][0]["driverIncomeRes"])
+                setT2Income(response["driverIncomeSummaryMonthResList"][1]["driverIncomeRes"])
+                setT3Income(response["driverIncomeSummaryMonthResList"][2]["driverIncomeRes"])
+                setT4Income(response["driverIncomeSummaryMonthResList"][3]["driverIncomeRes"])
+                setT5Income(response["driverIncomeSummaryMonthResList"][4]["driverIncomeRes"])
+                setT6Income(response["driverIncomeSummaryMonthResList"][5]["driverIncomeRes"])
+                setT7Income(response["driverIncomeSummaryMonthResList"][6]["driverIncomeRes"])
+                setT8Income(response["driverIncomeSummaryMonthResList"][7]["driverIncomeRes"])
+                setT9Income(response["driverIncomeSummaryMonthResList"][8]["driverIncomeRes"])
+                setT10Income(response["driverIncomeSummaryMonthResList"][9]["driverIncomeRes"])
+                setT11Income(response["driverIncomeSummaryMonthResList"][10]["driverIncomeRes"])
+                setT12Income(response["driverIncomeSummaryMonthResList"][11]["driverIncomeRes"])
             })
             .catch((error) => {
                 console.log(error)
@@ -346,18 +280,9 @@ const ProfileScreen = ({ navigation, route }) => {
     const [driver, setDriver] = useState({});
     const [showModal, setshowModal] = useState(-1);
     const [imageIndex, setimageIndex] = useState(0);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     //let Image_Http_URL = { uri: driverdetailimage };
     const renderImages = (item, parindex) => (
-        // <TouchableOpacity onPress={() => {
-        //     setimageIndex(index)
-        //     setshowModal(1)
-        // }}>
-        //     <Image
-        //         source={{ uri: item }}
-        //         style={{ height: 100, width: 100, marginBottom: 25, marginRight: 15 }}
-        //         center />
-        // </TouchableOpacity>
         <FlatList
             data={item["userDocumentImages"]}
             horizontal={true}
@@ -386,7 +311,7 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 console.log(error)
             })
-        setIsLoading(false);
+        //setIsLoading(false);
     }
 
     return (
@@ -524,7 +449,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 </Block>
                                                 <Block row>
                                                     <Block column>
-
+                                                        <Text style={{ marginLeft: 10 }} color="black3">Document ID: {item["userDocumentId"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Registered Location: {item["registeredLocation"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Registered Date: {item["registeredDate"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Expiry Date: {item["expiryDate"]}</Text>

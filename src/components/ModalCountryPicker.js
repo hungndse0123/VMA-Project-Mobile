@@ -15,13 +15,14 @@ export default function ModalCountryPicker(props) {
 
   useEffect(() => {
     props.selectCountryCode(countryCallCode);
+
   }, []);
 
   const onSelect = (country) => {
     setCountryCode(country.cca2);
     setCountry(country);
     setCountryCallCode(country.callingCode[0]);
-    props.selectCountryCode(country.callingCode[0]);
+    props.selectCountryCode(country.name);
   };
   return (
     <View>

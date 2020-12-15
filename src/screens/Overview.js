@@ -71,11 +71,13 @@ const OverviewScreen = ({ navigation }) => {
   const [vehicleCountMaintenance, setVehicleCountMaintenance] = useState(-1);
   const [vehicleCountNeedRepair, setVehicleCountNeedRepair] = useState(-1);
   const [vehicleCountPendingApproval, setVehicleCountPendingApproval] = useState(-1);
-  const [vehicleCountCar, setVehicleCountCar] = useState(-1);
-  const [vehicleCountCoach, setVehicleCountCoach] = useState(-1);
-  const [vehicleCountTruck, setVehicleCountTruck] = useState(-1);
-  const [vehicleCountSpecialized, setVehicleCountSpecialized] = useState(-1);
-  const [vehicleCount45Bus, setVehicleCount45Bus] = useState(-1);
+  const [vehicleCountSedan, setVehicleCountSedan] = useState(-1);
+  const [vehicleCountSUV, setVehicleCountSUV] = useState(-1);
+  const [vehicleCountMinivan, setVehicleCountMinivan] = useState(-1);
+  const [vehicleCountMinibus, setVehicleCountMinibus] = useState(-1);
+  const [vehicleCountMediumBus, setVehicleCountMediumBus] = useState(-1);
+  const [vehicleCountLargeBus, setVehicleCountLargeBus] = useState(-1);
+  const [vehicleCountSleeperBus, setVehicleCountSleeperBus] = useState(-1);
   const data = {
     // labels: ["Swim"], // optional
     data: [0.8]
@@ -186,6 +188,24 @@ const OverviewScreen = ({ navigation }) => {
   });
   const initmonthlyIncome = async (id) => {
     setIsLoading(true)
+    await ReportRepository.getContributorIncomesSummaryReportData(`/${id}/summary/data`)
+      .then((response) => {
+        setT1Income(response["contributorIncomeSummaryMonthResList"][0]["contributorEarnedAndEstimatedIncome"])
+        setT2Income(response["contributorIncomeSummaryMonthResList"][1]["contributorEarnedAndEstimatedIncome"])
+        setT3Income(response["contributorIncomeSummaryMonthResList"][2]["contributorEarnedAndEstimatedIncome"])
+        setT4Income(response["contributorIncomeSummaryMonthResList"][3]["contributorEarnedAndEstimatedIncome"])
+        setT5Income(response["contributorIncomeSummaryMonthResList"][4]["contributorEarnedAndEstimatedIncome"])
+        setT6Income(response["contributorIncomeSummaryMonthResList"][5]["contributorEarnedAndEstimatedIncome"])
+        setT7Income(response["contributorIncomeSummaryMonthResList"][6]["contributorEarnedAndEstimatedIncome"])
+        setT8Income(response["contributorIncomeSummaryMonthResList"][7]["contributorEarnedAndEstimatedIncome"])
+        setT9Income(response["contributorIncomeSummaryMonthResList"][8]["contributorEarnedAndEstimatedIncome"])
+        setT10Income(response["contributorIncomeSummaryMonthResList"][9]["contributorEarnedAndEstimatedIncome"])
+        setT11Income(response["contributorIncomeSummaryMonthResList"][10]["contributorEarnedAndEstimatedIncome"])
+        setT12Income(response["contributorIncomeSummaryMonthResList"][11]["contributorEarnedAndEstimatedIncome"])
+      })
+      .catch((error) => {
+        console.log(error)
+      })
     await ReportRepository.getContributorIncomesReportData(`/${id}/data`)
       .then((response) => {
         setTIncome(response)
@@ -193,91 +213,7 @@ const OverviewScreen = ({ navigation }) => {
       .catch((error) => {
         console.log(error)
       })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=JANUARY`)
-      .then((response) => {
-        setT1Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=FEBRUARY`)
-      .then((response) => {
-        setT2Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=MARCH`)
-      .then((response) => {
-        setT3Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=APRIL`)
-      .then((response) => {
-        setT4Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=MAY`)
-      .then((response) => {
-        setT5Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=JUNE`)
-      .then((response) => {
-        setT6Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=JULY`)
-      .then((response) => {
-        setT7Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=AUGUST`)
-      .then((response) => {
-        setT8Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=SEPTEMBER`)
-      .then((response) => {
-        setT9Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=OCTOBER`)
-      .then((response) => {
-        setT10Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=NOVEMBER`)
-      .then((response) => {
-        setT11Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await ReportRepository.getContributorIncomesReportData(`/${id}/data?quarter=DECEMBER`)
-      .then((response) => {
-        setT12Income(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    //console.log(JSON.stringify(T10Income))
+
     setIsLoading(false)
   }
   const chartConfig = {
@@ -304,92 +240,27 @@ const OverviewScreen = ({ navigation }) => {
   }
   const init = async (uid) => {
     setIsLoading(true)
-    await getCount(`?ownerId=${uid}`)
+    await VehicleRepository.getVehicleOverview(`?ownerId=${uid}`)
       .then((response) => {
-        setVehicleCountAll(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await getCount(`?ownerId=${uid}&vehicleStatus=ON_ROUTE&viewOption=1`)
-      .then((response) => {
-        setVehicleCountOnRoute(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await getCount(`?ownerId=${uid}&vehicleStatus=AVAILABLE&viewOption=1`)
-      .then((response) => {
-        setVehicleCountAvailable(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await getCount(`?ownerId=${uid}&vehicleStatus=AVAILABLE_NO_DRIVER&viewOption=1`)
-      .then((response) => {
-        setVehicleCountAvailableNoDriver(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await getCount(`?ownerId=${uid}&vehicleStatus=MAINTENANCE&viewOption=1`)
-      .then((response) => {
-        setVehicleCountMaintenance(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    // await getCount(`?ownerId=${uid}&vehicleStatus=PENDING_APPROVAL&viewOption=1`)
-    //   .then((response) => {
-    //     setVehicleCountPendingApproval(response)
-    //   })
-    //   .catch((error) => {
-    //     console.log(error)
-    //   })
-    await getCount(`?ownerId=${uid}&vehicleStatus=NEED_REPAIR&viewOption=1`)
-      .then((response) => {
-        setVehicleCountNeedRepair(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await getCount(`?ownerId=${uid}&vehicleTypeId=1`)
-      .then((response) => {
-        setVehicleCountCar(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await getCount(`?ownerId=${uid}&vehicleTypeId=2`)
-      .then((response) => {
-        setVehicleCountCoach(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await getCount(`?ownerId=${uid}&vehicleTypeId=3`)
-      .then((response) => {
-        setVehicleCountTruck(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await getCount(`?ownerId=${uid}&vehicleTypeId=4`)
-      .then((response) => {
-        setVehicleCountSpecialized(response)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    await getCount(`?ownerId=${uid}&vehicleTypeId=5`)
-      .then((response) => {
-        setVehicleCount45Bus(response)
+        setVehicleCountAll(response["totalVehicles"])
+        setVehicleCountOnRoute(response["onRouteVehicleCount"])
+        setVehicleCountAvailable(response["availableVehicleCount"])
+        setVehicleCountAvailableNoDriver(response["statusCount"][1]["statusCount"])
+        setVehicleCountMaintenance(response["statusCount"][3]["statusCount"])
+        setVehicleCountNeedRepair(response["statusCount"][7]["statusCount"])
+        setVehicleCountSedan(response["typeCount"][4]["typeCount"])
+        setVehicleCountSUV(response["typeCount"][6]["typeCount"])
+        setVehicleCountMinivan(response["typeCount"][3]["typeCount"])
+        setVehicleCountMinibus(response["typeCount"][2]["typeCount"])
+        setVehicleCountMediumBus(response["typeCount"][1]["typeCount"])
+        setVehicleCountLargeBus(response["typeCount"][0]["typeCount"])
+        setVehicleCountSleeperBus(response["typeCount"][5]["typeCount"])
       })
       .catch((error) => {
         console.log(error)
       })
 
-    setIsLoading(false)
+    //setIsLoading(false)
   }
 
 
@@ -421,7 +292,6 @@ const OverviewScreen = ({ navigation }) => {
               </Text>  */}
             <ProgressChart
               data={{
-                // labels: ["Swim"], // optional
                 data: [((vehicleCountOnRoute + vehicleCountAvailable) / vehicleCountAll)]
               }}
               width={screenWidth - 30}
@@ -456,7 +326,7 @@ const OverviewScreen = ({ navigation }) => {
 
           <Card middle style={{ marginLeft: 7 }}>
             <Icon distance />
-            <Text h2 style={{ marginTop: 17 }}>{vehicleCountAvailable + vehicleCountAvailableNoDriver}</Text>
+            <Text h2 style={{ marginTop: 17 }}>{vehicleCountAvailable}</Text>
             <Text paragraph color="gray">Vehicles Available</Text>
           </Card>
         </Block>
@@ -524,37 +394,51 @@ const OverviewScreen = ({ navigation }) => {
             <PieChart
               data={[
                 {
-                  name: "Car",
-                  population: vehicleCountCar,
+                  name: "Sedan",
+                  population: vehicleCountSedan,
                   color: "rgba(131, 167, 234, 1)",
                   legendFontColor: "#7F7F7F",
                   legendFontSize: 10
                 },
                 {
-                  name: "Coach",
-                  population: vehicleCountCoach,
+                  name: "SUV",
+                  population: vehicleCountSUV,
                   color: "#F00",
                   legendFontColor: "#7F7F7F",
                   legendFontSize: 10
                 },
                 {
-                  name: "Truck",
-                  population: vehicleCountTruck,
+                  name: "Minivan",
+                  population: vehicleCountMinivan,
                   color: "blue",
                   legendFontColor: "#7F7F7F",
                   legendFontSize: 10
                 },
                 {
-                  name: "Specialized",
-                  population: vehicleCountSpecialized,
+                  name: "Minibus",
+                  population: vehicleCountMinibus,
                   color: "#7CFC00",
                   legendFontColor: "#7F7F7F",
                   legendFontSize: 10
                 },
                 {
-                  name: "45 seats Bus",
-                  population: vehicleCount45Bus,
+                  name: "Medium Bus",
+                  population: vehicleCountMediumBus,
                   color: "#FFFF00",
+                  legendFontColor: "#7F7F7F",
+                  legendFontSize: 10
+                },
+                {
+                  name: "Large Bus",
+                  population: vehicleCountLargeBus,
+                  color: "purple",
+                  legendFontColor: "#7F7F7F",
+                  legendFontSize: 10
+                },
+                {
+                  name: "Sleeper Bus",
+                  population: vehicleCountSleeperBus,
+                  color: "orange",
                   legendFontColor: "#7F7F7F",
                   legendFontSize: 10
                 }

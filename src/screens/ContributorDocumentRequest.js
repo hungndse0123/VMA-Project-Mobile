@@ -283,7 +283,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 setIsLoading(false)
                 Alert.alert(
                     'Error',
-                    JSON.stringify(error),
+                    JSON.stringify(error["debugMessage"]),
                     [
                         {
                             text: 'Cancel',
@@ -319,8 +319,9 @@ const ProfileScreen = ({ navigation, route }) => {
                     'Request Created!!',
                     [
                         {
-                            text: 'Back to menu',
-                            onPress: () => navigation.navigate("RequestType")
+                            text: 'Close',
+                            onPress: () => { navigation.navigate("DocumentRequest") },
+                            style: 'cancel'
                         },
                     ],
                     { cancelable: false }
@@ -329,7 +330,7 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 Alert.alert(
                     'Error',
-                    JSON.stringify(error),
+                    JSON.stringify(error["debugMessage"]),
                     [
                         {
                             text: 'Cancel',
@@ -347,6 +348,338 @@ const ProfileScreen = ({ navigation, route }) => {
 
     }
     const [vehicleList, setVehicleList] = useState([])
+    const [checkdocumentTypes, setCheckDocumentTypes] = useState([])
+    const [isfiled1err, setIsfiled1err] = useState(false)
+    const [isfiled2err, setIsfiled2err] = useState(false)
+    const [isfiled3err, setIsfiled3err] = useState(false)
+    const [isfiled4err, setIsfiled4err] = useState(false)
+    const [isfiled5err, setIsfiled5err] = useState(false)
+    const [isfiled5err2, setIsfiled5err2] = useState(false)
+    const [isfiled6err, setIsfiled6err] = useState(false)
+    const [isfiled7err, setIsfiled7err] = useState(false)
+    const [isfiled8err, setIsfiled8err] = useState(false)
+    const [isfiled9err, setIsfiled9err] = useState(false)
+    const [isfiled10err, setIsfiled10err] = useState(false)
+    const [cityData, setCityData] = useState([
+        {
+            label: "Thành phố Cần Thơ",
+            value: "Thành phố Cần Thơ"
+        },
+        {
+            label: "Tỉnh Bạc Liêu",
+            value: "Tỉnh Bạc Liêu"
+        },
+        {
+            label: "Tỉnh Bắc Ninh",
+            value: "Tỉnh Bắc Ninh"
+        },
+        {
+            label: "Tỉnh Bến Tre",
+            value: "Tỉnh Bến Tre"
+        },
+        {
+            label: "Tỉnh Bình Định",
+            value: "Tỉnh Bình Định"
+        },
+        {
+            label: "Tỉnh Bình Dương",
+            value: "Tỉnh Bình Dương"
+        },
+        {
+            label: "Tỉnh Bình Phước",
+            value: "Tỉnh Bình Phước"
+        },
+        {
+            label: "Tỉnh Bình Thuận",
+            value: "Tỉnh Bình Thuận"
+        },
+        {
+            label: "Tỉnh Cà Mau",
+            value: "Tỉnh Cà Mau"
+        },
+        {
+            label: "Tỉnh Cao Bằng",
+            value: "Tỉnh Cao Bằng"
+        },
+        {
+            label: "Tỉnh Đắk Lắk",
+            value: "Tỉnh Đắk Lắk"
+        },
+        {
+            label: "Thành phố Đà Nẵng",
+            value: "Thành phố Đà Nẵng"
+        },
+        {
+            label: "Tỉnh Đắk Nông",
+            value: "Tỉnh Đắk Nông"
+        },
+        {
+            label: "Tỉnh Điện Biên",
+            value: "Tỉnh Điện Biên"
+        },
+        {
+            label: "Tỉnh Đồng Nai",
+            value: "Tỉnh Đồng Nai"
+        },
+        {
+            label: "Tỉnh Đồng Tháp",
+            value: "Tỉnh Đồng Tháp"
+        },
+        {
+            label: "Tỉnh Gia Lai",
+            value: "Tỉnh Gia Lai"
+        },
+        {
+            label: "Tỉnh Hà Giang",
+            value: "Tỉnh Hà Giang"
+        },
+        {
+            label: "Tỉnh Hà Nam",
+            value: "Tỉnh Hà Nam"
+        },
+        {
+            label: "Tỉnh Hà Tĩnh",
+            value: "Tỉnh Hà Tĩnh"
+        },
+        {
+            label: "Tỉnh Hải Dương",
+            value: "Tỉnh Hải Dương"
+        },
+        {
+            label: "Tỉnh Hậu Giang",
+            value: "Tỉnh Hậu Giang"
+        },
+        {
+            label: "Thành phố Hà Nội",
+            value: "Thành phố Hà Nội"
+        },
+        {
+            label: "Tỉnh Hoà Bình",
+            value: "Tỉnh Hoà Bình"
+        },
+        {
+            label: "Tỉnh Hưng Yên",
+            value: "Tỉnh Hưng Yên"
+        },
+        {
+            label: "Tỉnh Khánh Hòa",
+            value: "Tỉnh Khánh Hòa"
+        },
+        {
+            label: "Tỉnh Kiên Giang",
+            value: "Tỉnh Kiên Giang"
+        },
+        {
+            label: "Tỉnh Kon Tum",
+            value: "Tỉnh Kon Tum"
+        },
+        {
+            label: "Tỉnh Lào Cai",
+            value: "Tỉnh Lào Cai"
+        },
+        {
+            label: "Tỉnh Lai Châu",
+            value: "Tỉnh Lai Châu"
+        },
+        {
+            label: "Tỉnh Lâm Đồng",
+            value: "Tỉnh Lâm Đồng"
+        },
+        {
+            label: "Tỉnh Lạng Sơn",
+            value: "Tỉnh Lạng Sơn"
+        },
+        {
+            label: "Tỉnh Long An",
+            value: "Tỉnh Long An"
+        },
+        {
+            label: "Thành phố Hải Phòng",
+            value: "Thành phố Hải Phòng"
+        },
+        {
+            label: "Tỉnh Nam Định",
+            value: "Tỉnh Nam Định"
+        },
+        {
+            label: "Tỉnh Nghệ An",
+            value: "Tỉnh Nghệ An"
+        },
+        {
+            label: "Tỉnh Ninh Bình",
+            value: "Tỉnh Ninh Bình"
+        },
+        {
+            label: "Tỉnh Ninh Thuận",
+            value: "Tỉnh Ninh Thuận"
+        },
+        {
+            label: "Tỉnh Phú Thọ",
+            value: "Tỉnh Phú Thọ"
+        },
+        {
+            label: "Tỉnh Phú Yên",
+            value: "Tỉnh Phú Yên"
+        },
+        {
+            label: "Tỉnh Quảng Bình",
+            value: "Tỉnh Quảng Bình"
+        },
+        {
+            label: "Tỉnh Quảng Nam",
+            value: "Tỉnh Quảng Nam"
+        },
+        {
+            label: "Tỉnh Quảng Ngãi",
+            value: "Tỉnh Quảng Ngãi"
+        },
+        {
+            label: "Tỉnh Quảng Ninh",
+            value: "Tỉnh Quảng Ninh"
+        },
+        {
+            label: "Thành phố Hồ Chí Minh",
+            value: "Thành phố Hồ Chí Minh"
+        },
+        {
+            label: "Tỉnh Quảng Trị",
+            value: "Tỉnh Quảng Trị"
+        },
+        {
+            label: "Tỉnh Sóc Trăng",
+            value: "Tỉnh Sóc Trăng"
+        },
+        {
+            label: "Tỉnh Sơn La",
+            value: "Tỉnh Sơn La"
+        },
+        {
+            label: "Tỉnh Tây Ninh",
+            value: "Tỉnh Tây Ninh"
+        },
+        {
+            label: "Tỉnh Thái Bình",
+            value: "Tỉnh Thái Bình"
+        },
+        {
+            label: "Tỉnh Thái Nguyên",
+            value: "Tỉnh Thái Nguyên"
+        },
+        {
+            label: "Tỉnh Thanh Hóa",
+            value: "Tỉnh Thanh Hóa"
+        },
+        {
+            label: "Tỉnh Thừa Thiên Huế",
+            value: "Tỉnh Thừa Thiên Huế"
+        },
+        {
+            label: "Tỉnh Tiền Giang",
+            value: "Tỉnh Tiền Giang"
+        },
+        {
+            label: "Tỉnh Trà Vinh",
+            value: "Tỉnh Trà Vinh"
+        },
+        {
+            label: "Tỉnh An Giang",
+            value: "Tỉnh An Giang"
+        },
+        {
+            label: "Tỉnh Tuyên Quang",
+            value: "Tỉnh Tuyên Quang"
+        },
+        {
+            label: "Tỉnh Vĩnh Long",
+            value: "Tỉnh Vĩnh Long"
+        },
+        {
+            label: "Tỉnh Vĩnh Phúc",
+            value: "Tỉnh Vĩnh Phúc"
+        },
+        {
+            label: "Tỉnh Yên Bái",
+            value: "Tỉnh Yên Bái"
+        },
+        {
+            label: "Tỉnh Bà Rịa - Vũng Tàu",
+            value: "Tỉnh Bà Rịa - Vũng Tàu"
+        },
+        {
+            label: "Tỉnh Bắc Giang",
+            value: "Tỉnh Bắc Giang"
+        },
+        {
+            label: "Tỉnh Bắc Kạn",
+            value: "Tỉnh Bắc Kạn"
+        },
+    ])
+
+    const validateCreateRequest = () => {
+        var exDate = new Date(expiryDate.replace(/-/g, '/'));
+        var regDate = new Date(registeredDate.replace(/-/g, '/'));
+        vehicleDocumentId.length < 9 || vehicleDocumentId.length > 12 ? setIsfiled1err(true) : setIsfiled1err(false)
+        registeredLocation.length < 1 || registeredLocation.length > 100 ? setIsfiled2err(true) : setIsfiled2err(false)
+        vehicleDocumentType === '' ? setIsfiled3err(true) : setIsfiled3err(false)
+        checkdocumentTypes.indexOf(vehicleDocumentType) > -1 ? setIsfiled10err(true) : setIsfiled10err(false)
+        registeredDate === '' ? setIsfiled4err(true) : setIsfiled4err(false)
+        expiryDate === '' ? setIsfiled5err(true) : setIsfiled5err(false)
+        exDate < regDate ? setIsfiled5err2(true) : setIsfiled5err2(false)
+        frontImgUri === '' ? setIsfiled6err(true) : setIsfiled6err(false)
+        backImgUri === '' ? setIsfiled7err(true) : setIsfiled7err(false)
+        description.length < 1 || description.length > 100 ? setIsfiled9err(true) : setIsfiled9err(false)
+
+    }
+    const checkCreateRequest = () => {
+        var exDate = new Date(expiryDate.replace(/-/g, '/'));
+        var regDate = new Date(registeredDate.replace(/-/g, '/'));
+        validateCreateRequest()
+        if ((vehicleDocumentId.length >= 9 && vehicleDocumentId.length <= 12) &&
+            (registeredLocation.length >= 1 && registeredLocation.length <= 100) &&
+            (vehicleDocumentType !== '') &&
+            checkdocumentTypes.indexOf(vehicleDocumentType) === -1 &&
+            (registeredDate !== '') &&
+            (expiryDate !== '') &&
+            (exDate > regDate) &&
+            (frontImgUri !== '') &&
+            (backImgUri !== '') &&
+            (description.length >= 1 && description.length <= 100)) {
+            createRequest()
+            // Alert.alert(
+            //     'Error',
+            //     'a',//JSON.stringify(error["debugMessage"]),
+            //     [
+            //         {
+            //             text: 'Cancel',
+            //             onPress: () => console.log('Cancel Pressed'),
+            //             style: 'cancel'
+            //         },
+            //         { text: 'OK', onPress: () => console.log('OK Pressed') }
+            //     ],
+            //     { cancelable: false }
+            // );
+        }
+    }
+    const initExistedVehicleDocument = async (uid) => {
+        setCheckDocumentTypes([])
+        setIsLoading(true)
+        await DocumentRepository.getVehicleDocument(`?vehicleId=${uid}&viewOption=0`)
+            .then((response) => {
+                //console.log(response);
+                //const result = Object.values(response.vehicleDocuments);
+                //console.log(result);
+                for (let i = 0; i < response.length; i++) {
+                    setCheckDocumentTypes(prevArray => [
+                        ...prevArray, response[i]["vehicleDocumentType"]
+                    ])
+                }
+
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        setIsLoading(false)
+    }
 
     return (
         <SafeAreaView style={styles.overview}>
@@ -380,6 +713,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         onChangeItem={item => {
                             setSelectedVehicle(item.value)
                             initdocument(item.value)
+                            initExistedVehicleDocument(item.value)
                             //setSelectedDocument(documentList[0]['value'])
                         }}
                     />
@@ -396,7 +730,11 @@ const ProfileScreen = ({ navigation, route }) => {
                                 value={vehicleDocumentId}
                                 onChangeText={text => setVehicleDocumentId(text)}
                             />
-                            <Input
+                            {
+                                isfiled1err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    ID need to be from 9 - 12 characters
+                                </Text>) : (<></>)}
+                            {/* <Input
                                 multiline={true}
                                 full
                                 maxLength={100}
@@ -405,6 +743,28 @@ const ProfileScreen = ({ navigation, route }) => {
                                 onChangeText={text => setRegisteredLocation(text)}
                                 style={{ marginBottom: 15, height: 80, textAlignVertical: "top" }}
                             />
+                            {
+                                isfiled2err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Registered Location need to be from 1 - 100 characters
+                                </Text>) : (<></>)} */}
+                            <Block>
+                                <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left" }}>
+                                    Registered Location
+                                </Text>
+                                <DropDownPicker
+                                    items={cityData}
+                                    defaultValue={registeredLocation}
+                                    itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
+                                    placeholder="Select city"
+                                    containerStyle={{ height: 40, width: width - 50, marginBottom: 15 }}
+                                    onChangeItem={item => setRegisteredLocation(item.value)}
+                                />
+                                {
+                                    isfiled2err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Must select Registered Location
+                                    </Text>) : (<></>)}
+
+                            </Block>
                             <Block>
                                 <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left" }}>
                                     Document type
@@ -417,6 +777,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                     containerStyle={{ height: 40, width: width - 50, marginBottom: 25 }}
                                     onChangeItem={item => setVehicleDocumentType(item.value)}
                                 />
+                                {
+                                    isfiled3err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Must select Document type
+                                    </Text>) : (<></>)}
                             </Block>
 
                             <Input
@@ -426,6 +790,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                 value={registeredDate}
                                 onFocus={() => setIsRegisteredDateVisible(true)}
                             />
+                            {
+                                isfiled4err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Registered date must not be empty
+                                </Text>) : (<></>)}
                             <DateTimePickerModal
                                 isVisible={isRegisteredDateVisible}
                                 mode="date"
@@ -437,6 +805,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 }}
                                 onCancel={text => setIsRegisteredDateVisible(false)}
                             />
+
                             <Input
                                 full
                                 label="Expiry date"
@@ -444,6 +813,14 @@ const ProfileScreen = ({ navigation, route }) => {
                                 value={expiryDate}
                                 onFocus={() => setIsExpiryDateVisible(true)}
                             />
+                            {
+                                isfiled5err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Expiry date must not be empty
+                                </Text>) : (<></>)}
+                            {
+                                isfiled5err2 ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Expiry date must not be sooner than Registered date
+                                </Text>) : (<></>)}
                             <DateTimePickerModal
                                 isVisible={isExpiryDateVisible}
                                 mode="date"
@@ -464,6 +841,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                         <Text caption medium style={styles.label, { marginBottom: 5, textTransform: 'uppercase' }}>
                                             Front side
                             </Text>
+                                        {
+                                            isfiled6err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                Must not be empty
+                                            </Text>) : (<></>)}
                                         <Block style={{ marginBottom: 15 }}>
                                             <Image
                                                 style={{ width: width - 200, height: width - 200 }}
@@ -485,6 +866,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                         <Text caption medium style={styles.label, { marginBottom: 5, textTransform: 'uppercase' }}>
                                             Back side
                             </Text>
+                                        {
+                                            isfiled7err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                Must not be empty
+                                            </Text>) : (<></>)}
                                         <Block style={{ marginBottom: 15 }}>
                                             <Image
                                                 style={{ width: width - 200, height: width - 200 }}
@@ -510,6 +895,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                 onChangeText={text => setDescription(text)}
                                 style={{ marginBottom: 15, height: 80, textAlignVertical: "top" }}
                             />
+                            {
+                                isfiled9err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                    Description must be from 1 - 100 characters
+                                </Text>) : (<></>)}
                             {/* <Button full center style={styles.margin, { marginBottom: 10 }} onPress={() => {
                                 //uploadImage(frontImgUri, requestType, user.uid)
                                 //console.log(vehicleList);
@@ -524,7 +913,9 @@ const ProfileScreen = ({ navigation, route }) => {
                             </Button> */}
                             <Block row>
                                 <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
-                                    createRequest()
+                                    //createRequest()
+                                    //console.log(registeredLocation)
+                                    checkCreateRequest()
                                 }}>
                                     <Block row center>
                                         <Text color="white" >

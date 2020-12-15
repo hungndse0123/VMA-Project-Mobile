@@ -99,6 +99,17 @@ export default {
                 });
         });
     },
+    getVehicleStatusByVehicleIdAndContractDetailId(contractDetailId, issuedVehicleId) {
+        return new Promise((resolve, reject) => {
+            Repository.get(`${resource}/vehicles/${issuedVehicleId}/trips/${contractDetailId}`)
+                .then((res) => {
+                    resolve(res.data);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
     createPassengerList(list) {
         return new Promise((resolve, reject) => {
             Repository.post(`${resource}/vehicles/passengers`, list)

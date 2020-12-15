@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
 
@@ -23,6 +24,14 @@
         <!-- Change the resource name to your App's accent color - or any other color you want -->
         <meta-data  android:name="com.dieam.reactnativepushnotification.notification_color"
                     android:resource="@color/white"/> <!-- or @android:color/{name} to use a standard color -->
+
+<!-- You will only need to add this meta-data tag, but make sure it's a child of application -->
+        <meta-data
+                    android:name="com.google.android.geo.API_KEY"
+                    android:value="AIzaSyBISRHpc6qdLEdVMmpHc5R8H5kXqp-i4x0"/>
+                    <!-- You will also only need to add this uses-library tag -->
+   `````<uses-library android:name="org.apache.http.legacy" android:required="false"/>
+
 
         <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationActions" />
         <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationPublisher" />

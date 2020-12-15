@@ -11,7 +11,7 @@ import Card from '../components/Card';
 import Icon from '../components/Icon';
 import * as theme from '../constants/theme';
 import Header from "../components/Header";
-
+import Geolocation from '@react-native-community/geolocation';
 
 const ProfileScreen = ({ navigation }) => {
     const styles = StyleSheet.create({
@@ -79,7 +79,7 @@ const ProfileScreen = ({ navigation }) => {
                 BackHandler.exitApp();
             })
             .catch((error) => {
-                alert(error);
+                alert(error["debugMessage"]);
             });
     };
     // const updateStatus = (userid) => {
@@ -101,6 +101,7 @@ const ProfileScreen = ({ navigation }) => {
     useEffect(() => {
         getCurrentUser()
             .then((user) => {
+                Geolocation.getCurrentPosition(info => console.log(info));
                 setUser(user);
                 updateStatus(user.uid)
             })
@@ -238,6 +239,7 @@ const ProfileScreen = ({ navigation }) => {
             </ScrollView>
 
         </SafeAreaView>
+
     );
 };
 
