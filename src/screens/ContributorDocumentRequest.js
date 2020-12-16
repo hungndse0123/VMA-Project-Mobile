@@ -205,19 +205,19 @@ const ProfileScreen = ({ navigation, route }) => {
     //     setIsLoading(false)
     // }
     const clear = () => {
-        setVehicleDocumentType(listvehicleDocumentTypes[0]['value'])
-        setSelectedDocument(documentList[0]["value"])
+        //setVehicleDocumentType(listvehicleDocumentTypes[0]['value'])
+        //setSelectedDocument(documentList[0]["value"])
         setVehicleDocumentId('')
         setDescription('')
         setFrontImgUri('')
         setBackImgUri('')
         setExpiryDate('')
-        setRegisteredLocation('')
+        //setRegisteredLocation(cityData[0]["value"])
         setRegisteredDate('')
     }
     const initdocument = async (uid) => {
         setDocumentList([{ label: "Select document", value: '' }])
-        setSelectedDocument(documentList[0]["value"])
+        //setSelectedDocument(documentList[0]["value"])
         setIsLoading(true)
         await DocumentRepository.getVehicleDocument(`?vehicleId=${uid}&viewOption=0`)
             .then((response) => {
@@ -281,9 +281,10 @@ const ProfileScreen = ({ navigation, route }) => {
             })
             .catch((error) => {
                 setIsLoading(false)
+                console.log(error)
                 Alert.alert(
                     'Error',
-                    JSON.stringify(error["debugMessage"]),
+                    JSON.stringify(error),
                     [
                         {
                             text: 'Cancel',
@@ -628,9 +629,10 @@ const ProfileScreen = ({ navigation, route }) => {
         frontImgUri === '' ? setIsfiled6err(true) : setIsfiled6err(false)
         backImgUri === '' ? setIsfiled7err(true) : setIsfiled7err(false)
         description.length < 1 || description.length > 100 ? setIsfiled9err(true) : setIsfiled9err(false)
-
+        console.log(JSON.stringify(checkdocumentTypes))
     }
     const checkCreateRequest = () => {
+        //console.log()
         var exDate = new Date(expiryDate.replace(/-/g, '/'));
         var regDate = new Date(registeredDate.replace(/-/g, '/'));
         validateCreateRequest()
@@ -709,7 +711,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
                         placeholder="Select vehicle"
                         defaultValue={selectedVehicle}
-                        containerStyle={{ height: 40, width: 250, marginBottom: 40 }}
+                        containerStyle={{ height: 40, width: 250, marginBottom: 100 }}
                         onChangeItem={item => {
                             setSelectedVehicle(item.value)
                             initdocument(item.value)
@@ -726,6 +728,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 full
                                 maxLength={20}
                                 label="Document ID"
+                                placeholder="9 - 12 characters"
                                 style={{ marginBottom: 15 }}
                                 value={vehicleDocumentId}
                                 onChangeText={text => setVehicleDocumentId(text)}
@@ -781,6 +784,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                     isfiled3err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
                                         Must select Document type
                                     </Text>) : (<></>)}
+                                {
+                                    isfiled10err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Document type already existed
+                                    </Text>) : (<></>)}
                             </Block>
 
                             <Input
@@ -799,7 +806,12 @@ const ProfileScreen = ({ navigation, route }) => {
                                 mode="date"
                                 onConfirm={datetime => {
                                     //console.log(datetime)
-                                    setRegisteredDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
+                                    // {
+                                    //     datetime.getDate() < 10 ?
+                                    //         setRegisteredDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-0${datetime.getDate()}`)
+                                    //         : setRegisteredDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
+                                    // }
+                                    setRegisteredDate(`${datetime.getFullYear()}-${("0" + (datetime.getMonth() + 1)).slice(-2)}-${("0" + datetime.getDate()).slice(-2)}`)
                                     //console.log(departureTime)
                                     setIsRegisteredDateVisible(false)
                                 }}
@@ -826,7 +838,13 @@ const ProfileScreen = ({ navigation, route }) => {
                                 mode="date"
                                 onConfirm={datetime => {
                                     //console.log(datetime)
-                                    setExpiryDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
+                                    {
+                                        setExpiryDate(`${datetime.getFullYear()}-${("0" + (datetime.getMonth() + 1)).slice(-2)}-${("0" + datetime.getDate()).slice(-2)}`)
+                                        // datetime.getDate() < 10 ?
+                                        //     setExpiryDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-0${datetime.getDate()}`)
+                                        //     : setExpiryDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
+                                    }
+                                    //setExpiryDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
                                     //console.log(departureTime)
                                     setIsExpiryDateVisible(false)
                                 }}
@@ -891,6 +909,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 full
                                 maxLength={100}
                                 label="Description"
+                                placeholder="1 - 100 characters"
                                 value={description}
                                 onChangeText={text => setDescription(text)}
                                 style={{ marginBottom: 15, height: 80, textAlignVertical: "top" }}

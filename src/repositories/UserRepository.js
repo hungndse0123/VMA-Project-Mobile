@@ -44,16 +44,28 @@ export default {
   },
   createClientRegistrationToken(token) {
     return new Promise((resolve, reject) => {
-      Repository.post(`${resource}/registration-token`, {
-        token: token
-      })
-        .then((res) => {
-          resolve(res);
-          console.log("Create token done")
-        })
-        .catch((err) => {
-          reject(err.response.data);
-        });
+      var token = '';
+      firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+          //console.log(user); // It shows the Firebase user
+          //console.log(firebase.auth().user); // It is still undefined
+          user.getIdToken().then(function (idToken) {  // <------ Check this line
+            token = idToken;
+            Repository.post(`${resource}/registration-token`, {
+              token: token
+            })
+              .then((res) => {
+                resolve(res);
+                console.log("Create token done")
+              })
+              .catch((err) => {
+                reject(err.response.data);
+              });
+          });
+        }
+      });
+
     });
   }
+
 }

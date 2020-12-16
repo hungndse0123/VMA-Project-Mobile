@@ -4,7 +4,7 @@ import CountryPicker from "react-native-country-picker-modal";
 
 export default function ModalCountryPicker(props) {
   const [countryCode, setCountryCode] = useState("IN");
-  const [countryCallCode, setCountryCallCode] = useState(91);
+  const [countryCallCode, setCountryCallCode] = useState('');
   const [country, setCountry] = useState(null);
   const [withCountryNameButton, setWithCountryNameButton] = useState(false);
   const [withFlag, setWithFlag] = useState(true);

@@ -366,9 +366,9 @@ const ProfileScreen = ({ navigation, route }) => {
         setUserDocumentType(documentTypes[0]["value"])
         setExpiryDate('')
         setUserDocumentId('')
-        setRegisteredLocation('')
+        setRegisteredLocation(cityData[0]["value"])
         setRegisteredDate('')
-        setOtherInformation('')
+        setOtherInformation(otherinfoData[0]["value"])
         setFrontImgId('')
         setBackImgId('')
         setIsfrontImgUpdate(false)
@@ -786,6 +786,7 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 console.log(error)
             })
+
         setIsLoading(false);
     }
 
@@ -803,7 +804,7 @@ const ProfileScreen = ({ navigation, route }) => {
         backImgUri === '' ? setIsfiled7err(true) : setIsfiled7err(false)
         otherInformation.length < 1 || otherInformation.length > 50 ? setIsfiled8err(true) : setIsfiled8err(false)
         description.length < 1 || description.length > 100 ? setIsfiled9err(true) : setIsfiled9err(false)
-
+        console.log(JSON.stringify(checkdocumentTypes))
     }
     const validateUpdateRequest = () => {
         var exDate = new Date(expiryDate.replace(/-/g, '/'));

@@ -117,12 +117,12 @@ const ProfileScreen = ({ navigation, route }) => {
     const [selectedVehicletype, setSelectedVehicletype] = useState('');
     const [selectedDocument, setSelectedDocument] = useState('');
     const [chassisNumber, setChassisNumber] = useState('');
-    const [distanceDriven, setDistanceDriven] = useState(0);
+    const [distanceDriven, setDistanceDriven] = useState('');
     const [engineNumber, setEngineNumber] = useState('');
     const [imageLink, setImageLink] = useState('');
     const [model, setModel] = useState('');
     const [origin, setOrigin] = useState('');
-    const [seats, setSeats] = useState(0);
+    const [seats, setSeats] = useState('');
     const [yearOfManufacture, setYearOfManufacture] = useState('');
     const [vehicleNumber, setVehicleNumber] = useState('');
     const [vehicleList, setVehicleList] = useState([]);
@@ -131,7 +131,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [imageIndex, setimageIndex] = useState(0);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState('');
     const [isStartDateVisible, setIsStartDateVisible] = useState(false);
     const [isEndDateVisible, setIsEndDateVisible] = useState(false);
     const renderImages = (item, parindex) => (
@@ -251,14 +251,16 @@ const ProfileScreen = ({ navigation, route }) => {
                 imageLinks: [
                     urlf,
                     urlb
-                    // "https://firebasestorage.googleapis.com/v0/b/vma-fa20se28.appspot.com/o/VEHICLE_REGISTRATION_CERTIFICATE-undefined-20201104154407?alt=media&token=41b1790a-42a5-4b30-a242-deef7ab9a718",
-                    // "https://firebasestorage.googleapis.com/v0/b/vma-fa20se28.appspot.com/o/VEHICLE_REGISTRATION_CERTIFICATE-undefined-20201104154408?alt=media&token=6b39ecce-7d7b-4abf-880e-cab1e3136b62"
                 ],
                 registeredDate: registeredDate,
                 registeredLocation: registeredLocation.trim(),
                 vehicleDocumentId: vehicleDocumentId.trim(),
                 vehicleDocumentType: vehicleDocumentType,
             }
+        ])
+        setExisteddoclist(prevArray => [
+            ...prevArray,
+            vehicleDocumentType
         ])
         resetVehicleDocument()
         setIsLoading(false)
@@ -268,7 +270,7 @@ const ProfileScreen = ({ navigation, route }) => {
         setFrontImgUri('')
         setBackImgUri('')
         setRegisteredDate('')
-        setRegisteredLocation('')
+        setRegisteredLocation(cityData[0]["value"])
         setVehicleDocumentId('')
         setVehicleDocumentType(vehicleDocumentTypeList[0]["value"])
     }
@@ -282,13 +284,14 @@ const ProfileScreen = ({ navigation, route }) => {
         setModel('')
         setOrigin('')
         setYearOfManufacture('')
-        setSeats(0)
-        setDistanceDriven(0)
+        setSeats('')
+        setDistanceDriven('')
         setDescription('')
         setStartDate('')
         setEndDate('')
-        setValue(0)
+        setValue('')
         setVehicleDocumentList([])
+        setExisteddoclist([])
     }
     const initvehicledocumenttype = async () => {
         setIsLoading(true)
@@ -471,15 +474,24 @@ const ProfileScreen = ({ navigation, route }) => {
     const [isfiled8err, setIsfiled8err] = useState(false)
     const [isfiled9err, setIsfiled9err] = useState(false)
     const [isfiled10err, setIsfiled10err] = useState(false)
-
     const [isfiled11err, setIsfiled11err] = useState(false)
     const [isfiled12err, setIsfiled12err] = useState(false)
     const [isfiled13err, setIsfiled13err] = useState(false)
-    const [isfiled13err2, setIsfiled13err2] = useState(false)
     const [isfiled14err, setIsfiled14err] = useState(false)
     const [isfiled15err, setIsfiled15err] = useState(false)
     const [isfiled16err, setIsfiled16err] = useState(false)
+
     const [isfiled17err, setIsfiled17err] = useState(false)
+    const [isfiled18err, setIsfiled18err] = useState(false)
+    const [isfiled19err, setIsfiled19err] = useState(false)
+    const [isfiled20err, setIsfiled20err] = useState(false)
+    const [isfiled21err, setIsfiled21err] = useState(false)
+    const [isfiled22err, setIsfiled22err] = useState(false)
+    const [isfiled23err, setIsfiled23err] = useState(false)
+    const [isfiled24err, setIsfiled24err] = useState(false)
+    const [isfiled25err, setIsfiled25err] = useState(false)
+
+    const [existeddoclist, setExisteddoclist] = useState([])
     const [visibleCountryPicker, setVisibleCountryPicker] = useState(false)
     const [cityData, setCityData] = useState([
         {
@@ -735,7 +747,113 @@ const ProfileScreen = ({ navigation, route }) => {
             value: "Tỉnh Bắc Kạn"
         },
     ])
+    const validateCreateRequest = () => {
+        const licensePlateRegex = new RegExp(/^[1-9]{1}[0-9][A-Z]{1}-[0-9]{3}([0-9]{1}|(.[0-9]{2}))$/);
+        var fromDate = new Date(startDate.replace(/-/g, '/'));
+        var toDate = new Date(endDate.replace(/-/g, '/'));
+        imageLink === '' ? setIsfiled1err(true) : setIsfiled1err(false)
+        !licensePlateRegex.test(vehicleNumber) ? setIsfiled2err(true) : setIsfiled2err(false)
+        selectedBrand === '' ? setIsfiled3err(true) : setIsfiled3err(false)
+        selectedVehicletype === '' ? setIsfiled4err(true) : setIsfiled4err(false)
+        chassisNumber.length !== 17 ? setIsfiled5err(true) : setIsfiled5err(false)
+        engineNumber.length !== 12 ? setIsfiled6err(true) : setIsfiled6err(false)
+        model.length < 1 || model.length > 30 ? setIsfiled7err(true) : setIsfiled7err(false)
+        origin === 91 ? setIsfiled8err(true) : setIsfiled8err(false)
+        JSON.stringify(yearOfManufacture).length !== 6 ? setIsfiled9err(true) : setIsfiled9err(false)
+        seats === 0 ? setIsfiled10err(true) : setIsfiled10err(false)
+        distanceDriven === 0 ? setIsfiled11err(true) : setIsfiled11err(false)
+        startDate === '' ? setIsfiled12err(true) : setIsfiled12err(false)
+        endDate === '' ? setIsfiled13err(true) : setIsfiled13err(false)
+        fromDate > toDate ? setIsfiled14err(true) : setIsfiled14err(false)
+        value === 0 ? setIsfiled15err(true) : setIsfiled15err(false)
+        description.length < 1 || description.length > 100 ? setIsfiled16err(true) : setIsfiled16err(false)
 
+    }
+    const validateCreateDocument = () => {
+        var fromDate = new Date(registeredDate.replace(/-/g, '/'));
+        var toDate = new Date(expiryDate.replace(/-/g, '/'));
+        vehicleDocumentId.length < 9 || vehicleDocumentId.length > 12 ? setIsfiled17err(true) : setIsfiled17err(false)
+        registeredLocation === '' ? setIsfiled18err(true) : setIsfiled18err(false)
+        vehicleDocumentType === '' ? setIsfiled19err(true) : setIsfiled19err(false)
+        registeredDate === '' ? setIsfiled20err(true) : setIsfiled20err(false)
+        expiryDate === '' ? setIsfiled21err(true) : setIsfiled21err(false)
+        toDate < fromDate ? setIsfiled22err(true) : setIsfiled22err(false)
+        frontImgUri === '' ? setIsfiled23err(true) : setIsfiled23err(false)
+        backImgUri === '' ? setIsfiled24err(true) : setIsfiled24err(false)
+        existeddoclist.indexOf(vehicleDocumentType) > -1 ? setIsfiled25err(true) : setIsfiled25err(false)
+
+    }
+    const checkCreateRequest = () => {
+        const licensePlateRegex = new RegExp(/^[1-9]{1}[0-9][A-Z]{1}-[0-9]{3}([0-9]{1}|(.[0-9]{2}))$/);
+        var fromDate = new Date(startDate.replace(/-/g, '/'));
+        var toDate = new Date(endDate.replace(/-/g, '/'));
+        validateCreateRequest()
+        if ((imageLink !== '') &&
+            (licensePlateRegex.test(vehicleNumber)) &&
+            (selectedBrand !== '') &&
+            (selectedVehicletype !== '') &&
+            (chassisNumber.length === 17) &&
+            (engineNumber.length === 12) &&
+            (model.length >= 1 && model.length <= 30) &&
+            (origin !== 91) &&
+            (JSON.stringify(yearOfManufacture).length === 6) &&
+            (seats !== 0) &&
+            (distanceDriven !== 0) &&
+            (startDate !== '') &&
+            (endDate !== '') &&
+            (fromDate <= toDate) &&
+            (value !== 0) &&
+            (description.length >= 1 && description.length <= 100)
+        ) {
+            createRequest()
+            // Alert.alert(
+            //     'Error',
+            //     'a',//JSON.stringify(error["debugMessage"]),
+            //     [
+            //         {
+            //             text: 'Cancel',
+            //             onPress: () => console.log('Cancel Pressed'),
+            //             style: 'cancel'
+            //         },
+            //         { text: 'OK', onPress: () => console.log('OK Pressed') }
+            //     ],
+            //     { cancelable: false }
+            // );
+        }
+    }
+    const checkCreateDocument = () => {
+        var fromDate = new Date(registeredDate.replace(/-/g, '/'));
+        var toDate = new Date(expiryDate.replace(/-/g, '/'));
+        validateCreateDocument()
+        console.log(JSON.stringify(existeddoclist))
+        if ((vehicleDocumentId.length >= 9 && vehicleDocumentId.length <= 12) &&
+            (registeredLocation !== '') &&
+            (selectedBrand !== '') &&
+            (vehicleDocumentType !== '') &&
+            (registeredDate !== '') &&
+            (expiryDate !== '') &&
+            (fromDate <= toDate) &&
+            (frontImgUri !== '') &&
+            (backImgUri !== '') &&
+            (existeddoclist.indexOf(vehicleDocumentType) === -1)
+        ) {
+            addVehiceDocument()
+            setIsDocumentVisible(!isDocumentVisible)
+            // Alert.alert(
+            //     'Error',
+            //     'a',//JSON.stringify(error["debugMessage"]),
+            //     [
+            //         {
+            //             text: 'Cancel',
+            //             onPress: () => console.log('Cancel Pressed'),
+            //             style: 'cancel'
+            //         },
+            //         { text: 'OK', onPress: () => console.log('OK Pressed') }
+            //     ],
+            //     { cancelable: false }
+            // );
+        }
+    }
 
     return (
         <SafeAreaView style={styles.overview}>
@@ -791,6 +909,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             <Input
                                 full
                                 maxLength={20}
+                                placeholder="ex: 93D-121.11"
                                 label="License plate number"
                                 style={{ marginBottom: 15 }}
                                 value={vehicleNumber}
@@ -798,7 +917,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             />
                             {
                                 isfiled2err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
-                                    License plate number need to be from 8 - 12 characters
+                                    Wrong format License plate number (ex: 93D-121.11)
                                 </Text>) : (<></>)}
                             <Block>
                                 <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
@@ -843,6 +962,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             <Input
                                 full
                                 maxLength={17}
+                                placeholder="17 characters"
                                 label="Chassis number/VIN"
                                 style={{ marginBottom: 15 }}
                                 value={chassisNumber}
@@ -855,6 +975,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             <Input
                                 full
                                 maxLength={12}
+                                placeholder="12 characters"
                                 label="Engine number"
                                 style={{ marginBottom: 15 }}
                                 value={engineNumber}
@@ -867,6 +988,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             <Input
                                 full
                                 maxLength={30}
+                                placeholder="1 - 30 characters"
                                 label="Vehicle Model"
                                 style={{ marginBottom: 15 }}
                                 value={model}
@@ -886,7 +1008,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                 onFocus={() => setVisibleCountryPicker(true)}
                             />
                             {
-                                isfiled8err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                isfiled8err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginTop: 15 }}>
                                     Vehicle Origin must not be empty
                                 </Text>) : (<></>)}
                             <View opacity={0} >
@@ -902,7 +1024,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             <Input
                                 full
                                 number
-                                maxLength={4}
+                                //maxLength={4}
                                 label="Year Of Manufacture"
                                 placeholder="Year Of Manufacture (YYYY)"
                                 style={{ marginBottom: 15 }}
@@ -958,7 +1080,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                     mode="date"
                                     onConfirm={datetime => {
                                         //console.log(datetime)
-                                        setStartDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
+                                        setStartDate(`${datetime.getFullYear()}-${("0" + (datetime.getMonth() + 1)).slice(-2)}-${("0" + datetime.getDate()).slice(-2)}`)
                                         //console.log(departureTime)
                                         setIsStartDateVisible(false)
                                     }}
@@ -984,7 +1106,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                     mode="date"
                                     onConfirm={datetime => {
                                         //console.log(datetime)
-                                        setEndDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
+                                        setEndDate(`${datetime.getFullYear()}-${("0" + (datetime.getMonth() + 1)).slice(-2)}-${("0" + datetime.getDate()).slice(-2)}`)
                                         //console.log(departureTime)
                                         setIsEndDateVisible(false)
                                     }}
@@ -1103,10 +1225,15 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 <Input
                                                     maxLength={20}
                                                     label="Document ID"
+                                                    placeholder="9 to 12 characters"
                                                     style={{ marginBottom: 15, width: width - 100 }}
                                                     value={vehicleDocumentId}
                                                     onChangeText={text => setVehicleDocumentId(text)}
                                                 />
+                                                {
+                                                    isfiled17err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                        Document ID need to be from 9 to 12 characters
+                                                    </Text>) : (<></>)}
                                                 <Block>
                                                     <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left" }}>
                                                         Registered Location
@@ -1119,6 +1246,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                                         containerStyle={{ height: 40, width: width - 100, marginBottom: 15 }}
                                                         onChangeItem={item => setRegisteredLocation(item.value)}
                                                     />
+                                                    {
+                                                        isfiled18err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                            Registered Location is required
+                                                        </Text>) : (<></>)}
                                                     {/* {
                                     isfiled2err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
                                         Must select Registered Location
@@ -1146,7 +1277,14 @@ const ProfileScreen = ({ navigation, route }) => {
                                                         onChangeItem={item => setVehicleDocumentType(item.value)}
                                                     />
                                                 </Block>
-
+                                                {
+                                                    isfiled19err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                        Document type is required
+                                                    </Text>) : (<></>)}
+                                                {
+                                                    isfiled25err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                        Document type is already existed
+                                                    </Text>) : (<></>)}
                                                 <Input
                                                     full
                                                     label="Registered date"
@@ -1154,12 +1292,16 @@ const ProfileScreen = ({ navigation, route }) => {
                                                     value={registeredDate}
                                                     onFocus={() => setIsRegisteredDateVisible(true)}
                                                 />
+                                                {
+                                                    isfiled20err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                        Registered date is required
+                                                    </Text>) : (<></>)}
                                                 <DateTimePickerModal
                                                     isVisible={isRegisteredDateVisible}
                                                     mode="date"
                                                     onConfirm={datetime => {
                                                         //console.log(datetime)
-                                                        setRegisteredDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
+                                                        setRegisteredDate(`${datetime.getFullYear()}-${("0" + (datetime.getMonth() + 1)).slice(-2)}-${("0" + datetime.getDate()).slice(-2)}`)
                                                         //console.log(departureTime)
                                                         setIsRegisteredDateVisible(false)
                                                     }}
@@ -1172,12 +1314,20 @@ const ProfileScreen = ({ navigation, route }) => {
                                                     value={expiryDate}
                                                     onFocus={() => setIsExpiryDateVisible(true)}
                                                 />
+                                                {
+                                                    isfiled21err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                        Expiry date is required
+                                                    </Text>) : (<></>)}
+                                                {
+                                                    isfiled22err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                        Expiry date must not be sooner than Registered date
+                                                    </Text>) : (<></>)}
                                                 <DateTimePickerModal
                                                     isVisible={isExpiryDateVisible}
                                                     mode="date"
                                                     onConfirm={datetime => {
                                                         //console.log(datetime)
-                                                        setExpiryDate(`${datetime.getFullYear()}-${datetime.getMonth() + 1}-${datetime.getDate()}`)
+                                                        setExpiryDate(`${datetime.getFullYear()}-${("0" + (datetime.getMonth() + 1)).slice(-2)}-${("0" + datetime.getDate()).slice(-2)}`)
                                                         //console.log(departureTime)
                                                         setIsExpiryDateVisible(false)
                                                     }}
@@ -1191,6 +1341,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                                         <Text caption medium style={styles.label, { marginBottom: 5, textTransform: 'uppercase' }}>
                                                             Front side
                             </Text>
+                                                        {
+                                                            isfiled23err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                                Must not be empty
+                                                            </Text>) : (<></>)}
                                                         <Block style={{ marginBottom: 15 }}>
                                                             <Image
                                                                 style={{ width: width - 250, height: width - 250 }}
@@ -1212,6 +1366,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                                         <Text caption medium style={styles.label, { marginBottom: 5, textTransform: 'uppercase' }}>
                                                             Back side
                             </Text>
+                                                        {
+                                                            isfiled24err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                                Must not be empty
+                                                            </Text>) : (<></>)}
                                                         <Block style={{ marginBottom: 15 }}>
                                                             <Image
                                                                 style={{ width: width - 250, height: width - 250 }}
@@ -1228,8 +1386,9 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 </TouchableWithoutFeedback>
 
                                                 <Button full center style={styles.margin, { width: width - 100, marginBottom: 10, }} onPress={() => {
-                                                    addVehiceDocument()
-                                                    setIsDocumentVisible(!isDocumentVisible)
+                                                    //addVehiceDocument()
+                                                    checkCreateDocument()
+
                                                 }}>
                                                     <Block row center>
                                                         <Text color="white" >
@@ -1261,6 +1420,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                     multiline={true}
                                     full
                                     label="Description"
+                                    placeholder="1 - 100 characters"
                                     value={description}
                                     onChangeText={text => setDescription(text)}
                                     style={{ marginBottom: 15, height: 80, textAlignVertical: "top" }}
@@ -1272,7 +1432,9 @@ const ProfileScreen = ({ navigation, route }) => {
                                 <Button full center style={styles.margin, { marginBottom: 10, width: width - 50 }} onPress={() => {
                                     //setIsDocumentVisible(!isDocumentVisible)
                                     //initPassengerList()
-                                    createRequest()
+                                    //createRequest()
+                                    //validateCreateRequest()
+                                    checkCreateRequest()
                                 }}>
                                     <Block row center>
                                         <Text color="white">

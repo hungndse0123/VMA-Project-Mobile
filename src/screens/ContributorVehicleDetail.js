@@ -138,6 +138,7 @@ const VehicleDetail = ({ navigation, route }) => {
     const [vehicleDocument, setVehicleDocument] = useState([])
     const init = async () => {
         setIsLoading(true)
+        setDriverName('')
         await VehicleRepository.getDetailVehicle(itemId)
             .then((response) => {
                 //console.log(response);

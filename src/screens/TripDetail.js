@@ -22,6 +22,7 @@ import Loader from '../components/Loader';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import moment from 'moment';
 
 const { width } = Dimensions.get("window");
 
@@ -497,52 +498,78 @@ const ProfileScreen = ({ navigation, route }) => {
 
     }
     const startstatus = async (DetailId) => {
-        setIsLoading(true)
-        let data = {
-            contractId: contractId,
-            vehicleId: vehicleId,
-            contractDetailId: DetailId,
+        var date = new Date().getDate();
+        var month = new Date().getMonth() + 1;
+        var year = new Date().getFullYear();
+        var hours = new Date().getHours();
+        var min = new Date().getMinutes();
+        var sec = new Date().getSeconds();
+        var datecurrent = new Date(year + '/' + month + '/' + date
+            + ' ' + hours + ':' + min + ':' + sec);
+        var exDate = new Date(contractTrips["departureTime"].replace(/-/g, '/'));
+        if (datecurrent >= exDate) {
+            setIsLoading(true)
+            let data = {
+                contractId: contractId,
+                vehicleId: vehicleId,
+                contractDetailId: DetailId,
+            }
+            console.log(JSON.stringify(data))
+            console.log(JSON.stringify(vehicleId))
+            await ContractRepository.startContractVehicle(data)
+                .then((response) => {
+                    console.log(response.status)
+                    Alert.alert(
+                        'Started',
+                        'Your trip is started!!',
+                        [
+                            {
+                                text: 'Back to trip detail',
+                                onPress: () => navigation.navigate("TripDetail", {
+                                    lastRefresh: Date(Date.now()).toString(),
+                                    contractId: contractId,
+                                    contractVehicleId: contractVehicleId,
+                                    vehicleId: vehicleId,
+                                    contractTrips: contractTrips,
+                                    vehicleStatus: "IN_PROGRESS"
+                                })
+                            },
+                        ],
+                        { cancelable: false }
+                    );
+                })
+                .catch((error) => {
+                    Alert.alert(
+                        'Error',
+                        JSON.stringify(error["debugMessage"]),
+                        [
+                            {
+                                text: 'Cancel',
+                                onPress: () => console.log('Cancel Pressed'),
+                                style: 'cancel'
+                            },
+                            { text: 'OK', onPress: () => console.log('OK Pressed') }
+                        ],
+                        { cancelable: false }
+                    );
+                })
+            setIsLoading(false)
+        } else {
+            Alert.alert(
+                'Error',
+                "It's not time to start trip yet!!!!",
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => console.log('Cancel Pressed'),
+                        style: 'cancel'
+                    },
+                    //{ text: 'OK', onPress: () => console.log('OK Pressed') }
+                ],
+                { cancelable: false }
+            );
         }
-        console.log(JSON.stringify(data))
-        console.log(JSON.stringify(vehicleId))
-        await ContractRepository.startContractVehicle(data)
-            .then((response) => {
-                console.log(response.status)
-                Alert.alert(
-                    'Started',
-                    'Your trip is started!!',
-                    [
-                        {
-                            text: 'Back to trip detail',
-                            onPress: () => navigation.navigate("TripDetail", {
-                                lastRefresh: Date(Date.now()).toString(),
-                                contractId: contractId,
-                                contractVehicleId: contractVehicleId,
-                                vehicleId: vehicleId,
-                                contractTrips: contractTrips,
-                                vehicleStatus: "IN_PROGRESS"
-                            })
-                        },
-                    ],
-                    { cancelable: false }
-                );
-            })
-            .catch((error) => {
-                Alert.alert(
-                    'Error',
-                    JSON.stringify(error["debugMessage"]),
-                    [
-                        {
-                            text: 'Cancel',
-                            onPress: () => console.log('Cancel Pressed'),
-                            style: 'cancel'
-                        },
-                        { text: 'OK', onPress: () => console.log('OK Pressed') }
-                    ],
-                    { cancelable: false }
-                );
-            })
-        setIsLoading(false)
+
         //setPassengerAddList([])
     }
 
@@ -691,7 +718,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                         <Text style={{ marginLeft: 10 }} color="black">Departure Time: <Text style={{ marginLeft: 10 }} color="black3">{contractTrips["departureTime"]}</Text></Text>
                                         <Text style={{ marginLeft: 10 }} color="black">Destination Time: <Text style={{ marginLeft: 10 }} color="black3">{contractTrips["destinationTime"]}</Text></Text>
                                         <Text style={{ marginLeft: 10 }} color="black">Locations: </Text>
-                                        <FlatList data={contractTrips["locations"]} renderItem={({ item, index }) => <Text column style={{ marginLeft: 10 }} color="black3">+ Location {index + 1}: {item["location"]}</Text>} />
+                                        <FlatList data={contractTrips["locations"]} renderItem={({ item, index }) => <Text column style={{ marginLeft: 10 }} color="black">+ Location {index + 1}: <Text column color="black3">{item["location"]}</Text></Text>} />
 
                                     </Block>
                                 </Block>
@@ -711,6 +738,26 @@ const ProfileScreen = ({ navigation, route }) => {
                                 </Block>
                             </Button>
                         </Block>
+                        {/* <Button center style={styles.margin, { marginBottom: 15 }}
+                            onPress={() => {
+                                var date = new Date().getDate(); 
+                                var month = new Date().getMonth() + 1; 
+                                var year = new Date().getFullYear(); 
+                                var hours = new Date().getHours(); 
+                                var min = new Date().getMinutes(); 
+                                var sec = new Date().getSeconds(); 
+                                var datecurrent = new Date(year + '/' + month + '/' + date
+                                    + ' ' + hours + ':' + min + ':' + sec);
+                                var exDate = new Date(contractTrips["destinationTime"].replace(/-/g, '/'));
+                                console.log(datecurrent)
+                                console.log(exDate)
+                                console.log(exDate < datecurrent)
+                            }}
+                        >
+                            <Text color="white">
+                                check
+            </Text>
+                        </Button> */}
                         {passengerVisible ? (passengerList.length !== 0 ?
                             (<Block row style={{ marginTop: 10, marginBottom: 15 }}>
                                 <FlatList
@@ -883,6 +930,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                                                 </Block>
                                                             </TouchableWithoutFeedback>
                                                         } />)}
+
                                             <Button center style={styles.margin, { marginBottom: 15 }}
                                                 onPress={() => {
                                                     createPassengerList();
@@ -898,6 +946,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                                     Confirm
             </Text>
                                             </Button>
+
                                         </Card>
                                     </ScrollView>
                                 </Modal>

@@ -9,6 +9,7 @@ export default {
     createVehicleDocumentRequests(requests) {
         return new Promise((resolve, reject) => {
             var token = '';
+            console.log(JSON.stringify(requests) + "ddddddddd")
             firebase.auth().onAuthStateChanged(function (user) {
                 if (user) {
                     //console.log(user); // It shows the Firebase user
@@ -23,6 +24,7 @@ export default {
                             })
                             .catch((err) => {
                                 reject(err.response.data);
+                                //console.log(err + "aasdfgabsydhujks")
                             });
                     });
                 }
