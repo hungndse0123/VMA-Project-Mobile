@@ -101,7 +101,11 @@ const ProfileScreen = ({ navigation }) => {
     useEffect(() => {
         getCurrentUser()
             .then((user) => {
-                Geolocation.getCurrentPosition(info => console.log(info));
+                //Geolocation.getCurrentPosition(info => console.log(info));
+                // Geolocation.watchPosition((position) => {
+                //     console.log(position)
+                //     //handleUpdates(position, position.coords.latitude, position.coords.longitude, position.coords.speed);
+                // });
                 setUser(user);
                 updateStatus(user.uid)
             })
@@ -113,6 +117,7 @@ const ProfileScreen = ({ navigation }) => {
     const updateStatus = (userid) => {
         UserRepository.updateUserStatusByUserId(userid, 'ACTIVE')
     }
+
 
     const profileIcon = (
         <Image

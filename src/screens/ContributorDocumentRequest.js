@@ -228,7 +228,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
                     setDocumentList(prevArray => [
                         ...prevArray, {
-                            label: response[i]["vehicleDocumentId"],
+                            label: response[i]["vehicleDocumentNumber"],
                             value: response[i]["vehicleDocumentId"]
                         }
                     ])
@@ -256,7 +256,8 @@ const ProfileScreen = ({ navigation, route }) => {
                     ],
                     registeredDate: registeredDate,
                     registeredLocation: registeredLocation.trim(),
-                    vehicleDocumentId: vehicleDocumentId.trim(),
+                    vehicleDocumentId: 0,
+                    vehicleDocumentNumber: vehicleDocumentId.trim(),
                     vehicleDocumentType: vehicleDocumentType,
                 },
                 vehicleId: selectedVehicle
@@ -665,7 +666,8 @@ const ProfileScreen = ({ navigation, route }) => {
     const initExistedVehicleDocument = async (uid) => {
         setCheckDocumentTypes([])
         setIsLoading(true)
-        await DocumentRepository.getVehicleDocument(`?vehicleId=${uid}&viewOption=0`)
+        console.log(`?vehicleId=${uid}&viewOption=0`);
+        await DocumentRepository.getVehicleDocument(`?vehicleId=${uid}&viewOption=1`)
             .then((response) => {
                 //console.log(response);
                 //const result = Object.values(response.vehicleDocuments);
@@ -674,6 +676,7 @@ const ProfileScreen = ({ navigation, route }) => {
                     setCheckDocumentTypes(prevArray => [
                         ...prevArray, response[i]["vehicleDocumentType"]
                     ])
+                    console.log(JSON.stringify(checkdocumentTypes))
                 }
 
             })
@@ -966,19 +969,20 @@ const ProfileScreen = ({ navigation, route }) => {
                                     //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
                                     placeholder="Select document"
                                     defaultValue={selectedDocument}
-                                    containerStyle={{ height: 40, width: 250, marginBottom: 25 }}
+                                    containerStyle={{ height: 40, width: 250, marginBottom: 80 }}
                                     onChangeItem={item => setSelectedDocument(item.value)}
                                 />
-                                <Input
-                                    multiline={true}
-                                    full
-                                    maxLength={100}
-                                    label="Description"
-                                    value={description}
-                                    onChangeText={text => setDescription(text)}
-                                    style={{ marginBottom: 15, height: 80, textAlignVertical: "top" }}
-                                />
-                                {/* <Button full center style={styles.margin, { marginBottom: 10 }} onPress={() => {
+                                {(selectedDocument !== '' && selectedDocument !== "Select document") ? (<>
+                                    <Input
+                                        multiline={true}
+                                        full
+                                        maxLength={100}
+                                        label="Description"
+                                        value={description}
+                                        onChangeText={text => setDescription(text)}
+                                        style={{ marginBottom: 15, height: 80, textAlignVertical: "top" }}
+                                    />
+                                    {/* <Button full center style={styles.margin, { marginBottom: 10 }} onPress={() => {
                                     //uploadImage(frontImgUri, requestType, user.uid)
                                     //console.log(vehicleList);
                                     deleteRequest()
@@ -990,26 +994,28 @@ const ProfileScreen = ({ navigation, route }) => {
                                             </Text>
                                     </Block>
                                 </Button> */}
-                                <Block row>
-                                    <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
-                                        deleteRequest()
-                                    }}>
-                                        <Block row center>
-                                            <Text color="white" >
-                                                Send Request
+                                    <Block row>
+                                        <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
+                                            deleteRequest()
+                                        }}>
+                                            <Block row center>
+                                                <Text color="white" >
+                                                    Send Request
                                             </Text>
-                                        </Block>
-                                    </Button>
-                                    <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
-                                        clear()
-                                    }}>
-                                        <Block row center>
-                                            <Text color="white" >
-                                                Reset
+                                            </Block>
+                                        </Button>
+                                        <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
+                                            clear()
+                                        }}>
+                                            <Block row center>
+                                                <Text color="white" >
+                                                    Reset
                                             </Text>
-                                        </Block>
-                                    </Button>
-                                </Block>
+                                            </Block>
+                                        </Button>
+                                    </Block>
+                                </>) : (<></>)}
+
                             </Block>
                         </Card>) : (<></>))}
             </ScrollView>

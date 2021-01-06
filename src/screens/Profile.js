@@ -29,6 +29,7 @@ import {
     ContributionGraph,
     StackedBarChart
 } from "react-native-chart-kit";
+import Geolocation from '@react-native-community/geolocation';
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -130,6 +131,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const signOut = () => {
         signOutUser()
             .then(() => {
+                //Geolocation.stopObserving();
                 updateStatus(user.uid);
                 //_storeData();
                 BackHandler.exitApp();
@@ -239,6 +241,7 @@ const ProfileScreen = ({ navigation, route }) => {
         barPercentage: 0.5,
         useShadowColorFromDataset: false // optional
     };
+    const [totalEarned, setTotalEarned] = useState('');
     const initmonthlyIncome = async (id) => {
         setIsLoading(true)
         await ReportRepository.getDriverIncomesReportData(`/${id}/data`)
@@ -250,6 +253,7 @@ const ProfileScreen = ({ navigation, route }) => {
             })
         await ReportRepository.getDriverIncomesSummaryReportData(`/${id}/summary/data`)
             .then((response) => {
+                setTotalEarned(response["totalEarned"])
                 setT1Income(response["driverIncomeSummaryMonthResList"][0]["driverIncomeRes"])
                 setT2Income(response["driverIncomeSummaryMonthResList"][1]["driverIncomeRes"])
                 setT3Income(response["driverIncomeSummaryMonthResList"][2]["driverIncomeRes"])
@@ -379,7 +383,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         />
                         <Input
                             full
-                            label="Base Salary"
+                            label="Base Salary per month (VND)"
                             value={JSON.stringify(driver["baseSalary"])}
                             style={{ marginBottom: 25 }}
                             editable={false}
@@ -449,7 +453,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 </Block>
                                                 <Block row>
                                                     <Block column>
-                                                        <Text style={{ marginLeft: 10 }} color="black3">Document ID: {item["userDocumentId"]}</Text>
+                                                        <Text style={{ marginLeft: 10 }} color="black3">Document number: {item["userDocumentNumber"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Registered Location: {item["registeredLocation"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Registered Date: {item["registeredDate"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Expiry Date: {item["expiryDate"]}</Text>
@@ -509,18 +513,20 @@ const ProfileScreen = ({ navigation, route }) => {
                         />
                         <SectionList
                             sections={[
-                                { title: 'JANUARY', data: [`Revenue: ${T1Income["earnedValue"]}`] },
-                                { title: 'FEBRUARY', data: [`Revenue: ${T2Income["earnedValue"]}`] },
-                                { title: 'MARCH', data: [`Revenue: ${T3Income["earnedValue"]}`] },
-                                { title: 'APRIL', data: [`Revenue: ${T4Income["earnedValue"]}`] },
-                                { title: 'MAY', data: [`Revenue: ${T5Income["earnedValue"]}`] },
-                                { title: 'JUNE', data: [`Revenue: ${T6Income["earnedValue"]}`] },
-                                { title: 'JULY', data: [`Revenue: ${T7Income["earnedValue"]}`] },
-                                { title: 'AUGUST', data: [`Revenue: ${T8Income["earnedValue"]}`] },
-                                { title: 'SEPTEMBER', data: [`Revenue: ${T9Income["earnedValue"]}`] },
-                                { title: 'OCTOBER', data: [`Revenue: ${T10Income["earnedValue"]}`] },
-                                { title: 'NOVEMBER', data: [`Revenue: ${T11Income["earnedValue"]}`] },
-                                { title: 'DECEMBER', data: [`Revenue: ${T12Income["earnedValue"]}`] },
+                                { title: 'JANUARY', data: [`Revenue: ${T1Income["earnedValue"]} VND`] },
+                                { title: 'FEBRUARY', data: [`Revenue: ${T2Income["earnedValue"]} VND`] },
+                                { title: 'MARCH', data: [`Revenue: ${T3Income["earnedValue"]} VND`] },
+                                { title: 'APRIL', data: [`Revenue: ${T4Income["earnedValue"]} VND`] },
+                                { title: 'MAY', data: [`Revenue: ${T5Income["earnedValue"]} VND`] },
+                                { title: 'JUNE', data: [`Revenue: ${T6Income["earnedValue"]} VND`] },
+                                { title: 'JULY', data: [`Revenue: ${T7Income["earnedValue"]} VND`] },
+                                { title: 'AUGUST', data: [`Revenue: ${T8Income["earnedValue"]} VND`] },
+                                { title: 'SEPTEMBER', data: [`Revenue: ${T9Income["earnedValue"]} VND`] },
+                                { title: 'OCTOBER', data: [`Revenue: ${T10Income["earnedValue"]} VND`] },
+                                { title: 'NOVEMBER', data: [`Revenue: ${T11Income["earnedValue"]} VND`] },
+                                { title: 'DECEMBER', data: [`Revenue: ${T12Income["earnedValue"]} VND`] },
+                                { title: 'TOTAL EARNED', data: [`Total Revenue: ${totalEarned} VND`] },
+
                             ]}
                             renderItem={({ item }) => <Text style={styles.item}>{item}</Text>}
                             renderSectionHeader={({ section }) => <Text style={styles.sectionHeader}>{section.title}</Text>}
@@ -536,7 +542,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             renderItem={({ item, index }) => <>
                                 <Text style={styles.sectionHeader}>Contract Id: {item.contractId}</Text>
                                 <Text style={styles.item}>Vehicle Id: {item.vehicleId}</Text>
-                                <Text style={styles.item}>Driver Earned: {item.driverEarned}</Text>
+                                <Text style={styles.item}>Driver Earned: {item.driverEarned} VND</Text>
 
                             </>}
                         />

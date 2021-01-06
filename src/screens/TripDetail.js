@@ -23,6 +23,10 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from 'moment';
+import Geolocation from '@react-native-community/geolocation';
+import firebase from "@react-native-firebase/app";
+import firestore from '@react-native-firebase/firestore';
+import RequestRepository from "../repositories/RequestRepository";
 
 const { width } = Dimensions.get("window");
 
@@ -87,7 +91,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [user, setUser] = useState(null);
     const [username, setUsername] = useState('');
     const [passengerVisible, setPassengerVisible] = useState(false);
-    const { vehicleId, contractId, contractVehicleId, vehicleStatus, lastRefresh, contractTrips } = route.params;
+    const { vehicleId, contractId, contractVehicleId, vehicleStatus, lastRefresh, contractTrips, curVehicleStatus } = route.params;
     const isFocused = useIsFocused();
     const [isLoading, setIsLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
@@ -98,6 +102,7 @@ const ProfileScreen = ({ navigation, route }) => {
     useEffect(() => {
         setIsLoading(true);
         console.log(lastRefresh);
+        console.log(curVehicleStatus);
         getCurrentUser()
             .then((user) => {
                 setUser(user);
@@ -125,6 +130,10 @@ const ProfileScreen = ({ navigation, route }) => {
     const [addPhone, setAddPhone] = useState('')
     const [addBirth, setAddBirth] = useState('')
     const [addAddress, setAddAddress] = useState('')
+    const [isfiled1err, setIsfiled1err] = useState(false)
+    const [isfiled2err, setIsfiled2err] = useState(false)
+    const [isfiled3err, setIsfiled3err] = useState(false)
+    const [isfiled4err, setIsfiled4err] = useState(false)
     const [isBirthDateVisible, setIsBirthDateVisible] = useState(false)
     //const [selectedContractTripId, setSelectedContractTripId] = useState(contractTrips[0])
     const [cityData, setCityData] = useState([
@@ -480,7 +489,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 })
                 .catch((error) => {
                     Alert.alert(
-                        'Error',
+                        'Create fail',
                         JSON.stringify(error["debugMessage"]),
                         [
                             {
@@ -531,16 +540,19 @@ const ProfileScreen = ({ navigation, route }) => {
                                     contractVehicleId: contractVehicleId,
                                     vehicleId: vehicleId,
                                     contractTrips: contractTrips,
-                                    vehicleStatus: "IN_PROGRESS"
+                                    vehicleStatus: "IN_PROGRESS",
+                                    curVehicleStatus: "ON_ROUTE"
                                 })
                             },
                         ],
                         { cancelable: false }
                     );
+                    getLocation()
+
                 })
                 .catch((error) => {
                     Alert.alert(
-                        'Error',
+                        'Start fail',
                         JSON.stringify(error["debugMessage"]),
                         [
                             {
@@ -553,10 +565,11 @@ const ProfileScreen = ({ navigation, route }) => {
                         { cancelable: false }
                     );
                 })
+
             setIsLoading(false)
         } else {
             Alert.alert(
-                'Error',
+                'Start fail',
                 "It's not time to start trip yet!!!!",
                 [
                     {
@@ -598,7 +611,187 @@ const ProfileScreen = ({ navigation, route }) => {
                                 contractVehicleId: contractVehicleId,
                                 vehicleId: vehicleId,
                                 contractTrips: contractTrips,
-                                vehicleStatus: "COMPLETED"
+                                vehicleStatus: "COMPLETED",
+                                curVehicleStatus: "AVAILABLE"
+                            })
+                        },
+                    ],
+                    { cancelable: false }
+                );
+                endWatchUserPosition();
+            })
+            .catch((error) => {
+                Alert.alert(
+                    'End fail',
+                    JSON.stringify(error["debugMessage"]),
+                    [
+                        {
+                            text: 'Cancel',
+                            onPress: () => console.log('Cancel Pressed'),
+                            style: 'cancel'
+                        },
+                        { text: 'OK', onPress: () => console.log('OK Pressed') }
+                    ],
+                    { cancelable: false }
+                );
+            })
+        setIsLoading(false)
+        //setPassengerAddList([])
+    }
+    const validateCreatePassenger = () => {
+        addName === '' ? setIsfiled1err(true) : setIsfiled1err(false)
+        addPhone.length !== 10 ? setIsfiled2err(true) : setIsfiled2err(false)
+        addBirth === '' ? setIsfiled3err(true) : setIsfiled3err(false)
+        addAddress === '' ? setIsfiled4err(true) : setIsfiled4err(false)
+    }
+    const checkCreatePassenger = () => {
+        validateCreatePassenger()
+        if (
+            (addName !== '') &&
+            (addPhone.length === 10) &&
+            (addBirth !== '') &&
+            (addAddress !== '')) {
+            setPassengerAddList(prevArray => [
+                ...prevArray, {
+                    fullName: addName,
+                    phoneNumber: addPhone,
+                    dateOfBirth: addBirth,
+                    address: addAddress,
+                }
+
+            ])
+            setAddName('')
+            setAddBirth('')
+            setAddPhone('')
+            setAddAddress('')
+            // Alert.alert(
+            //     'Error',
+            //     'a',//JSON.stringify(error["debugMessage"]),
+            //     [
+            //         {
+            //             text: 'Cancel',
+            //             onPress: () => console.log('Cancel Pressed'),
+            //             style: 'cancel'
+            //         },
+            //         { text: 'OK', onPress: () => console.log('OK Pressed') }
+            //     ],
+            //     { cancelable: false }
+            // );
+        }
+
+    }
+    const getLocation = () => {
+        Geolocation.getCurrentPosition(async (position) => {
+            await sendToFirebase(position.coords.latitude, position.coords.longitude, "START");
+            //updateToFirebase(position.coords.latitude, position.coords.longitude)
+            console.log("first position :" + position.coords.latitude + "," + position.coords.longitude)
+            watchUserPosition();
+        },
+            (error) => {
+                //Handle error
+                console.log("Get Current Position Error :" + error)
+            },
+            { enableHighAccuracy: true, timeout: 200000, maximumAge: 1000 },
+        );
+    }
+    const [watchID, setWatchID] = useState(0)
+    const watchUserPosition = () => {
+        setWatchID(Geolocation.watchPosition(
+            async (position) => {
+                // this.setState({
+                //   newLatitude: position.coords.latitude,
+                //   newLongitude: position.coords.longitude,
+                //   error: null,
+                // });
+                await updateToFirebase(position.coords.latitude, position.coords.longitude, "IN-PROGRESS")
+                console.log("new position :" + position.coords.latitude + "," + position.coords.longitude)
+            },
+            (error) => console.log("watchUserPosition Error :" + error),
+            //{ enableHighAccuracy: true, timeout: 20000, maximumAge: 1000, distanceFilter: 0.00001 },
+            { enableHighAccuracy: true, distanceFilter: 5 },
+        ))
+    }
+
+    const endWatchUserPosition = () => {
+        Geolocation.getCurrentPosition(async (position) => {
+            await sendToFirebase(position.coords.latitude, position.coords.longitude, "END");
+            //updateToFirebase(position.coords.latitude, position.coords.longitude)
+            console.log("end position :" + position.coords.latitude + "," + position.coords.longitude)
+            //watchUserPosition();
+        },
+            (error) => {
+                //Handle error
+                console.log("Get Current Position Error :" + error)
+            },
+            { enableHighAccuracy: true, timeout: 200000, maximumAge: 1000 },
+        );
+        Geolocation.clearWatch(watchID);
+        Geolocation.stopObserving();
+        console.log("position end!")
+    }
+
+    const sendToFirebase = async (latitude, longitude, curstatus) => {
+        var currentMomentDate = moment().format("YYYY-MM-DD HH:mm:ss")
+        //console.log(contractId)
+        await firestore().collection("Tracking").doc(JSON.stringify(contractId)).collection(JSON.stringify(contractVehicleId)).doc(currentMomentDate).set({
+            //location: new firestore.GeoPoint(latitude, longitude)
+            lat: latitude,
+            long: longitude,
+            status: curstatus
+        })
+            .then(() => {
+                console.log("Document successfully written!");
+            })
+            .catch((error) => {
+                console.error("Error writing document: ", error);
+            });
+    }
+    const updateToFirebase = async (latitude, longitude, curstatus) => {
+        var currentMomentDate = moment().format("YYYY-MM-DD HH:mm:ss")
+        console.log(contractId)
+        await firebase.firestore().collection("Tracking").doc(JSON.stringify(contractId)).collection(JSON.stringify(contractVehicleId)).doc(currentMomentDate).set({
+            //location: new firestore.GeoPoint(latitude, longitude)
+            lat: latitude,
+            long: longitude,
+            status: curstatus
+        })
+            .then(() => {
+                console.log("Document successfully written!");
+                setLocationstate("update location: " + latitude + " and " + longitude);
+
+            })
+            .catch((error) => {
+                console.error("Error writing document: ", error);
+            });
+    }
+    const [locationstate, setLocationstate] = useState('');
+    const [issueModal, setIssueModal] = useState(false)
+    const [issueDescription, setIssueDescription] = useState('');
+    const reportIssue = async () => {
+        setIsLoading(true)
+        let data = {
+            contractTripId: contractTrips["contractTripId"],
+            description: issueDescription,
+            vehicleId: vehicleId
+        }
+        console.log(data)
+        RequestRepository.reportIssueInVehicle(data)
+            .then((response) => {
+                console.log(response.status)
+                Alert.alert(
+                    'Reported',
+                    'Report issue sent!!!',
+                    [
+                        {
+                            text: 'Back to trip detail',
+                            onPress: () => navigation.navigate("TripDetail", {
+                                lastRefresh: Date(Date.now()).toString(),
+                                contractId: contractId,
+                                contractVehicleId: contractVehicleId,
+                                vehicleId: vehicleId,
+                                contractTrips: contractTrips,
+                                vehicleStatus: "IN_PROGRESS",
+                                curVehicleStatus: "NEED_REPAIR"
                             })
                         },
                     ],
@@ -620,10 +813,51 @@ const ProfileScreen = ({ navigation, route }) => {
                     { cancelable: false }
                 );
             })
+        setIssueDescription('')
         setIsLoading(false)
-        //setPassengerAddList([])
     }
-
+    const completeRepair = () => {
+        let data = "ON_ROUTE"
+        console.log(vehicleId)
+        VehicleRepository.updateVehicleStatusById(vehicleId, data)
+            .then((response) => {
+                console.log(response.status)
+                Alert.alert(
+                    'Completed',
+                    'Repair completed!!!',
+                    [
+                        {
+                            text: 'Back to trip detail',
+                            onPress: () => navigation.navigate("TripDetail", {
+                                lastRefresh: Date(Date.now()).toString(),
+                                contractId: contractId,
+                                contractVehicleId: contractVehicleId,
+                                vehicleId: vehicleId,
+                                contractTrips: contractTrips,
+                                vehicleStatus: "IN_PROGRESS",
+                                curVehicleStatus: "ON_ROUTE"
+                            })
+                        },
+                    ],
+                    { cancelable: false }
+                );
+            })
+            .catch((error) => {
+                Alert.alert(
+                    'Error',
+                    JSON.stringify(error["debugMessage"]),
+                    [
+                        {
+                            text: 'Cancel',
+                            onPress: () => console.log('Cancel Pressed'),
+                            style: 'cancel'
+                        },
+                        { text: 'OK', onPress: () => console.log('OK Pressed') }
+                    ],
+                    { cancelable: false }
+                );
+            })
+    }
     return (
         <SafeAreaView style={styles.overview}>
             <Header navigation={navigation} title="Trip Detail" />
@@ -637,57 +871,125 @@ const ProfileScreen = ({ navigation, route }) => {
                             </Text>) : (<Text medium color="yellow">
                                 STATUS: {vehicleStatus}
                             </Text>)}
-                            {vehicleStatus === "NOT_STARTED" ?
-                                (<TouchableOpacity
-                                    onPress={() => {
-                                        // setIsLoading(true);
-                                        // setIsLoading(false);
-                                        // navigation.navigate("TripDetail", {
-                                        //     itemId: item["contractId"],
-                                        //     contractVehicleId: item["contractVehicleId"]
-                                        // })
-                                        setSelectedVehicleStatus("IN_PROGRESS")
-                                        startstatus(contractTrips["contractTripId"])
-                                    }}
-                                >
-                                    <Block center row style={{ marginTop: 5 }}>
-                                        <Icon name="aircraft-take-off" style={{ marginLeft: 20, marginRight: 5 }} />
-                                        <Text medium caption>
-                                            START TRIP
+                            <Block>
+
+                                {vehicleStatus === "NOT_STARTED" ?
+                                    (<TouchableOpacity
+                                        onPress={() => {
+                                            setSelectedVehicleStatus("IN_PROGRESS")
+                                            startstatus(contractTrips["contractTripId"])
+                                        }}
+                                    >
+                                        <Block center row style={{ marginTop: 5 }}>
+                                            <Icon name="aircraft-take-off" style={{ marginLeft: 20, marginRight: 5 }} />
+                                            <Text medium caption>
+                                                START TRIP
                             </Text>
 
-                                    </Block>
+                                        </Block>
 
-                                </TouchableOpacity>) : (vehicleStatus === "IN_PROGRESS" ? (<TouchableOpacity
-                                    onPress={() => {
-                                        // setIsLoading(true);
-                                        // setIsLoading(false);
-                                        // navigation.navigate("TripDetail", {
-                                        //     itemId: item["contractId"],
-                                        //     contractVehicleId: item["contractVehicleId"]
-                                        // })
-                                        setSelectedVehicleStatus("COMPLETED")
-                                        endstatus(contractTrips["contractTripId"])
-                                    }}
-                                >
-                                    <Block row style={{ marginTop: 5 }}>
-                                        <Icon name="aircraft-landing" style={{ marginLeft: 20, marginRight: 5 }} />
-                                        <Text medium caption>
-                                            END TRIP
+                                    </TouchableOpacity>) : (vehicleStatus === "IN_PROGRESS" && curVehicleStatus === "ON_ROUTE" ? (<>
+
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                setSelectedVehicleStatus("COMPLETED")
+                                                endstatus(contractTrips["contractTripId"])
+                                            }}
+                                        >
+                                            <Block row style={{ marginTop: 5 }}>
+                                                <Icon name="aircraft-landing" style={{ marginLeft: 20, marginRight: 5 }} />
+                                                <Text medium caption>
+                                                    END TRIP
                             </Text>
 
-                                    </Block>
+                                            </Block>
 
-                                </TouchableOpacity>) : (<></>))}
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                setIssueModal(!issueModal)
+                                            }}
+                                        >
+                                            <Block row style={{ marginTop: 5 }}>
+                                                <Icon name="tools" style={{ marginLeft: 20, marginRight: 5 }} />
+                                                <Text medium caption>
+                                                    REPORT ISSUE
+                                                </Text>
 
+                                            </Block>
+
+                                        </TouchableOpacity>
+
+                                    </>) : (vehicleStatus === "IN_PROGRESS" && curVehicleStatus === "NEED_REPAIR" ? (<>
+                                        <Block row style={{ marginTop: 5 }}>
+                                            <Icon name="signal" style={{ marginLeft: 20, marginRight: 5 }} />
+                                            <Text medium caption>
+                                                Repair request pending...
+                                            </Text>
+
+                                        </Block>
+
+                                    </>) : (<>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                completeRepair()
+                                            }}
+                                        >
+                                            <Block row style={{ marginTop: 5 }}>
+                                                <Icon name="bell" style={{ marginLeft: 20, marginRight: 5 }} />
+                                                <Text medium caption>
+                                                    COMPLETE REPAIR
+                                                            </Text>
+
+                                            </Block>
+
+                                        </TouchableOpacity>
+                                    </>)
+                                        ))}
+
+                                <Modal
+                                    animationType="fade"
+                                    transparent={true}
+                                    visible={issueModal}
+                                    onRequestClose={() => {
+
+                                        setIssueModal(!issueModal)
+                                    }}
+                                >
+                                    <ScrollView style={styles.centeredView, { marginTop: 90 }}>
+                                        <Card style={styles.margin} title="Report issue">
+                                            <Block column>
+                                                <Input
+                                                    multiline={true}
+                                                    onChangeText={text => setIssueDescription(text)}
+                                                    label="Issue description"
+                                                    value={issueDescription}
+                                                    style={{ marginBottom: 25, height: width - 200, width: width - 100, textAlignVertical: "top" }}
+
+                                                />
+                                                <Button center style={styles.margin, { marginBottom: 15 }}
+                                                    onPress={() => {
+                                                        reportIssue()
+                                                        setIssueModal(!issueModal)
+                                                    }}
+                                                >
+                                                    <Text color="white">
+                                                        Report issue
+            </Text>
+                                                </Button>
+                                            </Block>
+                                        </Card>
+                                    </ScrollView>
+                                </Modal>
+                            </Block>
                         </Block>
-                        <Input
+                        {/* <Input
                             full
                             label="Contract Id"
                             value={JSON.stringify(contractId)}
                             style={{ marginBottom: 25 }}
                             editable={false}
-                        />
+                        /> */}
                     </Block>
                     <Text caption medium style={styles.label}>
                         CONTRACT TRIPS
@@ -738,26 +1040,6 @@ const ProfileScreen = ({ navigation, route }) => {
                                 </Block>
                             </Button>
                         </Block>
-                        {/* <Button center style={styles.margin, { marginBottom: 15 }}
-                            onPress={() => {
-                                var date = new Date().getDate(); 
-                                var month = new Date().getMonth() + 1; 
-                                var year = new Date().getFullYear(); 
-                                var hours = new Date().getHours(); 
-                                var min = new Date().getMinutes(); 
-                                var sec = new Date().getSeconds(); 
-                                var datecurrent = new Date(year + '/' + month + '/' + date
-                                    + ' ' + hours + ':' + min + ':' + sec);
-                                var exDate = new Date(contractTrips["destinationTime"].replace(/-/g, '/'));
-                                console.log(datecurrent)
-                                console.log(exDate)
-                                console.log(exDate < datecurrent)
-                            }}
-                        >
-                            <Text color="white">
-                                check
-            </Text>
-                        </Button> */}
                         {passengerVisible ? (passengerList.length !== 0 ?
                             (<Block row style={{ marginTop: 10, marginBottom: 15 }}>
                                 <FlatList
@@ -816,6 +1098,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                     transparent={true}
                                     visible={modalVisible}
                                     onRequestClose={() => {
+
                                         setModalVisible(!modalVisible)
                                     }}
                                 >
@@ -831,8 +1114,14 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 //onFocus={() => setIsDepartureVisible(true)}
                                                 //onPress={setIsDepartureVisible(true)}
                                                 />
+                                                {
+                                                    isfiled1err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                        Full name is required
+                                                    </Text>) : (<></>)}
                                                 <Input
+                                                    number
                                                     maxLength={10}
+                                                    placeholder="ex: 0926788133"
                                                     label="Phone number"
                                                     style={{ marginRight: 15, width: width - 100, marginBottom: 15 }}
                                                     value={addPhone}
@@ -840,6 +1129,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 //onFocus={() => setIsDepartureVisible(true)}
                                                 //onPress={setIsDepartureVisible(true)}
                                                 />
+                                                {
+                                                    isfiled2err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                        Phone number must be 10 characters
+                                                    </Text>) : (<></>)}
                                                 <Input
                                                     onFocus={() => setIsBirthDateVisible(!isBirthDateVisible)}
                                                     label="Date of birth"
@@ -849,6 +1142,10 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 //onFocus={() => setIsDepartureVisible(true)}
                                                 //onPress={setIsDepartureVisible(true)}
                                                 />
+                                                {
+                                                    isfiled3err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                        Date of birth is required
+                                                    </Text>) : (<></>)}
                                                 <DateTimePickerModal
                                                     isVisible={isBirthDateVisible}
                                                     mode="date"
@@ -869,22 +1166,28 @@ const ProfileScreen = ({ navigation, route }) => {
                                                 //onFocus={() => setIsDepartureVisible(true)}
                                                 //onPress={setIsDepartureVisible(true)}
                                                 />
+                                                {
+                                                    isfiled4err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                        Address is required
+                                                    </Text>) : (<></>)}
                                             </Block>
+
                                             <Button center style={styles.margin, { marginBottom: 15 }}
                                                 onPress={() => {
-                                                    setPassengerAddList(prevArray => [
-                                                        ...prevArray, {
-                                                            fullName: addName,
-                                                            phoneNumber: addPhone,
-                                                            dateOfBirth: addBirth,
-                                                            address: addAddress,
-                                                        }
+                                                    // setPassengerAddList(prevArray => [
+                                                    //     ...prevArray, {
+                                                    //         fullName: addName,
+                                                    //         phoneNumber: addPhone,
+                                                    //         dateOfBirth: addBirth,
+                                                    //         address: addAddress,
+                                                    //     }
 
-                                                    ])
-                                                    setAddName('')
-                                                    setAddBirth('')
-                                                    setAddPhone('')
-                                                    setAddAddress('')
+                                                    // ])
+                                                    // setAddName('')
+                                                    // setAddBirth('')
+                                                    // setAddPhone('')
+                                                    // setAddAddress('')
+                                                    checkCreatePassenger()
                                                 }}
                                             >
                                                 <Text color="white">
@@ -930,7 +1233,15 @@ const ProfileScreen = ({ navigation, route }) => {
                                                                 </Block>
                                                             </TouchableWithoutFeedback>
                                                         } />)}
-
+                                            <Button center style={styles.margin, { marginBottom: 15 }}
+                                                onPress={() => {
+                                                    setPassengerAddList([])
+                                                }}
+                                            >
+                                                <Text color="white">
+                                                    Reset
+            </Text>
+                                            </Button>
                                             <Button center style={styles.margin, { marginBottom: 15 }}
                                                 onPress={() => {
                                                     createPassengerList();

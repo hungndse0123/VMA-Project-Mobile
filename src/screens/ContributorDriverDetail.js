@@ -239,7 +239,7 @@ const DriverDetail = ({ navigation, route }) => {
                                                 maxStars={5}
                                                 rating={rate}
                                                 selectedStar={(rating) => setRate(rating)}
-                                                fullStarColor={'blue'}
+                                                fullStarColor={'yellow'}
                                             />
 
                                         </Block>
@@ -395,7 +395,7 @@ const DriverDetail = ({ navigation, route }) => {
                                                 </Block>
                                                 <Block row>
                                                     <Block column>
-                                                        <Text style={{ marginLeft: 10 }} color="black3">Document ID: {item["userDocumentId"]}</Text>
+                                                        <Text style={{ marginLeft: 10 }} color="black3">Document number: {item["userDocumentNumber"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Registered Location: {item["registeredLocation"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Registered Date: {item["registeredDate"]}</Text>
                                                         <Text style={{ marginLeft: 10 }} color="black3">Expiry Date: {item["expiryDate"]}</Text>

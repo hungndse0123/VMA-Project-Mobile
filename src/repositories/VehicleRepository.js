@@ -85,6 +85,17 @@ export default {
                 });
         });
     },
+    getVehicleSeats() {
+        return new Promise((resolve, reject) => {
+            Repository.get(`${resource}/misc/seats`)
+                .then((res) => {
+                    resolve(res.data.seats);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
     getVehicleStatusList() {
         return new Promise((resolve, reject) => {
             Repository.get(`${resource}/status`)
@@ -102,6 +113,17 @@ export default {
             Repository.get(`${resource}/overview${filter}`)
                 .then((res) => {
                     resolve(res.data);
+                })
+                .catch((err) => {
+                    reject(err.response.data);
+                });
+        });
+    },
+    updateVehicleStatusById(id, data) {
+        return new Promise((resolve, reject) => {
+            Repository.patch(`${resource}/${id}/status`, data)
+                .then((res) => {
+                    resolve(res);
                 })
                 .catch((err) => {
                     reject(err.response.data);

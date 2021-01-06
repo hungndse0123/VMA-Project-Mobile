@@ -22,8 +22,11 @@ import AuthNavigator from './src/navigation/AuthNavigator';
 import DriverNavigator from './src/navigation/DriverNavigator';
 import SplashScreen from './src/screens/SplashScreen';
 import Role from './src/screens/Role';
-import { fcmService } from './src/services/FCMService'
-import { localNotificationService } from './src/services/LocalNotificationService'
+import { fcmService } from './src/services/FCMService';
+import { localNotificationService } from './src/services/LocalNotificationService';
+import Geolocation from '@react-native-community/geolocation';
+import firebase from "@react-native-firebase/app";
+import firestore from '@react-native-firebase/firestore';
 
 
 const Stack = createStackNavigator();
@@ -32,14 +35,38 @@ const { height } = Dimensions.get('window');
 const App = () => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [watchID, setWatchID] = useState(0);
   useEffect(() => {
-    fcmService.registerAppWithFCM()
-    fcmService.register(onRegister, onNotification, onOpenNotification)
-    localNotificationService.configure(onOpenNotification)
+    checkAuthState()
+      .then((user) => {
+        console.log("checkOnAuthStateChanged =>", user);
+        setUser(user);
+        fcmService.registerAppWithFCM()
+        fcmService.register(onRegister, onNotification, onOpenNotification)
+        localNotificationService.configure(onOpenNotification)
+        watchUserPosition(user.uid)
+        //watchUserPosition(user.uid)
+        setIsLoading(false);
+        // return () => {
+        //   console.log("[App] unRegister")
+        //   fcmService.unRegister()
+        //   localNotificationService.unregister()
+        //   Geolocation.clearWatch(watchID);
+        //   Geolocation.stopObserving();
+        //   console.log("position end!")
+        // }
+      })
+      .catch((error) => {
+        console.log(error);
+        setUser(null);
+        setIsLoading(false);
+      });
+
 
     function onRegister(token) {
       console.log("[App] onRegister: ", token)
       UserRepository.createClientRegistrationToken(token)
+
     }
 
     function onNotification(notify) {
@@ -61,28 +88,56 @@ const App = () => {
 
     function onOpenNotification(notify) {
       console.log("[App] onOpenNotification: ", notify)
-      alert("REQUEST" + notify.id + ": " + notify.notificationType)
+      //alert("REQUEST" + notify.id + ": " + notify.notificationType)
     }
 
     return () => {
       console.log("[App] unRegister")
       fcmService.unRegister()
       localNotificationService.unregister()
+      Geolocation.clearWatch(watchID);
+      Geolocation.stopObserving();
+      console.log("position end!")
     }
 
   }, [])
   LogBox.ignoreAllLogs();
-  checkAuthState()
-    .then((user) => {
-      console.log("checkOnAuthStateChanged =>", user);
-      setUser(user);
-      setIsLoading(false);
+
+  const watchUserPosition = (userid) => {
+    setWatchID(Geolocation.watchPosition(
+      async (position) => {
+        // this.setState({
+        //   newLatitude: position.coords.latitude,
+        //   newLongitude: position.coords.longitude,
+        //   error: null,
+        // });
+        await updateToFirebase(position.coords.latitude, position.coords.longitude, userid)
+        console.log("new position :" + position.coords.latitude + "," + position.coords.longitude)
+      },
+      (error) => console.log("watchUserPosition Error :" + JSON.stringify(error)),
+      //{ enableHighAccuracy: true, timeout: 20000, maximumAge: 1000, distanceFilter: 0.00001 },
+      { enableHighAccuracy: true, distanceFilter: 5 },
+    ))
+
+  }
+
+  const updateToFirebase = async (latitude, longitude, id) => {
+    //var currentMomentDate = moment().format("YYYY-MM-DD HH:mm:ss")
+    //console.log(contractId)
+    await firebase.firestore().collection("Users").doc(id).set({
+      //location: new firestore.GeoPoint(latitude, longitude)
+      lat: latitude,
+      long: longitude,
     })
-    .catch((error) => {
-      console.log(error);
-      setUser(null);
-      setIsLoading(false);
-    });
+      .then(() => {
+        console.log("Document successfully written!");
+        //setLocationstate("update location: " + latitude + " and " + longitude + " and " + id);
+
+      })
+      .catch((error) => {
+        console.error("Error writing document: ", error);
+      });
+  }
 
   const Loader = () => {
     return (

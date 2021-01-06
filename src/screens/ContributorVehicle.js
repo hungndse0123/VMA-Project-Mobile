@@ -395,7 +395,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                         </Block>
                                         <Block>
                                             <Text medium style={{ width: 90, marginLeft: 13 }}>
-                                                {item["vehicleTypeName"]}
+                                                {item["vehicleType"]["vehicleTypeName"]}
                                             </Text>
                                         </Block>
                                         <Block >{item["vehicleStatus"] === "AVAILABLE" ? (<Text color="green" medium style={[{ marginLeft: 25 }]}>

@@ -127,6 +127,7 @@ const TripsScreen = ({ navigation, route }) => {
     const [issuedvehicleid, setIssuedvehicleid] = useState('');
     const [vehicleId, setVehicleId] = useState('');
     const [vehicleStatusList, setVehicleStatusList] = useState([])
+    const [vehicle, setVehicle] = useState({});
     const isFocused = useIsFocused();
     useEffect(() => {
         console.log(tripList.length)
@@ -135,6 +136,7 @@ const TripsScreen = ({ navigation, route }) => {
             .then((user) => {
                 setUser(user);
                 initVehicleStatusList();
+                initvehicleid(user.uid)
                 setImage_Http_URL({ uri: user["photoURL"] });
                 setUsername(user["displayName"]);
                 init(user.uid)
@@ -215,6 +217,35 @@ const TripsScreen = ({ navigation, route }) => {
         setSelectedStatus("");
         setDepartureTime("");
         setDestinationTime("");
+    }
+    const initvehicleid = async (userId) => {
+        setIsLoading(true)
+        await VehicleRepository.getCurrentlyAssignedVehicleByDriverId(userId)
+            .then(async (response) => {
+                await VehicleRepository.getDetailVehicle(response.vehicleId)
+                    .then((response) => {
+                        response !== null ? setVehicle(response) : setVehicle({})
+
+                        // response["vehicleType"]["vehicleTypeName"] !== null ? setVehicleType(response["vehicleType"]["vehicleTypeName"]) : setVehicleType('')
+                        // response["brand"]["brandName"] !== null ? setBrandName(response["brand"]["brandName"]) : setBrandName('')
+                        // response["assignedDriver"]["userName"] !== null ? setDriverName(response["assignedDriver"]["userName"]) : setDriverName('')
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    })
+                // await DocumentRepository.getVehicleDocument(`?vehicleId=${response.vehicleId}&viewOption=1`)
+                //     .then((response) => {
+
+                //         response !== null ? setVehicleDocument(response) : setVehicleDocument([])
+                //     })
+                //     .catch((error) => {
+                //         console.log(error)
+                //     })
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        setIsLoading(false)
     }
     const initVehicleStatusList = async () => {
         setIsLoading(true)
@@ -405,7 +436,8 @@ const TripsScreen = ({ navigation, route }) => {
                                             contractVehicleId: item["contractVehicleId"],
                                             vehicleStatus: item["contractVehicleStatus"],
                                             vehicleId: vehicleId,
-                                            contractTrips: item["contractTrip"]
+                                            contractTrips: item["contractTrip"],
+                                            curVehicleStatus: vehicle["vehicleStatus"]
                                         })
                                         console.log(item["vehicleId"])
                                     }}

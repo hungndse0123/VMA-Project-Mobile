@@ -1,7 +1,7 @@
 const firebaseConfig = {
   apiKey: 'AIzaSyD-Zpk-VTrjdFFljLikPiCak3OJrh0JnLo',
   authDomain: "vma-fa20se28.firebaseapp.com",
-  databaseURL: "vma-fa20se28.firebaseio.com",
+  databaseURL: "vma-fa20se28.firebaseapp.com",
   projectId: "vma-fa20se28",
   messagingSenderId: "25758894581",
   storageBucket: "vma-fa20se28.appspot.com",

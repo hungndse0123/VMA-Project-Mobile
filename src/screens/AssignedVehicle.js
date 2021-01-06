@@ -142,53 +142,25 @@ const VehicleDetail = ({ navigation, route }) => {
         setIsLoading(true)
         await VehicleRepository.getCurrentlyAssignedVehicleByDriverId(userId)
             .then(async (response) => {
-                //console.log(response);
-                //const result = Object.entries(response);
-                //console.log(response["userId"]);
-                //console.log(result["userId"]);
-                // setDriver({
-                //     ...driver,
-                //     result
-                // })
                 await VehicleRepository.getDetailVehicle(response.vehicleId)
                     .then((response) => {
-                        //console.log(response);
-                        //const result = Object.entries(response);
-                        //console.log(response["userId"]);
-                        //console.log(result["userId"]);
-                        // setDriver({
-                        //     ...driver,
-                        //     result
-                        // })
+                        response !== null ? setVehicle(response) : setVehicle({})
 
-                        setVehicle(response);
-                        setVehicleType(response["vehicleType"]["vehicleTypeName"])
-                        setBrandName(response["brand"]["brandName"])
-                        setDriverName(response["assignedDriver"]["userName"])
+                        response["vehicleType"]["vehicleTypeName"] !== null ? setVehicleType(response["vehicleType"]["vehicleTypeName"]) : setVehicleType('')
+                        response["brand"]["brandName"] !== null ? setBrandName(response["brand"]["brandName"]) : setBrandName('')
+                        response["assignedDriver"]["userName"] !== null ? setDriverName(response["assignedDriver"]["userName"]) : setDriverName('')
                     })
                     .catch((error) => {
                         console.log(error)
                     })
-                await DocumentRepository.getVehicleDocument(`?vehicleId=${response.vehicleId}`)
+                await DocumentRepository.getVehicleDocument(`?vehicleId=${response.vehicleId}&viewOption=1`)
                     .then((response) => {
-                        //console.log(response);
-                        //const result = Object.entries(response);
-                        //console.log(response["userId"]);
-                        //console.log(result["userId"]);
-                        // setDriver({
-                        //     ...driver,
-                        //     result
-                        // })
 
-                        setVehicleDocument(response)
+                        response !== null ? setVehicleDocument(response) : setVehicleDocument([])
                     })
                     .catch((error) => {
                         console.log(error)
                     })
-                // setVehicle(response);
-                // setVehicleType(response["vehicleType"]["vehicleTypeName"])
-                // setBrandName(response["brand"]["brandName"])
-                // setDriverName(response["assignedDriver"]["userName"])
             })
             .catch((error) => {
                 console.log(error)
@@ -199,14 +171,7 @@ const VehicleDetail = ({ navigation, route }) => {
         setIsLoading(true)
         await VehicleRepository.getDetailVehicle(itemId)
             .then((response) => {
-                //console.log(response);
                 const result = Object.entries(response);
-                //console.log(response["userId"]);
-                //console.log(result["userId"]);
-                // setDriver({
-                //     ...driver,
-                //     result
-                // })
                 setVehicle(response);
                 setVehicleType(response["vehicleType"]["vehicleTypeName"])
                 setBrandName(response["brand"]["brandName"])
@@ -216,6 +181,21 @@ const VehicleDetail = ({ navigation, route }) => {
                 console.log(error)
             })
         setIsLoading(false)
+    }
+    const initdummy = () => {
+
+        //console.log(response);
+        //const result = Object.entries(response);
+        //console.log(response["userId"]);
+        //console.log(result["userId"]);
+        // setDriver({
+        //     ...driver,
+        //     result
+        // })
+        // setVehicle(response);
+        // setVehicleType(response["vehicleType"]["vehicleTypeName"])
+        // setBrandName(response["brand"]["brandName"])
+        // setDriverName(response["assignedDriver"]["userName"])
     }
     //const [contributor, setContributor] = useState(null);
 
@@ -385,7 +365,7 @@ const VehicleDetail = ({ navigation, route }) => {
                                                     </Block>
                                                     <Block row>
                                                         <Block column>
-                                                            <Text style={{ marginLeft: 10 }} color="black3">Document ID: {item["vehicleDocumentId"]}</Text>
+                                                            <Text style={{ marginLeft: 10 }} color="black3">Document Number: {item["vehicleDocumentNumber"]}</Text>
                                                             <Text style={{ marginLeft: 10 }} color="black3">Registered Location: {item["registeredLocation"]}</Text>
                                                             <Text style={{ marginLeft: 10 }} color="black3">Registered Date: {item["registeredDate"]}</Text>
                                                             <Text style={{ marginLeft: 10 }} color="black3">Expiry Date: {item["expiryDate"]}</Text>

@@ -19,6 +19,10 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { ThemeProvider } from '@react-navigation/native';
 import * as theme from '../constants/theme';
 import Loader from '../components/Loader';
+import Geolocation from '@react-native-community/geolocation';
+import firebase from "@react-native-firebase/app";
+import firestore from '@react-native-firebase/firestore';
+import { signOutUser, getCurrentUser } from "../services/FireAuthHelper";
 
 const { height } = Dimensions.get('window');
 
@@ -30,6 +34,14 @@ class Register extends Component {
   }
   componentDidMount() {
     this.getRole()
+    // getCurrentUser()
+    //   .then((user) => {
+    //     this.watchUserPosition(user.uid)
+    //   })
+    //   .catch((error) => {
+    //     //setUser(null);
+    //     console.log(error);
+    //   });
     //console.log(JSON.stringify(this.state.role))
 
   }
@@ -64,6 +76,8 @@ class Register extends Component {
     // id === 'driver' ? this.storeRole('DRIVER') : this.storeRole('CONTRIBUTOR');
     id === 'driver' ? this.props.navigation.navigate('Driver') : this.props.navigation.navigate('Contributor');
   }
+
+
 
   render() {
     const { navigation } = this.props;

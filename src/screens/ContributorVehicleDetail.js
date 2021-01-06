@@ -149,15 +149,15 @@ const VehicleDetail = ({ navigation, route }) => {
                 //     ...driver,
                 //     result
                 // })
-                setVehicle(response);
-                setVehicleType(response["vehicleType"]["vehicleTypeName"])
-                setBrandName(response["brand"]["brandName"])
-                setDriverName(response["assignedDriver"]["userName"])
+                response !== null ? setVehicle(response) : setVehicle({});
+                response["vehicleType"]["vehicleTypeName"] !== null ? setVehicleType(response["vehicleType"]["vehicleTypeName"]) : setVehicleType('')
+                response["brand"]["brandName"] !== null ? setBrandName(response["brand"]["brandName"]) : setBrandName('')
+                response["assignedDriver"]["userName"] !== null ? setDriverName(response["assignedDriver"]["userName"]) : setDriverName('')
             })
             .catch((error) => {
                 console.log(error)
             })
-        await DocumentRepository.getVehicleDocument(`?vehicleId=${itemId}`)
+        await DocumentRepository.getVehicleDocument(`?vehicleId=${itemId}&viewOption=1`)
             .then((response) => {
                 //console.log(response);
                 //const result = Object.entries(response);
@@ -168,7 +168,7 @@ const VehicleDetail = ({ navigation, route }) => {
                 //     result
                 // })
 
-                setVehicleDocument(response)
+                response !== null ? setVehicleDocument(response) : setVehicleDocument([])
             })
             .catch((error) => {
                 console.log(error)
@@ -342,7 +342,7 @@ const VehicleDetail = ({ navigation, route }) => {
                                                     </Block>
                                                     <Block row>
                                                         <Block column>
-                                                            <Text style={{ marginLeft: 10 }} color="black3">Document ID: {item["vehicleDocumentId"]}</Text>
+                                                            <Text style={{ marginLeft: 10 }} color="black3">Document number: {item["vehicleDocumentNumber"]}</Text>
                                                             <Text style={{ marginLeft: 10 }} color="black3">Registered Location: {item["registeredLocation"]}</Text>
                                                             <Text style={{ marginLeft: 10 }} color="black3">Registered Date: {item["registeredDate"]}</Text>
                                                             <Text style={{ marginLeft: 10 }} color="black3">Expiry Date: {item["expiryDate"]}</Text>

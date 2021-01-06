@@ -17,6 +17,7 @@ import * as theme from '../constants/theme';
 import Auth from "@react-native-firebase/auth";
 import Header from "../components/Header";
 import ImageViewer from 'react-native-image-zoom-viewer';
+import Geolocation from '@react-native-community/geolocation';
 
 const ProfileScreen = ({ navigation, route }) => {
     const styles = StyleSheet.create({
@@ -99,6 +100,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const signOut = () => {
         signOutUser()
             .then(() => {
+                //Geolocation.stopObserving();
                 updateStatus(user.uid);
                 BackHandler.exitApp();
             })

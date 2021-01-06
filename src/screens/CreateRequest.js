@@ -101,6 +101,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [requestType, setRequestType] = useState('');
     const [frontImgUri, setFrontImgUri] = useState('');
     const [backImgUri, setBackImgUri] = useState('');
+    const [userDocumentNumber, setUserDocumentNumber] = useState('');
     const [userDocumentId, setUserDocumentId] = useState('');
     const [registeredLocation, setRegisteredLocation] = useState('');
     const [userDocumentType, setUserDocumentType] = useState('');
@@ -177,8 +178,8 @@ const ProfileScreen = ({ navigation, route }) => {
                 for (let i = 0; i < result.length; i++)
                     setUserDocumentList(prevArray => [
                         ...prevArray, {
-                            label: `${result[i]["userDocumentType"]}-${result[i]["userDocumentId"]}`,
-                            value: result[i]["userDocumentId"]
+                            label: `${result[i]["userDocumentType"]}-${result[i]["userDocumentNumber"]}`,
+                            value: result[i]["userDocumentNumber"]
                         }
                     ])
             })
@@ -201,7 +202,8 @@ const ProfileScreen = ({ navigation, route }) => {
                 setBackImgId(response["userDocumentImages"][1]["userDocumentImageId"])
                 setUserDocumentType(response["userDocumentType"])
                 setExpiryDate(response["expiryDate"])
-                setUserDocumentId(id)
+                setUserDocumentId(JSON.stringify(response["userDocumentId"]))
+                setUserDocumentNumber(id)
                 setRegisteredLocation(response["registeredLocation"])
                 setRegisteredDate(response["registeredDate"])
                 setOtherInformation(response["otherInformation"])
@@ -253,11 +255,12 @@ const ProfileScreen = ({ navigation, route }) => {
                 ],
                 registeredDate: registeredDate,
                 registeredLocation: registeredLocation.trim(),
-                userDocumentId: userDocumentId.trim(),
+                userDocumentNumber: userDocumentNumber.trim(),
+                userDocumentId: 0,
                 userDocumentType: userDocumentType,
             }
         }
-        RequestRepository.createUserDocumentRequests(requests)
+        await RequestRepository.createUserDocumentRequests(requests)
             .then((response) => {
                 console.log(response.status)
                 Alert.alert(
@@ -320,12 +323,13 @@ const ProfileScreen = ({ navigation, route }) => {
                 ],
                 registeredDate: registeredDate,
                 registeredLocation: registeredLocation.trim(),
+                userDocumentNumber: userDocumentNumber,
                 userDocumentId: userDocumentId,
                 userDocumentType: userDocumentType,
             }
         }
         console.log(JSON.stringify(requests))
-        RequestRepository.createUserDocumentRequests(requests)
+        await RequestRepository.createUserDocumentRequests(requests)
             .then((response) => {
                 console.log(response.status)
                 Alert.alert(
@@ -365,6 +369,7 @@ const ProfileScreen = ({ navigation, route }) => {
         setBackImgUri('')
         setUserDocumentType(documentTypes[0]["value"])
         setExpiryDate('')
+        setUserDocumentNumber('')
         setUserDocumentId('')
         setRegisteredLocation(cityData[0]["value"])
         setRegisteredDate('')
@@ -381,10 +386,10 @@ const ProfileScreen = ({ navigation, route }) => {
             description: description.trim(),
             requestType: requestType,
             userDocumentReq: {
-                userDocumentId: selectedDocument
+                userDocumentId: userDocumentId
             }
         }
-        RequestRepository.createUserDocumentRequests(requests)
+        await RequestRepository.createUserDocumentRequests(requests)
             .then((response) => {
                 console.log(response.status)
                 Alert.alert(
@@ -403,7 +408,7 @@ const ProfileScreen = ({ navigation, route }) => {
             .catch((error) => {
                 Alert.alert(
                     'Error',
-                    JSON.stringify(error["debugMessage"]),
+                    'deleteRequest:' + JSON.stringify(error["debugMessage"]),
                     [
                         {
                             text: 'Cancel',
@@ -424,7 +429,7 @@ const ProfileScreen = ({ navigation, route }) => {
             description: description,
             requestType: requestType,
         }
-        RequestRepository.createChangeVehicleRequests(requests)
+        await RequestRepository.createChangeVehicleRequests(requests)
             .then((response) => {
                 console.log(response.status)
                 Alert.alert(
@@ -793,7 +798,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const validateCreateRequest = () => {
         var exDate = new Date(expiryDate.replace(/-/g, '/'));
         var regDate = new Date(registeredDate.replace(/-/g, '/'));
-        userDocumentId.length < 9 || userDocumentId.length > 12 ? setIsfiled1err(true) : setIsfiled1err(false)
+        userDocumentNumber.length < 9 || userDocumentNumber.length > 12 ? setIsfiled1err(true) : setIsfiled1err(false)
         registeredLocation.length < 1 || registeredLocation.length > 100 ? setIsfiled2err(true) : setIsfiled2err(false)
         userDocumentType === '' ? setIsfiled3err(true) : setIsfiled3err(false)
         checkdocumentTypes.indexOf(userDocumentType) > -1 ? setIsfiled10err(true) : setIsfiled10err(false)
@@ -802,7 +807,7 @@ const ProfileScreen = ({ navigation, route }) => {
         exDate < regDate ? setIsfiled5err2(true) : setIsfiled5err2(false)
         frontImgUri === '' ? setIsfiled6err(true) : setIsfiled6err(false)
         backImgUri === '' ? setIsfiled7err(true) : setIsfiled7err(false)
-        otherInformation.length < 1 || otherInformation.length > 50 ? setIsfiled8err(true) : setIsfiled8err(false)
+        //otherInformation.length < 1 || otherInformation.length > 50 ? setIsfiled8err(true) : setIsfiled8err(false)
         description.length < 1 || description.length > 100 ? setIsfiled9err(true) : setIsfiled9err(false)
         console.log(JSON.stringify(checkdocumentTypes))
     }
@@ -815,7 +820,7 @@ const ProfileScreen = ({ navigation, route }) => {
         exDate < regDate ? setIsfiled13err2(true) : setIsfiled13err2(false)
         frontImgUri === '' ? setIsfiled14err(true) : setIsfiled14err(false)
         backImgUri === '' ? setIsfiled15err(true) : setIsfiled15err(false)
-        otherInformation.length < 1 || otherInformation.length > 50 ? setIsfiled16err(true) : setIsfiled16err(false)
+        //otherInformation.length < 1 || otherInformation.length > 50 ? setIsfiled16err(true) : setIsfiled16err(false)
         description.length < 1 || description.length > 100 ? setIsfiled17err(true) : setIsfiled17err(false)
 
     }
@@ -830,7 +835,7 @@ const ProfileScreen = ({ navigation, route }) => {
             (exDate > regDate) &&
             (frontImgUri !== '') &&
             (backImgUri !== '') &&
-            (otherInformation.length >= 1 && otherInformation.length <= 50) &&
+            //(otherInformation.length >= 1 && otherInformation.length <= 50) &&
             (description.length >= 1 && description.length <= 100)) {
             updateRequest()
             // Alert.alert(
@@ -853,7 +858,7 @@ const ProfileScreen = ({ navigation, route }) => {
         var exDate = new Date(expiryDate.replace(/-/g, '/'));
         var regDate = new Date(registeredDate.replace(/-/g, '/'));
         validateCreateRequest()
-        if ((userDocumentId.length >= 9 && userDocumentId.length <= 12) &&
+        if ((userDocumentNumber.length >= 9 && userDocumentNumber.length <= 12) &&
             (registeredLocation.length >= 1 && registeredLocation.length <= 100) &&
             (userDocumentType !== '') &&
             checkdocumentTypes.indexOf(userDocumentType) === -1 &&
@@ -862,7 +867,7 @@ const ProfileScreen = ({ navigation, route }) => {
             (exDate > regDate) &&
             (frontImgUri !== '') &&
             (backImgUri !== '') &&
-            (otherInformation.length >= 1 && otherInformation.length <= 50) &&
+            // (otherInformation.length >= 1 && otherInformation.length <= 50) &&
             (description.length >= 1 && description.length <= 100)) {
             createRequest()
             // Alert.alert(
@@ -933,8 +938,8 @@ const ProfileScreen = ({ navigation, route }) => {
                                 maxLength={20}
                                 label="Document ID"
                                 style={{ marginBottom: 15 }}
-                                value={userDocumentId}
-                                onChangeText={text => setUserDocumentId(text)}
+                                value={userDocumentNumber}
+                                onChangeText={text => setUserDocumentNumber(text)}
                             />
                             {
                                 isfiled1err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
@@ -1114,25 +1119,26 @@ const ProfileScreen = ({ navigation, route }) => {
                                 isfiled8err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
                                     Other information must be from 1 - 50 characters
                                 </Text>) : (<></>)} */}
-                            <Block>
-                                <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left" }}>
-                                    Other information (Class)
+                            {userDocumentType === "DRIVING_LICENSE" ? (<>
+                                <Block>
+                                    <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left" }}>
+                                        Other information (Class)
                                 </Text>
-                                <DropDownPicker
-                                    items={otherinfoData}
-                                    defaultValue={otherInformation}
-                                    itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
-                                    placeholder="Select class"
-                                    containerStyle={{ height: 40, width: width - 50, marginBottom: 15 }}
-                                    onChangeItem={item => setOtherInformation(item.value)}
-                                />
-                                {
-                                    isfiled8err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
-                                        Must select class
-                                    </Text>) : (<></>)}
+                                    <DropDownPicker
+                                        items={otherinfoData}
+                                        defaultValue={otherInformation}
+                                        itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
+                                        placeholder="Select class"
+                                        containerStyle={{ height: 40, width: width - 50, marginBottom: 15 }}
+                                        onChangeItem={item => setOtherInformation(item.value)}
+                                    />
+                                    {
+                                        isfiled8err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                            Must select class
+                                        </Text>) : (<></>)}
 
-                            </Block>
-
+                                </Block>
+                            </>) : (<></>)}
 
                             <Input
                                 multiline={true}
@@ -1189,8 +1195,8 @@ const ProfileScreen = ({ navigation, route }) => {
                                     //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
                                     placeholder="Select document"
                                     defaultValue={selectedDocument}
-                                    containerStyle={{ height: 40, width: 250, marginBottom: 25 }}
-                                    onChangeItem={item => setSelectedDocument(item.value)}
+                                    containerStyle={{ height: 40, width: 250, marginBottom: 100 }}
+                                    onChangeItem={item => { initdocument(item.value) }}
                                 />
                                 {selectedDocument !== '' ? (<>
                                     <Input
@@ -1212,7 +1218,7 @@ const ProfileScreen = ({ navigation, route }) => {
                                             <Block row center>
                                                 <Text color="white" >
                                                     Send Request
-                                            </Text>
+                                                </Text>
                                             </Block>
                                         </Button>
                                         <Button center style={styles.margin, { marginBottom: 10, width: width - 200, marginHorizontal: 10 }} onPress={() => {
@@ -1243,18 +1249,18 @@ const ProfileScreen = ({ navigation, route }) => {
                                     //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
                                     placeholder="Select document"
                                     defaultValue={selectedDocument}
-                                    containerStyle={{ height: 40, width: 250, marginBottom: 25 }}
+                                    containerStyle={{ height: 40, width: 250, marginBottom: 80 }}
                                     onChangeItem={item => { initdocument(item.value) }}
                                 />
                                 {selectedDocument !== '' ? (<>
                                     <Input
                                         full
                                         editable={false}
-                                        label="Document ID"
+                                        label="Document Number"
                                         maxLength={20}
                                         style={{ marginBottom: 15 }}
-                                        value={userDocumentId}
-                                        onChangeText={text => setUserDocumentId(text)}
+                                        value={userDocumentNumber}
+                                        onChangeText={text => setUserDocumentNumber(text)}
                                     />
                                     <Input
                                         multiline={true}
@@ -1401,24 +1407,27 @@ const ProfileScreen = ({ navigation, route }) => {
                                         </TouchableWithoutFeedback>
 
                                     </Block>
-                                    <Block>
-                                        <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left" }}>
-                                            Document class
+                                    {userDocumentType === "DRIVING_LICENSE" ? (<>
+                                        <Block>
+                                            <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left" }}>
+                                                Document class
                                 </Text>
-                                        <DropDownPicker
-                                            items={otherinfoData}
-                                            defaultValue={otherInformation}
-                                            itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
-                                            placeholder="Select class"
-                                            containerStyle={{ height: 40, width: width - 50, marginBottom: 15 }}
-                                            onChangeItem={item => setOtherInformation(item.value)}
-                                        />
-                                        {
-                                            isfiled16err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
-                                                Must select class
-                                            </Text>) : (<></>)}
+                                            <DropDownPicker
+                                                items={otherinfoData}
+                                                defaultValue={otherInformation}
+                                                itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
+                                                placeholder="Select class"
+                                                containerStyle={{ height: 40, width: width - 50, marginBottom: 15 }}
+                                                onChangeItem={item => setOtherInformation(item.value)}
+                                            />
+                                            {
+                                                isfiled16err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                                    Must select class
+                                                </Text>) : (<></>)}
 
-                                    </Block>
+                                        </Block>
+                                    </>) : (<></>)}
+
                                     {/* <Input
                                         multiline={true}
                                         full

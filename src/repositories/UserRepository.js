@@ -42,18 +42,18 @@ export default {
 
     });
   },
-  createClientRegistrationToken(token) {
+  createClientRegistrationToken(regtoken) {
     return new Promise((resolve, reject) => {
       var token = '';
       firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
           //console.log(user); // It shows the Firebase user
           //console.log(firebase.auth().user); // It is still undefined
-          user.getIdToken().then(function (idToken) {  // <------ Check this line
-            token = idToken;
+          user.getIdToken().then(function (token) {  // <------ Check this line
+            token = token;
             Repository.post(`${resource}/registration-token`, {
-              token: token
-            })
+              token: regtoken
+            }, { headers: { Authorization: `Bearer ${token}` } })
               .then((res) => {
                 resolve(res);
                 console.log("Create token done")

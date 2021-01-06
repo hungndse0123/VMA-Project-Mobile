@@ -34,7 +34,7 @@ export default function Header({ navigation, title }) {
       <TouchableOpacity onPress={() => {
 
       }}>
-        <Icon2 name="bell" color="black" size={30} style={styles.right, { padding: 5 }} />
+        <Icon2 name="bell" size={30} style={styles.right, { padding: 5, opacity: 0 }} />
       </TouchableOpacity>
 
     </View>

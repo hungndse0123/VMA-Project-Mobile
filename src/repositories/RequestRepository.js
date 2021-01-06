@@ -104,6 +104,30 @@ export default {
 
         });
     },
+    reportIssueInVehicle(requests) {
+        return new Promise((resolve, reject) => {
+            var token = '';
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    //console.log(user); // It shows the Firebase user
+                    //console.log(firebase.auth().user); // It is still undefined
+                    user.getIdToken().then(function (idToken) {  // <------ Check this line
+                        token = idToken;
+                        Repository.post(`${resource}/vehicles/issue`, requests, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        })
+                            .then((res) => {
+                                resolve(res);
+                            })
+                            .catch((err) => {
+                                reject(err.response.data);
+                            });
+                    });
+                }
+            });
+
+        });
+    },
     getRecentRequest(filter) {
         return new Promise((resolve, reject) => {
             Repository.get(`${resource}${filter}`)

@@ -111,6 +111,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [description, setDescription] = useState('');
     const [request, setRequest] = useState({});
     const [brandList, setBrandList] = useState([]);
+    const [seatList, setSeatList] = useState([]);
     const [vehicleDocumentTypeList, setVehicleDocumentTypeList] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState(1);
     const [vehicletypeList, setVehicleTypeList] = useState([]);
@@ -159,6 +160,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 setUser(user);
                 // init(user.uid);
                 initbrand();
+                initseats();
                 initvehicletype();
                 initvehicledocumenttype();
                 initvehicle(user.uid);
@@ -241,6 +243,26 @@ const ProfileScreen = ({ navigation, route }) => {
             })
         setIsLoading(false)
     }
+    const initseats = async () => {
+        setIsLoading(true)
+        await VehicleRepository.getVehicleSeats()
+            .then((response) => {
+                //console.log(response);
+                const result = Object.values(response);
+                //console.log(result);
+                for (let i = 0; i < result.length; i++)
+                    setSeatList(prevArray => [
+                        ...prevArray, {
+                            label: JSON.stringify(result[i]["seats"]),
+                            value: result[i]["seatsId"]
+                        }
+                    ])
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        setIsLoading(false)
+    }
     const addVehiceDocument = async () => {
         setIsLoading(true)
         let urlf = await FirebaseRepository.uploadImageToFirebase(frontImgUri, requestType + "_DOCUMENT_FRONT", user.uid)
@@ -254,7 +276,8 @@ const ProfileScreen = ({ navigation, route }) => {
                 ],
                 registeredDate: registeredDate,
                 registeredLocation: registeredLocation.trim(),
-                vehicleDocumentId: vehicleDocumentId.trim(),
+                vehicleDocumentId: 0,
+                vehicleDocumentNumber: vehicleDocumentId.trim(),
                 vehicleDocumentType: vehicleDocumentType,
             }
         ])
@@ -284,7 +307,7 @@ const ProfileScreen = ({ navigation, route }) => {
         setModel('')
         setOrigin('')
         setYearOfManufacture('')
-        setSeats('')
+        setSeats(seatList[0]["value"])
         setDistanceDriven('')
         setDescription('')
         setStartDate('')
@@ -363,7 +386,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 model: model.trim(),
                 origin: origin.trim(),
                 ownerId: user.uid,
-                seats: parseInt(seats),
+                seatsId: parseInt(seats),
                 //seats: 6,
                 vehicleDocuments: vehicleDocumentList,
                 vehicleId: vehicleNumber.trim(),
@@ -490,6 +513,7 @@ const ProfileScreen = ({ navigation, route }) => {
     const [isfiled23err, setIsfiled23err] = useState(false)
     const [isfiled24err, setIsfiled24err] = useState(false)
     const [isfiled25err, setIsfiled25err] = useState(false)
+    const [isfiled26err, setIsfiled26err] = useState(false)
 
     const [existeddoclist, setExisteddoclist] = useState([])
     const [visibleCountryPicker, setVisibleCountryPicker] = useState(false)
@@ -758,16 +782,16 @@ const ProfileScreen = ({ navigation, route }) => {
         chassisNumber.length !== 17 ? setIsfiled5err(true) : setIsfiled5err(false)
         engineNumber.length !== 12 ? setIsfiled6err(true) : setIsfiled6err(false)
         model.length < 1 || model.length > 30 ? setIsfiled7err(true) : setIsfiled7err(false)
-        origin === 91 ? setIsfiled8err(true) : setIsfiled8err(false)
+        origin === '' ? setIsfiled8err(true) : setIsfiled8err(false)
         JSON.stringify(yearOfManufacture).length !== 6 ? setIsfiled9err(true) : setIsfiled9err(false)
-        seats === 0 ? setIsfiled10err(true) : setIsfiled10err(false)
-        distanceDriven === 0 ? setIsfiled11err(true) : setIsfiled11err(false)
+        seats === '' ? setIsfiled10err(true) : setIsfiled10err(false)
+        distanceDriven === '' ? setIsfiled11err(true) : setIsfiled11err(false)
         startDate === '' ? setIsfiled12err(true) : setIsfiled12err(false)
         endDate === '' ? setIsfiled13err(true) : setIsfiled13err(false)
         fromDate > toDate ? setIsfiled14err(true) : setIsfiled14err(false)
-        value === 0 ? setIsfiled15err(true) : setIsfiled15err(false)
+        value === '' ? setIsfiled15err(true) : setIsfiled15err(false)
         description.length < 1 || description.length > 100 ? setIsfiled16err(true) : setIsfiled16err(false)
-
+        //vehicleDocumentList.length !== 2 ? setIsfiled26err(true) : setIsfiled26err(false)
     }
     const validateCreateDocument = () => {
         var fromDate = new Date(registeredDate.replace(/-/g, '/'));
@@ -795,15 +819,16 @@ const ProfileScreen = ({ navigation, route }) => {
             (chassisNumber.length === 17) &&
             (engineNumber.length === 12) &&
             (model.length >= 1 && model.length <= 30) &&
-            (origin !== 91) &&
+            (origin !== '') &&
             (JSON.stringify(yearOfManufacture).length === 6) &&
-            (seats !== 0) &&
-            (distanceDriven !== 0) &&
+            (seats !== '') &&
+            (distanceDriven !== '') &&
             (startDate !== '') &&
             (endDate !== '') &&
             (fromDate <= toDate) &&
-            (value !== 0) &&
+            (value !== '') &&
             (description.length >= 1 && description.length <= 100)
+            //(vehicleDocumentList.length === 2)
         ) {
             createRequest()
             // Alert.alert(
@@ -1035,17 +1060,35 @@ const ProfileScreen = ({ navigation, route }) => {
                                 isfiled9err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
                                     Year Of Manufacture must be 4 characters
                                 </Text>) : (<></>)}
-                            <Input
+                            {/* <Input
                                 number
                                 label="Number of seats"
                                 style={{ marginBottom: 15, width: width - 50 }}
                                 value={seats}
                                 onChangeText={text => setSeats(text)}
-                            />
-                            {
-                                isfiled10err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
-                                    Number of seats is required
-                                </Text>) : (<></>)}
+                            /> */}
+                            <Block>
+                                <Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", marginBottom: 5 }}>
+                                    Number of seats
+                                </Text>
+                                <DropDownPicker
+                                    items={seatList}
+                                    //itemStyle={{ alignItems: 'flex-start|flex-end|center' }}
+                                    placeholder="Select seats"
+                                    defaultValue={seats}
+                                    containerStyle={{ height: 40, width: width - 50, marginBottom: 25 }}
+                                    onChangeItem={item => {
+                                        //setDistanceDriven(item.value)
+                                        setSeats(item.value)
+                                        //initdocument(item.value)
+                                    }}
+                                />
+                                {
+                                    isfiled10err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Number of seats is required
+                                    </Text>) : (<></>)}
+                            </Block>
+
                             <Input
                                 numeric
                                 number
@@ -1129,6 +1172,10 @@ const ProfileScreen = ({ navigation, route }) => {
                         </Card>
                         <Card column middle style={styles.margin, { marginHorizontal: 10, marginTop: 40, }} title="Vehicle Documents">
                             <Block column center style={{ marginTop: 10 }}>
+                                {
+                                    isfiled26err ? (<Text caption medium style={{ textTransform: 'uppercase', textAlign: "left", color: "red", marginBottom: 10 }}>
+                                        Must contain all document type!!
+                                    </Text>) : (<></>)}
                                 <Button full center style={styles.margin, { marginBottom: 10 }} onPress={() => {
                                     setIsDocumentVisible(!isDocumentVisible)
                                     //initPassengerList()

@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "25758894581-gf39c3bbmul2sdchsrbsc456aivrhbtf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.velocityapp",
+            "certificate_hash": "eaa6acc10e2436b2b0c71227ab590a6a535d0a6b"
+          }
+        },
+        {
+          "client_id": "25758894581-ogo6ircjuetb21fmt0r7i36b4qdkfuj0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.velocityapp",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
           "client_id": "25758894581-n3bp69p6s7fr7m33oas8juvs4bnv2bbk.apps.googleusercontent.com",
           "client_type": 3
         }
